@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ OAI4Solr exposes your Solr indexes using an OAI2 protocol handler.
+  ~
+  ~     Copyright (C) 2011  International Institute of Social History
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2002-08-11T07:21:33Z</responseDate>
+    <request verb="ListSets">http://api.iisg.nl/solr/all/oai</request>
+
+    <ListSets>
+        <set>
+            <setSpec>iisg_marcxml</setSpec>
+            <setName>Catalog</setName>
+        </set>
+        <set>
+            <setSpec>iish.archieven.1</setSpec>
+            <setName>Archives</setName>
+        </set>
+        <set>
+            <setSpec>iish.eci.1</setSpec>
+            <setName>Audio and visual material</setName>
+        </set>
+
+        <set>
+            <setSpec>ahm.afbeeldingen.1</setSpec>
+            <setName>Amsterdam Historisch Museum</setName>
+        </set>
+        <set>
+            <setSpec>aletta.afbeeldingen.1</setSpec>
+            <setName>Stichting Aletta</setName>
+        </set>
+        <set>
+            <setSpec>aletta.archieven.1</setSpec>
+            <setName>Stichting Aletta</setName>
+        </set>
+        <set>
+            <setSpec>aletta.bibliotheek.1</setSpec>
+            <setName>Stichting Aletta</setName>
+        </set>
+        <set>
+            <setSpec>aletta.verhalen.1</setSpec>
+            <setName>Stichting Aletta</setName>
+        </set>
+        <set>
+            <setSpec>continium.afbeeldingen.1</setSpec>
+            <setName>Continium</setName>
+        </set>
+        <set>
+            <setSpec>diep.afbeeldingen.1</setSpec>
+            <setName>Diep</setName>
+        </set>
+        <set>
+            <setSpec>diep.archieven.1</setSpec>
+            <setName>Diep</setName>
+        </set>
+        <set>
+            <setSpec>eemland.afbeeldingen.1a</setSpec>
+            <setName>Eemland</setName>
+        </set>
+        <set>
+            <setSpec>eemland.afbeeldingen.1b</setSpec>
+            <setName>Eemland</setName>
+        </set>
+        <set>
+            <setSpec>eemland.archieven.1</setSpec>
+            <setName>Eemland</setName>
+        </set>
+        <set>
+            <setSpec>gar.afbeeldingen.1</setSpec>
+            <setName>Gemeentearchief Rotterdam</setName>
+        </set>
+        <set>
+            <setSpec>gar.archieven.1</setSpec>
+            <setName>Gemeentearchief Rotterdam</setName>
+        </set>
+        <set>
+            <setSpec>harderwijk.afbeeldingen.1</setSpec>
+            <setName>Harderwijk</setName>
+        </set>
+        <set>
+            <setSpec>hbm.afbeeldingen.1</setSpec>
+            <setName>Hbm</setName>
+        </set>
+        <set>
+            <setSpec>hmr.afbeeldingen.1</setSpec>
+            <setName>Hbm</setName>
+        </set>
+        <set><setSpec>limburgsmuseum.afbeeldingen.1</setSpec>limburgsmuseum
+            <setName></setName>
+        </set>
+        <set>
+            <setSpec>muma.afbeeldingen.1</setSpec>
+            <setName>muma</setName>
+        </set>
+        <set>
+            <setSpec>na.archieven.1</setSpec>
+            <setName>Nationaal Archief</setName>
+        </set>
+        <set>
+            <setSpec>openlucht.afbeeldingen.1</setSpec>
+            <setName>Openlucht</setName>
+        </set>
+        <set>
+            <setSpec>ral.afbeeldingen.1</setSpec>
+            <setName>Ral</setName>
+        </set>
+        <set>
+            <setSpec>ran.afbeeldingen.1</setSpec>
+            <setName>Ral</setName>
+        </set>
+        <set>
+            <setSpec>ran.turksecollectie.1</setSpec>
+            <setName>turksecollectie</setName>
+        </set>
+        <set>
+            <setSpec>saa.archieven.1</setSpec>
+            <setName>ssa</setName>
+        </set>
+        <set>
+            <setSpec>zeeuwsarchief.afbeeldingen.1</setSpec>
+            <setName>zeeuwsarchief</setName>
+        </set>
+        <set>
+            <setSpec>zeeuwsebibliotheek.afbeeldingen.1</setSpec>
+            <setName>zeeuwsebibliotheek</setName>
+        </set>
+    </ListSets>
+</OAI-PMH>
+
+
