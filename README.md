@@ -1,18 +1,18 @@
-=This is a OAI2 library plugin for Solr
+#This is a OAI2 library plugin for Solr
 
-==What is it ?
+##What is it ?
 A plugin that exposed your Solr indexes with the OAI2 protocol.
 
-==How it works
+##How it works
 You can use simple xslt and a few mappings to expose your index, regardless of your
 solr schema. If can be used for single and multicore instances.
 
-==The metadataSchema
+##The metadataSchema
 The ListMetadataPrefix.xml contains your schema definitions. By
 convention, at startup the Oai4Solr plugin  will look for a corresponding
  XSLT document in the oai folder and load it.
 
-==ListSets
+##ListSets
 ListSets are not constructed dynamically from facets. Rather, they are
 declared in the file ListSets.xml. For example like:
 <code><ListSets>
@@ -24,7 +24,7 @@ declared in the file ListSets.xml. For example like:
 
 You specify the index field for sets in the "field_index_set" field below.
 
-==Mapping your schema
+##Mapping your schema
 Each Solr schema can be different from another. To map your Solr
  documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, etc,
  you need to make an XSLT document. Each schema needs a document.
@@ -34,21 +34,21 @@ and just datadump it ( see the marc.xsl as an example ). In other you need
  to map individual stored Solr fields to the schema you want to expose ( see
  oai_dc.xml where such a mapping takes place).
 
-==Configuration
+##Configuration
 In the solrconfig.xml add a requestHandler. In that section you map
 OAI parameters to your schema's identifier and datestamps index fields.
 Further more you can add the metadataPrefici you support and set paging.
 
-==The oai folder
+##The oai folder
 For each metadataPrefix you need an associated xslt document that must be
 placed in a "oai" folder. There are sample xslt documents already
 in the folder of this distribution.
 
-==Non dynamic documents
+##Non dynamic documents
 In this release the Identify, ListSets and ListMetadataPrefix verbs are
  xml documents you need to set manually.
 
-==Solrconfig.xml configuration
+##Solrconfig.xml configuration
 Set the following in the solrconfig.xml document:
 
 <code><config>
@@ -117,13 +117,13 @@ Set the following in the solrconfig.xml document:
     </config>
 <code>
 
-==To build from source
+##To build from source
 Download from the repository and use the maven command:
 <code>$ mvn clean package<code>
 
-==Install
+##Install
 To install place the oai4solr.jar in the designated "lib" folder of your Solr application.
 
-==Download the binary
+##Download the binary
 You can directly download the binary from
 http://bamboo.socialhistoryservices.org/
