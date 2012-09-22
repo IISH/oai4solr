@@ -117,6 +117,9 @@ Set the following in the solrconfig.xml document:
     </config>
 <code>
 
+##Download
+You can download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/
+
 ##To build from source
 Download from the repository and use the maven command:
 <code>$ mvn clean package<code>
