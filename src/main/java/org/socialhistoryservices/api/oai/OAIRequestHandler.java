@@ -39,10 +39,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -366,9 +363,8 @@ public class OAIRequestHandler extends RequestHandlerBase {
             }
             final Source xslSource = new StreamSource(file);
             xslSource.setSystemId(file.toURI().toURL().toString());
-            final Transformer transformer = tf.newTransformer(xslSource);
-            Utils.setParam(metadataPrefix, transformer);
-            transformer.setParameter("prefix", Utils.getParam("prefix"));
+            final Templates templates = tf.newTemplates(xslSource);
+            Utils.setParam(metadataPrefix, templates);
         } catch (TransformerConfigurationException e) {
             log.error(e);
         } catch (MalformedURLException e) {

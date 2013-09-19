@@ -36,6 +36,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Result;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
@@ -213,8 +214,10 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
         StreamSource source = new StreamSource(new ByteArrayInputStream(baos.toByteArray()));
         Result result = new StreamResult(writer);
-        Transformer t = (Transformer) Utils.getParam(metadataPrefix);
-        t.transform(source, result);
+        Templates t = (Templates) Utils.getParam(metadataPrefix);
+        Transformer transformer = t.newTransformer();
+        transformer.setParameter("prefix", Utils.getParam("prefix"));
+        transformer.transform(source, result);
     }
 
     public String getContentType(SolrQueryRequest request, SolrQueryResponse response) {
