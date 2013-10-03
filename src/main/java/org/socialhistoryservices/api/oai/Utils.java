@@ -188,7 +188,9 @@ public class Utils {
         final int dl = date.length();
         if (dl > tl)
             return date.substring(0, tl - 1) + "Z"; // Not entirely correct... GMT correction needed.
-        return date + template.substring(tl);
+        else if (dl < tl)
+            return date + template.substring(dl);
+        return date;
     }
 
     public static String parseDate(String date) {
