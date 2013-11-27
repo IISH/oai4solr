@@ -69,11 +69,14 @@ Set the following in the solrconfig.xml document:
         <!-- the base url...  -->
         <str name="proxyurl">http://localhost:8080/oai</str>
 
-        <!-- index of the oai identifier user for the -identifier parameter
+        <!-- index of the oai identifier used for the -identifier parameter
          For example, if your Solr identifier index is "identifier", you set it
          to... ques what...
          -->
         <str name="field_index_identifier">identifier</str>
+
+        <!-- The index used for the -set parameter -->
+        <str name="field_index_set">myIndexForSets</str>
 
         <!-- The prefix will be stripped from the oai identifier value, before it is passed
         to the Solr Lucene query. For example, if your index contains a
@@ -84,7 +87,7 @@ Set the following in the solrconfig.xml document:
         -->
         <str name="prefix">oai:socialhistoryservices:</str>
 
-        <!-- the field that can be used for the -from and -until  values -->
+        <!-- the field that can be used for the -from and -until parameters -->
         <str name="field_index_datestamp">datestamp</str>
 
         <!-- the field that can be used to sort datestamps. It is relevant
