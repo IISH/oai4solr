@@ -1,7 +1,7 @@
 #This is a OAI2 library plugin for Solr
 
 ##What is it ?
-A plugin that exposes your Solr indexes with the OAI2 protocol.
+A plugin that exposes your Solr 3.x indexes with the OAI2 protocol.
 
 ##How it works
 You can use simple xslt and a few mappings to expose your index, regardless of your
@@ -15,24 +15,21 @@ convention, at startup the oai4Solr plugin  will look for a corresponding
 ##ListSets
 ListSets are not constructed dynamically from facets. Rather, they are
 declared in the file ListSets.xml. For example like:
-<code>
+
 <ListSets>
         <set>
             <setSpec>iisg_marcxml</setSpec>
             <setName>Catalog</setName>
         </set>
 <ListSets>
-<code>
 
 You specify the solr index field for sets in the solrconfig.xml document with the "field_index_set" field.
 
 ##Datestamps
 The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields that contain the indexed datestamps are of type 'date'. For example:
 
-<code>
 <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
 <field name="iisg_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
-<code>
 
 ##Mapping your schema
 To map your Solr
@@ -75,7 +72,7 @@ In this release the Identify, ListSets and ListMetadataPrefix verbs are
 ##Solrconfig.xml configuration
 Set the following in the solrconfig.xml document:
 
-<code><config>
+<config>
 
     ....
 
@@ -142,7 +139,6 @@ Set the following in the solrconfig.xml document:
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.solr.oai.OAIQueryResponseWriter"/>
 
     </config>
-<code>
 
 ##Download
 You can download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/
