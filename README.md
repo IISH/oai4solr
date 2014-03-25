@@ -1,38 +1,62 @@
 #This is a OAI2 library plugin for Solr
 
 ##What is it ?
-A plugin that exposed your Solr indexes with the OAI2 protocol.
+A plugin that exposes your Solr indexes with the OAI2 protocol.
 
 ##How it works
 You can use simple xslt and a few mappings to expose your index, regardless of your
-solr schema. If can be used for single and multicore instances.
+solr schema. It can be used for single and multicore instances.
 
 ##The metadataSchema
 The ListMetadataPrefix.xml contains your schema definitions. By
-convention, at startup the Oai4Solr plugin  will look for a corresponding
- XSLT document in the oai folder and load it.
+convention, at startup the oai4Solr plugin  will look for a corresponding
+ XSLT document in the solr/oai folder and load it.
 
 ##ListSets
 ListSets are not constructed dynamically from facets. Rather, they are
 declared in the file ListSets.xml. For example like:
-<code><ListSets>
+<code>
+<ListSets>
         <set>
             <setSpec>iisg_marcxml</setSpec>
             <setName>Catalog</setName>
         </set>
-<ListSets><code>
+<ListSets>
+<code>
 
-You specify the index field for sets in the "field_index_set" field below.
+You specify the solr index field for sets in the solrconfig.xml document with the "field_index_set" field.
+
+##Datestamps
+The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields that contain the indexed datestamps are of type 'date'. For example:
+
+<code>
+<fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
+<field name="iisg_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
+<code>
 
 ##Mapping your schema
-Each Solr schema can be different from another. To map your Solr
- documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, etc,
- you need to make an XSLT document. Each schema needs a document.
+To map your Solr
+ documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, MODS, etc,
+ you need to make a corresponding XSLT document.
 
 In some cases, you can add the schema as a document in a resource field...
 and just datadump it ( see the marc.xsl as an example ). In other you need
  to map individual stored Solr fields to the schema you want to expose ( see
  oai_dc.xml where such a mapping takes place).
+
+## XSLT 2
+Depending on your approach you may want to use xslt 2. If you do, add an xslt parser like Saxon in your web container's classpath. For example from:
+
+http://repo1.maven.org/maven2/net/sf/saxon/saxon/8.7/saxon-8.7.jar
+http://repo1.maven.org/maven2/net/sf/saxon/saxon-dom/8.7/saxon-dom-8.7.jar
+
+Place the libraries in the class path:
+
+I.e.
+
+.../webapps/solr/WEB-INF/lib
+
+or /tomcat6/lib
 
 ##Configuration
 In the solrconfig.xml add a requestHandler. In that section you map
@@ -125,11 +149,8 @@ You can download the latest build from https://bamboo.socialhistoryservices.org/
 
 ##To build from source
 Download from the repository and use the maven command:
+
 <code>$ mvn clean package<code>
 
 ##Install
 To install place the oai4solr.jar in the designated "lib" folder of your Solr application.
-
-##Download the binary
-You can directly download the binary from
-http://bamboo.socialhistoryservices.org/
