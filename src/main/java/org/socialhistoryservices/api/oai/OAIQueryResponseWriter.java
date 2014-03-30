@@ -94,13 +94,13 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     }
 
     private void addResponseDate(Writer writer, XMLGregorianCalendar calendar) throws IOException {
-        openXmlElement(writer, "ResponseDate");
+        openXmlElement(writer, "responseDate");
         writer.write(Utils.formatDate(calendar.toString()));
-        closeXmlElement(writer, "ResponseDate");
+        closeXmlElement(writer, "responseDate");
     }
 
     private void addRequest(Writer writer, RequestType request) throws IOException {
-        writer.write("<Request");
+        writer.write("<request");
         writeAttribute(writer, "verb", request.getVerb().value());
         if (request.getResumptionToken() == null) {
             writeAttribute(writer, "from", request.getFrom());
