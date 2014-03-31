@@ -16,24 +16,26 @@ convention, at startup the oai4Solr plugin  will look for a corresponding
 ListSets are not constructed dynamically from facets. Rather, they are
 declared in the file ListSets.xml. For example like:
 
-<ListSets>
-        <set>
-            <setSpec>iisg_marcxml</setSpec>
-            <setName>Catalog</setName>
-        </set>
-</ListSets>
+    <ListSets>
+            <set>
+                <setSpec>iisg_marcxml</setSpec>
+                <setName>Catalog</setName>
+            </set>
+    </ListSets>
 
 You specify the solr index field for sets in the solrconfig.xml document with the "field_index_set" field.
 
 ##OAI Identifier
 An OAI identifier has the format 'oai:[domain]:[identifier]'. When this value is passed on with the GetRecord verb using the -identifier parameter,
-the 'oai:[domain}:' is stripped of and the remaining (low local) identifier is used for the query.
+the 'oai:[domain]:' bit is stripped of and the remaining (low local) identifier is used for the query.
 
 Indicate the domain with the 'prefix' parameter. For example like so:
-<str name="prefix">oai:localhost:</str>
+
+    <str name="prefix">oai:localhost:</str>
 
 And the local identifier with the 'identifier' parameter. For example:
-<str name="field_index_identifier">my-unique-record-identifier</str>
+
+    <str name="field_index_identifier">my-unique-record-identifier</str>
 
 So in this example an oai identifier like 'oai:localhost:12345' would translate in a Lucene query 'my-unique-record-identifier:12345'
 
@@ -41,8 +43,8 @@ So in this example an oai identifier like 'oai:localhost:12345' would translate 
 ##Datestamps
 The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields that contain the indexed datestamps are of type 'date'. For example:
 
-<fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
-<field name="iisg_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
+    <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
+    <field name="iisg_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
 
 ##Mapping your schema
 To map your Solr
@@ -58,6 +60,7 @@ and just datadump it ( see the marc.xsl as an example ). In other you need
 Depending on your approach you may want to use xslt 2. If you do, add an xslt parser like Saxon in your web container's classpath. For example from:
 
 http://repo1.maven.org/maven2/net/sf/saxon/saxon/8.7/saxon-8.7.jar
+
 http://repo1.maven.org/maven2/net/sf/saxon/saxon-dom/8.7/saxon-dom-8.7.jar
 
 Place the libraries in the class path:
@@ -85,9 +88,9 @@ In this release the Identify, ListSets and ListMetadataPrefix verbs are
 ##Solrconfig.xml configuration
 Set the following in the solrconfig.xml document:
 
-<config>
+    <config>
 
-    ....
+    <!-- configuration -->
 
     <requestHandler name="/oai" default="false" class="org.socialhistoryservices.solr.oai.OAIRequestHandler">
 
@@ -159,7 +162,7 @@ You can download the latest build from https://bamboo.socialhistoryservices.org/
 ##To build from source
 Download from the repository and use the maven command:
 
-<code>$ mvn clean package<code>
+    $ mvn clean package
 
 ##Install
 To install place the oai4solr.jar in the designated "lib" folder of your Solr application.
