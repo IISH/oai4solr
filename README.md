@@ -21,9 +21,22 @@ declared in the file ListSets.xml. For example like:
             <setSpec>iisg_marcxml</setSpec>
             <setName>Catalog</setName>
         </set>
-<ListSets>
+</ListSets>
 
 You specify the solr index field for sets in the solrconfig.xml document with the "field_index_set" field.
+
+##OAI Identifier
+An OAI identifier has the format 'oai:[domain]:[identifier]'. When this value is passed on with the GetRecord verb using the -identifier parameter,
+the 'oai:[domain}:' is stripped of and the remaining (low local) identifier is used for the query.
+
+Indicate the domain with the 'prefix' parameter. For example like so:
+<str name="prefix">oai:localhost:</str>
+
+And the local identifier with the 'identifier' parameter. For example:
+<str name="field_index_identifier">my-unique-record-identifier</str>
+
+So in this example an oai identifier like 'oai:localhost:12345' would translate in a Lucene query 'my-unique-record-identifier:12345'
+
 
 ##Datestamps
 The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields that contain the indexed datestamps are of type 'date'. For example:
@@ -90,14 +103,11 @@ Set the following in the solrconfig.xml document:
         <!-- the base url...  -->
         <str name="proxyurl">http://localhost:8080/oai</str>
 
-        <!-- index of the oai identifier used for the -identifier parameter
-         For example, if your Solr identifier index is "identifier", you set it
-         to... ques what...
+        <!-- index name of the oai identifier used for the -identifier parameter
+         For example, if your Solr identifier index is "identifier", set it
+         to:
          -->
         <str name="field_index_identifier">identifier</str>
-
-        <!-- The index used for the -set parameter -->
-        <str name="field_index_set">myIndexForSets</str>
 
         <!-- The prefix will be stripped from the oai identifier value, before it is passed
         to the Solr Lucene query. For example, if your index contains a
@@ -108,15 +118,18 @@ Set the following in the solrconfig.xml document:
         -->
         <str name="prefix">oai:socialhistoryservices:</str>
 
-        <!-- the field that can be used for the -from and -until parameters -->
+        <!-- The index name used for the -set parameter -->
+        <str name="field_index_set">myIndexForSets</str>
+
+        <!-- the index name that can be used for the -from and -until parameters -->
         <str name="field_index_datestamp">datestamp</str>
 
-        <!-- the field that can be used to sort datestamps. It is relevant
+        <!-- the index name that can be used to sort datestamps. It is relevant
         to have a sortable field for your datestamp when having paged OAI2
         results. -->
         <str name="field_sort_datestamp">s_datestamp</str>
 
-        <!-- index for the -set value -->
+        <!-- index name for the -set value -->
         <str name="field_index_set">sets</str>
 
         <!-- Some documents may be large or small, depending on the schema.
