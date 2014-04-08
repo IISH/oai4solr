@@ -20,7 +20,7 @@ limitations under the License.
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.socialhistoryservices.solr</groupId>
     <artifactId>oai4solr</artifactId>
-    <version>1.0</version>
+    <version>${project.version}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -74,6 +74,7 @@ limitations under the License.
     </developers>
 
     <properties>
+        <project.version>3.x-1.0</project.version>
         <solr.version>3.6.2</solr.version>
     </properties>
 

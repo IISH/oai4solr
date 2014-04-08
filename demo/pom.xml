@@ -22,11 +22,11 @@ limitations under the License.
     <parent>
         <groupId>org.socialhistoryservices.solr</groupId>
         <artifactId>oai4solr</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
     </parent>
 
     <artifactId>demo</artifactId>
-    <version>1.0</version>
+    <version>${project.version}</version>
 
     <packaging>jar</packaging>
 

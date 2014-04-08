@@ -1,0 +1,8 @@
+Version 3.x-1.0
+ - Include a runnable demo.
+ - More verbose readme.
+ - Unit tests to assert that the plugin handles OAI2 requests as described at http://www.openarchives.org/OAI/2.0/openarchivesprotocol.htm
+ - Project is branched and version reflects the targeted Apache Solr search platform.
+
+Version 1
+- Inception June 2012
