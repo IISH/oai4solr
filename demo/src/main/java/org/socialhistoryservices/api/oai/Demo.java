@@ -20,36 +20,42 @@ public class Demo {
     public static void main(String[] args) throws Exception {
 
         String solr_home = deriveSolrHome();
-        CoreContainer coreContainer = new CoreContainer(solr_home, new File(solr_home, "solr.xml"));
-        EmbeddedSolrServer server = null ;
-        try {
-            new EmbeddedSolrServer(coreContainer, CORE);
-        }   catch (org.apache.solr.common.SolrException e) {
-            log.fatal(e);
-            log.fatal("Make sure you have the oai2-plugin jar placed in the Solr ./demo/solr/lib folder, or a symbolic link pointing to it");
-            System.exit(-1);
-        }
+
+        checkLib(solr_home);
+
+        final CoreContainer coreContainer = new CoreContainer(solr_home, new File(solr_home, "solr.xml"));
+        final EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, CORE);
 
         server.deleteByQuery("*:*");
         server.optimize();
 
         final BatchImport batchImport = new BatchImport(server);
-        batchImport.process(new File(solr_home + "/docs/irsh.xml"));
+        batchImport.processFiles(new File(solr_home + "/docs/"));
         server.commit();
         server.shutdown();
 
-        String baseUrl = "http://localhost:8983/solr/core0/oai?";
         JettySolrRunner solrRunner = new JettySolrRunner("/solr", 8983);
-        solrRunner.start(false);
-        System.out.println("Now try out the plugin. Make sure it is on the classpath when you build this demo:\n" +
+        String baseUrl = "http://localhost:8983/solr/core0/oai?";
+        System.out.println("\n\nGo ahead and try out the plugin:\n" +
                 baseUrl + "verb=Identify\n" +
                 baseUrl + "verb=ListSets\n" +
                 baseUrl + "verb=ListMetadataFormats\n" +
-                baseUrl + "verb=ListRecords&metaPrefix=oai_dc\n" +
-                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metaPrefix=oai_dc\n" +
-                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metaPrefix=solr\n" +
-                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metaPrefix=marcxml");
-        solrRunner.waitForSolr("/solr");
+                baseUrl + "verb=ListRecords&metadataPrefix=oai_dc\n" +
+                baseUrl + "verb=ListRecords&metadataPrefix=marcxml\n" +
+                baseUrl + "verb=ListRecords&metadataPrefix=solr\n" +
+                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=oai_dc\n" +
+                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=marcxml\n" +
+                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=solr");
+        solrRunner.start(true);
+    }
+
+    private static void checkLib(String solr_home) {
+        File checkLib = new File( solr_home, "/lib/");
+        File[] files = checkLib.listFiles();
+        if ( files == null ||files.length == 0 ) {
+            log.fatal("No library plugins found. Please make sure the /demo/solr/lib folder has the oai2-plugin jar file.");
+            System.exit(-1);
+        }
     }
 
     private static String deriveSolrHome() {

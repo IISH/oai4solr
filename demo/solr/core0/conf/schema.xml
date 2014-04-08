@@ -149,7 +149,7 @@ lexicographic ordering isn't equal to the numeric ordering) -->
                 <filter class="solr.LowerCaseFilterFactory"/>
                 <!--<filter class="org.socialhistory.solr.analyzers.TransliterationFactory" translist="transliteration.txt"/>-->
                 <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
-                <filter class="solr.ISOLatin1AccentFilterFactory"/>
+                <filter class="solr.ASCIIFoldingFilterFactory"/>
                 <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1"
                         catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="0"/>
 
@@ -236,7 +236,7 @@ but may be good for SKUs.  Can insert dashes in the wrong place and still match.
     <fields>
         <field name="identifier" type="string" indexed="true" stored="true" required="true"/>
         <field name="datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
-        <field name="theme" type="string" indexed="true" stored="true" required="true" />
+        <field name="theme" type="string" indexed="true" stored="true" required="true" multiValued="true" />
         <field name="resource" type="string" indexed="false" stored="true" compressed="true" required="true" />
     </fields>
 

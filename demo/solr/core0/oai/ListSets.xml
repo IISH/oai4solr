@@ -26,16 +26,16 @@
      The records in this demo will get these set values randomly assigned. -->
     <ListSets>
         <set>
-            <setSpec>setSpec1</setSpec>
+            <setSpec>setSpec0</setSpec>
             <setName>A setspec</setName>
             <setDescription>description 1</setDescription>
         </set>
         <set>
-            <setSpec>setSpec2</setSpec>
+            <setSpec>setSpec1</setSpec>
             <setName>Another setspec</setName>
         </set>
         <set>
-            <setSpec>setSpec3</setSpec>
+            <setSpec>setSpec2</setSpec>
             <setName>And another setspec</setName>
         </set>
     </ListSets>

@@ -287,9 +287,9 @@ To map your Solr documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, 
  document for each.
 
 ###1. From stored Solr index fields
-These are typically the stored index fields that you define and will see in a raw XML Solr result set.
+Map stored Solr index fields from your schema.xml. Typically, those fields will show up in a /select XML Solr result set.
 
-For example, if you want to create an oai_dc response with a dc:title and the suitable Solr index field
+For example, if you want to create an oai_dc metadata response with a dc:title and the suitable Solr index field
 was defined as 'main_title'
 
     <field name="main_title" type="string" indexed="true" stored="true" multiValued="false" />
@@ -300,11 +300,13 @@ then map it to a dc:title in the oai_dc.xsl document so:
         <xsl:value-of select="$doc//str[@name='main_title']"/>
     </dc:title>
 
+See the oai_dc.xsl example in the demo/solr/oai folder of this project for a working example.
+
 ###2. Map a single stored XML document
 In some cases, you may find it more convenient to - apart from the indexed fields - add the complete document of a
 particular metadata schema as an unindexed and compressed resource field and just data dump it.
 
-For example, if you stored an MARCXML document:
+For example, if you have a MARCXML document:
 
     <marc:record xmlns:marc="http://www.loc.gov/MARC21/slim">
         <marc:leader>00620nam a22 7i</marc:leader>
@@ -317,7 +319,7 @@ For example, if you stored an MARCXML document:
         <!-- snip snip -->
     </marc:record>
 
-into an Solr index field that is named let's say 'resource':
+and add in to a Solr index field that is named let's say 'resource':
 
     <field name="resource" type="string" indexed="false" stored="true" required="true" compressed="true"/>
 
@@ -336,7 +338,7 @@ then the typical Solr XML response would indicate:
             &lt;/marc:record&gt;
         </str>
         
-In your marcxml.xsl that supports a 'marxcml' metadataPrefix you can then map this so:
+In your marcxml.xsl you can map this so:
 
     <xsl:template name="metadata">
         <metadata>
@@ -347,90 +349,9 @@ In your marcxml.xsl that supports a 'marxcml' metadataPrefix you can then map th
 
 Note: we used an xslt 2 method here.
 
-###3. Combine
-The two mentioned techniques above can be used together. For example you can use a stored xml document and map that,
-rather than the index fields, into another format such as oai_dc. 
+See the marcxml.xsl example in the demo/solr/oai folder of this project for a working example.
 
-See the oai_dc.xml example document where both techniques are used. One for the header that directly maps values from
-the stored Solr index fields:
-
-        <header>
-            <identifier>
-                <xsl:value-of select="$doc//str[@name='iisg_oai']"/>
-            </identifier>
-            <datestamp>
-                <xsl:value-of select="$doc//date[@name='iisg_datestamp']"/>
-            </datestamp>
-            <xsl:for-each select="$doc//arr[@name='iisg_collectionName']/str">
-                <setSpec>
-                    <xsl:value-of select="."/>
-                </setSpec>
-            </xsl:for-each>
-        </header>
-
-And the xslt mapping where a stored MARCXML record is directly mapped to dc:
-
-    <xsl:template name="metadata">
-        <xsl:variable name="metadata" select="saxon:parse($doc//str[@name='resource']/text())/node()"/>
-        <metadata>
-            <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-                       xmlns:dc="http://purl.org/dc/elements/1.1/">
-                <xsl:for-each select="$metadata//marc:datafield">
-                    <xsl:choose>
-                        <xsl:when
-                                test="@tag='100' or @tag='110' or @tag='111' or @tag='700' or @tag='710' or tag='711' or @tag='720'">
-                            <dc:contributor>
-                                <xsl:value-of select="marc:subfield/text()"/>
-                            </dc:contributor>
-                        </xsl:when>
-                        <!-- etc -->
-    </xsl:template>
-
-Note: we used an xslt 2 method here.
-
-##Download
-You can download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/
-
-##To build from source
-Download from the repository and use one the two maven commands:
-
-    $ mvn clean package
-
-The -Dsolr.solr.home VM property may need to be set manually if the unit tests cannot derive it.s location. In that case add:
-
-    $ mvn -Dsolr.solr.home=[absolute path to oai4solr/solr] clean package
-
-The end result is a package in oai4solr/oai2-plugin/target/oai2-plugin-1.0.jar ( or your maven local repository if you used 'install').
-
-##Install
-Place oai2-plugin-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
-that points to the jar.
-
-##Runable demo
-Once build, the demo module will contain an embedded Solr Jetty server. If you start it, it will load 11 test records.
-
-Before you start it, make sure to copy the oai2-plugin-1.0.jar into it's Solr lib folder. Or place a symbolic link to it. The
-directory structure should look like this:
-
-    ----
-    -demo
-        -solr
-            -core0
-                +conf
-                +oai
-            +docs
-            -lib
-                oai2-plugin-1.0.jar
-
-Start the mode with:
-
-    java -jar demo/target/demo-1.0.jar
-
-Then explore the test OAI2 repository with your request to it, e.g.
-
-    http://localhost:8983/solr/core0/oai?verb=Identify
-
-## XSLT 2
+### XSLT 2
 Depending on your approach you may want to use xslt 2. If you do, add an xslt parser like Saxon in your web container's classpath. For example from:
 
 http://repo1.maven.org/maven2/net/sf/saxon/saxon/8.7/saxon-8.7.jar
@@ -444,3 +365,45 @@ Place the libraries in the class path, i.e.
 or /tomcat6/lib
 
 or the web-container-classpath-of-your-choice equivalent.
+
+##To build from source
+Clone from the git repository and use one the two maven commands:
+
+    $ mvn clean package
+
+The -Dsolr.solr.home VM property may need to be set manually if the unit tests cannot derive it's location. In that case add:
+
+    $ mvn -Dsolr.solr.home=[absolute path to oai4solr/solr] clean package
+
+The end result is a package in ./oai2-plugin/target/oai2-plugin-1.0.jar ( or your maven local repository if you used 'install').
+
+##Download
+You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
+
+##Install
+Place oai2-plugin-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
+that points to the jar.
+
+##Runable demo
+Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.
+
+Copy the oai2-plugin-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
+directory structure should look like this:
+
+    ----
+    -demo
+        -solr
+            -core0
+                +conf
+                +oai
+            +docs
+            -lib
+                oai2-plugin-1.0.jar
+
+Start the demo with:
+
+    java -jar demo/target/demo-1.0.jar
+
+Then explore the test OAI2 repository with your request to it, e.g.
+
+    http://localhost:8983/solr/core0/oai?verb=Identify

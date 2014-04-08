@@ -22,17 +22,33 @@
                 xmlns:saxon="http://saxon.sf.net/"
                 exclude-result-prefixes="saxon">
 
+    <!-- Demonstrate how a Solr response can be mapped into a  marcxml format.
+
+   The header values are taken from stored Lucene index fields as set in the schema.xml document:
+
+       header/identifier:
+       <field name="identifier" type="string" indexed="true" stored="true" required="true"/>
+
+       header/datestamp
+       <field name="datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
+
+       header/setSpec
+       <field name="theme" type="string" indexed="true" stored="true" required="true" multiValued="true" />
+
+   The metadata element is created by taking a data dump from one particular index field called 'resource'. It is
+   assumed that resource contains a valid marcxml document with a marcxml namespace. -->
+
     <xsl:import href="oai.xsl"/>
 
     <xsl:template name="header">
         <header>
             <identifier>
-                <xsl:value-of select="$doc//str[@name='iisg_oai']"/>
+                oai:localhost:<xsl:value-of select="$doc//str[@name='identifier']"/>
             </identifier>
             <datestamp>
-                <xsl:value-of select="$doc//date[@name='iisg_datestamp']"/>
+                <xsl:value-of select="$doc//date[@name='datestamp']"/>
             </datestamp>
-            <xsl:for-each select="$doc//arr[@name='iisg_collectionName']/str">
+            <xsl:for-each select="$doc//arr[@name='theme']/str">
                 <setSpec>
                     <xsl:value-of select="."/>
                 </setSpec>
@@ -42,8 +58,7 @@
 
     <xsl:template name="metadata">
         <metadata>
-            <xsl:variable name="record" select="saxon:parse($doc//str[@name='resource']/text())/node()"/>
-            <xsl:copy-of select="$record//recordData/*"/>
+            <xsl:copy-of select="saxon:parse($doc//str[@name='resource']/text())/node()"/>
         </metadata>
     </xsl:template>
 

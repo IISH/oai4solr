@@ -16,21 +16,28 @@
   ~
   ~     You should have received a copy of the GNU General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+-->
+
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns="http://www.openarchives.org/OAI/2.0/">
+
+    <!--
+    Demonstrate how a Solr response can be mapped into an raw format.
+
+    This is not a proper OAI2 response, because the solr namespace is not added anywhere.
+    -->
 
     <xsl:import href="oai.xsl"/>
 
     <xsl:template name="header">
         <header>
             <identifier>
-                <xsl:value-of select="$doc//str[@name='iisg_oai']"/>
+                oai:localhost:<xsl:value-of select="$doc//str[@name='identifier']"/>
             </identifier>
             <datestamp>
-                <xsl:value-of select="$doc//date[@name='iisg_datestamp']"/>
+                <xsl:value-of select="$doc//date[@name='datestamp']"/>
             </datestamp>
-            <xsl:for-each select="$doc//arr[@name='iisg_collectionName']/str">
+            <xsl:for-each select="$doc//arr[@name='theme']/str">
                 <setSpec>
                     <xsl:value-of select="."/>
                 </setSpec>
@@ -40,7 +47,7 @@
 
     <xsl:template name="metadata">
         <metadata>
-            <xsl:copy-of select="$doc"/>
+            <xsl:copy-of select="$doc/*"/>
         </metadata>
     </xsl:template>
 
