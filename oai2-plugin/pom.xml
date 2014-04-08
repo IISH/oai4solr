@@ -25,7 +25,7 @@ limitations under the License.
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>oai2-plugin</artifactId>
-    <version>${project.version}</version>
+    <version>4.1</version>
     <packaging>jar</packaging>
 
     <build>

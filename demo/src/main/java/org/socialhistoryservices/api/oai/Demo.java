@@ -23,7 +23,8 @@ public class Demo {
 
         checkLib(solr_home);
 
-        final CoreContainer coreContainer = new CoreContainer(solr_home, new File(solr_home, "solr.xml"));
+        final CoreContainer coreContainer = new CoreContainer(solr_home);
+        coreContainer.load();
         final EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, CORE);
 
         server.deleteByQuery("*:*");
@@ -34,7 +35,7 @@ public class Demo {
         server.commit();
         server.shutdown();
 
-        JettySolrRunner solrRunner = new JettySolrRunner("/solr", 8983);
+        JettySolrRunner solrRunner = new JettySolrRunner(solr_home, "/solr", 8983);
         String baseUrl = "http://localhost:8983/solr/core0/oai?";
         System.out.println("\n\nGo ahead and try out the plugin:\n" +
                 baseUrl + "verb=Identify\n" +

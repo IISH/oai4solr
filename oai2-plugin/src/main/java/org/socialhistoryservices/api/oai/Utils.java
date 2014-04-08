@@ -284,6 +284,7 @@ public class Utils {
      * @throws FileNotFoundException
      * @throws JAXBException
      */
+    @SuppressWarnings("unchecked")
     public static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
         final File f = new File(Utils.getParam("oai_home") + File.separator + verb.value() + ".xml");
         final FileInputStream fis = new FileInputStream(f);

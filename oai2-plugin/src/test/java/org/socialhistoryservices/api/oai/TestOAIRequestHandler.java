@@ -4,7 +4,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -31,17 +30,21 @@ public class TestOAIRequestHandler extends TestCase {
 
     public static String CORE = "core0";
 
-    private EmbeddedServer server;
+    private static EmbeddedServer server;
 
 
     protected void setUp() throws Exception {
-        super.setUp();
-        String solr_home = System.getProperty("solr.solr.home");
-        if (solr_home == null)
-            solr_home = deriveSolrHome();
+        if ( server == null ) {
+            super.setUp();
+            String solr_home = System.getProperty("solr.solr.home");
+            if (solr_home == null)
+                solr_home = deriveSolrHome();
 
-        Utils.clearParams();
-        server = new EmbeddedServer(new CoreContainer(solr_home, new File(solr_home, "solr.xml")), CORE);
+            Utils.clearParams();
+            final CoreContainer coreContainer = new CoreContainer(solr_home);
+            coreContainer.load();
+            server = new EmbeddedServer(coreContainer, CORE);
+        }
     }
 
     private String deriveSolrHome() {
@@ -57,10 +60,6 @@ public class TestOAIRequestHandler extends TestCase {
 
         System.setProperty("solr.solr.home", file.getAbsolutePath());
         return file.getAbsolutePath();
-    }
-
-    protected void tearDown() {
-        server.shutdown();
     }
 
     private void deleteIndex() {
@@ -79,11 +78,10 @@ public class TestOAIRequestHandler extends TestCase {
      * <p/>
      * See if we receive an Identify response and if it holds against the Identify.xml document.
      *
-     * @throws ParseException
      * @throws SolrServerException
      * @throws IOException
      */
-    public void testVerbIdentify() throws ParseException, SolrServerException, IOException, XPathExpressionException, JAXBException {
+    public void testVerbIdentify() throws SolrServerException, IOException, XPathExpressionException, JAXBException {
 
         final ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("verb", "Identify");
@@ -104,11 +102,10 @@ public class TestOAIRequestHandler extends TestCase {
      * <p/>
      * See if we receive a ListSet response.
      *
-     * @throws ParseException
      * @throws SolrServerException
      * @throws IOException
      */
-    public void testListSets() throws ParseException, SolrServerException, IOException, JAXBException {
+    public void testListSets() throws SolrServerException, IOException, JAXBException {
 
         final ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("verb", "ListSets");

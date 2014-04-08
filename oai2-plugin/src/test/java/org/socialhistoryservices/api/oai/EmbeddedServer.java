@@ -75,6 +75,7 @@ public class EmbeddedServer extends EmbeddedSolrServer {
      *
      * @return The OAI2 response.
      */
+    @SuppressWarnings("unchecked")
     public OAIPMHtype sendRequest( SolrParams oai_params) {
 
         // Create a request with the desired oai parameters and set the OAI handler
@@ -103,7 +104,7 @@ public class EmbeddedServer extends EmbeddedSolrServer {
             log.error(e);
         }
 
-        // unmarchall the response into the main OAIPMHtype instance
+        // unmarchall (is that a verb ?) the response into the main OAIPMHtype instance
         byte[] bytes = is.toByteArray();
         final Source source = new StreamSource(new ByteArrayInputStream(bytes));
         final Unmarshaller marshaller = (Unmarshaller) Utils.getParam("unmarshaller");
@@ -128,7 +129,7 @@ public class EmbeddedServer extends EmbeddedSolrServer {
      */
     public String GetNode(Node node, String xquery) {
 
-        XPathExpression expr = null;
+        XPathExpression expr;
         Object evaluate = null;
 
         try {

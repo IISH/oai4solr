@@ -22,7 +22,6 @@ package org.socialhistoryservices.api.oai;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -32,8 +31,7 @@ import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.handler.RequestHandlerBase;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
-import org.apache.solr.search.DocList;
-import org.apache.solr.search.SolrQueryParser;
+import org.apache.solr.search.*;
 import org.openarchives.oai2.*;
 
 import javax.xml.bind.JAXBContext;
@@ -81,7 +79,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         response.add("oai", oai);
 
 
-        VerbType verb = null;
+        VerbType verb;
         try {
             verb = VerbType.fromValue(request.getParams().get("verb"));
         } catch (Exception e) {
@@ -149,7 +147,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         return oaiRequest;
     }
 
-    private void buildQuery(SolrQueryRequest request, SolrQueryResponse response, ResumptionToken oaiRequest, VerbType verb, OAIPMHtype oai) throws java.text.ParseException, IOException, ParseException {
+    private void buildQuery(SolrQueryRequest request, SolrQueryResponse response, ResumptionToken oaiRequest, VerbType verb, OAIPMHtype oai) throws java.text.ParseException, IOException, SyntaxError {
 
         List<String> q = new ArrayList<String>();
         Object maxrecords = Utils.getParam("maxrecords_" + oaiRequest.getMetadataPrefix());
@@ -223,15 +221,15 @@ public class OAIRequestHandler extends RequestHandlerBase {
             addToQuery(String.format("%s:\"%s\"", Utils.getParam("field_index_set"), setParam), q);
     }
 
-    private DocList runQuery(SolrQueryRequest request, List<String> q, int cursor, int len) throws ParseException, IOException {
+    private DocList runQuery(SolrQueryRequest request, List<String> q, int cursor, int len) throws IOException, SyntaxError {
 
-        final SortField sortField = new SortField((String) Utils.getParam("field_sort_datestamp"), SortField.LONG, false);
+        final SortField sortField = new SortField((String) Utils.getParam("field_sort_datestamp"), SortField.Type.LONG, false);
         final Sort sort = new Sort(sortField);
-        final SolrQueryParser parser = new SolrQueryParser(request.getSchema(), null);
+
         String[] queryParts = q.toArray(new String[0]);
-        final Query query = parser.parse(Utils.join(queryParts, " AND "));
+        final QParser parser = QParser.getParser(Utils.join(queryParts, " AND "), QParserPlugin.DEFAULT_QTYPE, request);
         Query filter = null; // not implemented
-        return request.getSearcher().getDocList(query, filter, sort, cursor, len);
+        return request.getSearcher().getDocList(parser.getQuery(), filter, sort, cursor, len);
     }
 
     private ListIdentifiersType listIdentifiers(ResumptionTokenType token) {
@@ -345,11 +343,6 @@ public class OAIRequestHandler extends RequestHandlerBase {
     @Override
     public String getDescription() {
         return "An OAI2 request handler";
-    }
-
-    @Override
-    public String getSourceId() {
-        return null;
     }
 
     @Override
