@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright 2010 International Institute for Social History, The Netherlands.
+Copyright (c) 2010-2014 International Institute for Social History, The Netherlands.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,38 +21,20 @@ limitations under the License.
     <groupId>org.socialhistoryservices.solr</groupId>
     <artifactId>oai4solr</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-
-    <build>
-        <finalName>oai4solr</finalName>
-        <defaultGoal>package</defaultGoal>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <groups>regression</groups>
-                    <parallel>true</parallel>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>oai2-plugin</module>
+        <module>demo</module>
+    </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>3.4.0</version>
+            <version>${solr.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>2.1</version>
@@ -61,7 +43,6 @@ limitations under the License.
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -74,19 +55,9 @@ limitations under the License.
             <version>1.6.1</version>
         </dependency>
         <dependency>
-         <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1</artifactId>
-            <version>6.1.7</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.8.2</version>
         </dependency>
     </dependencies>
 
@@ -94,5 +65,16 @@ limitations under the License.
         <name>International Institute of Social History</name>
         <url>www.socialhistoryservices.org</url>
     </organization>
+
+    <developers>
+        <developer>
+            <name>Lucien van Wouw</name>
+            <email>lwo@iisg.nl</email>
+        </developer>
+    </developers>
+
+    <properties>
+        <solr.version>3.6.2</solr.version>
+    </properties>
 
 </project>

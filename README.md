@@ -4,30 +4,178 @@
 A plugin that exposes your Solr 3.x indexes with the OAI2 protocol.
 
 ##How it works
-You can use simple xslt and a few mappings to expose your index, regardless of your
+You can use simple xslt documents to map the raw Solr XML response into the oai_dc metadata format; and any other
+metadata schema you may which to offer to your harvesting public. This way you can expose your index, regardless of your
 solr schema. It can be used for single and multicore instances.
 
-##The metadataSchema
-The ListMetadataPrefix.xml contains your schema definitions. By
-convention, at startup the oai4Solr plugin  will look for a corresponding
- XSLT document in the solr/oai folder and load it.
+##Declare the request and response handlers
+In the solrconfig.xml add a requestHandler and response writer:
 
-##ListSets
-ListSets are not constructed dynamically from facets. Rather, they are
+    <requestHandler name="/oai" default="false" class="org.socialhistoryservices.solr.oai.OAIRequestHandler">
+        <!-- WT is the key for the queryResponseWriter (see below) -->
+        <str name="wt">oai</str>
+        <str name="oai_home">/oai</str>
+        <! -- more configuration in this readme below -->
+    </requestHandler>
+
+    <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.solr.oai.OAIQueryResponseWriter"/>
+
+##The oai folder
+For each metadata schema you want to support, add an associated xslt document to the "oai" folder. There are sample xslt
+documents already in the folder of this distribution.
+
+The oai folder can be placed in each core; or higher up in de solr_home directory. If your directory structure look like this:
+
+    ---
+    -solr
+        -core0
+            -conf
+                schema.xml
+                solrconfig.xml
+        -core1
+             -conf
+                 schema.xml
+                 solrconfig.xml
+    -oai
+        Identify.xml
+        ListSets.xml
+        ListMetadataFormats.xml
+        oai.xsl
+        oai_dc.xsl
+        solr.xsl
+    -lib
+        oai2-plugin-1.0.jar
+
+then the setting ought to be
+
+    <str name="oai_home">/oai</str>
+
+Alternatively, you can place a oai folder in each core as well. For example:
+
+    <str name="oai_home">/core0/oai</str>
+
+    ---
+    -solr
+        -core0
+            -conf
+                schema.xml
+                solrconfig.xml
+            +oai
+
+###Non dynamic documents
+The Identify, ListSets and ListMetadataPrefix verbs are
+ xml documents you need to set manually in the oai folder:
+
+###The Identify verb
+Place a suitable Identify.xml document in the -oai folder. For example:
+
+    <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+
+        <!-- You may leave out the responseDate and request elements -->
+
+        <Identify>
+            <repositoryName>Your repo name</repositoryName>
+            <baseURL>http://localhost:8983/solr/example/oai?</baseURL>
+            <protocolVersion>2.0</protocolVersion>
+            <adminEmail>admin@domain.org</adminEmail>
+            <earliestDatestamp>2011-06-01T12:00:00Z</earliestDatestamp>
+            <deletedRecord>transient</deletedRecord>
+            <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+            <compression>none</compression>
+            <description>
+                <oai-identifier
+                        xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+                    <scheme>oai</scheme>
+                    <repositoryIdentifier>localhost</repositoryIdentifier>
+                    <delimiter>:</delimiter>
+                    <sampleIdentifier>oai:localhost:12345/12345-abcde</sampleIdentifier>
+                </oai-identifier>
+            </description>
+        </Identify>
+    </OAI-PMH>
+
+
+###The ListMetadataFormats verb
+The ListMetadataPrefix.xml document contains your metadata schema definitions. At startup the oai4Solr plugin will look
+for a 'ListMetadataPrefix.xml' document in the oai folder and use for the ListMetadataFormats response.
+
+The plugin will derive and load all declared xslt documents from it. For example, consider the fragment:
+
+
+    <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+
+        <!-- You may leave out the responseDate and request elements -->
+
+        <ListMetadataFormats>
+            <metadataFormat>
+                <metadataPrefix>oai_dc</metadataPrefix>
+                <schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema>
+                <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+            </metadataFormat>
+            <metadataFormat>
+                <metadataPrefix>marcxml</metadataPrefix>
+                <schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>
+                <metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>
+            </metadataFormat>
+            <metadataFormat>
+                <metadataPrefix>solr</metadataPrefix>
+                <schema>http://wiki.apache.org/solr/solr.xsd</schema>
+                <metadataNamespace>http://wiki.apache.org/solr/</metadataNamespace>
+            </metadataFormat>
+        </ListMetadataFormats>
+    </OAI-PMH>
+
+The -metadataPrefix element value will be used to load an associate xslt document from the oai folder. Here:
+oai_dc.xsl, marcxml.xsl and solr.xsl
+
+Valid OAI2 metadataPrefix parameter values will then be oai_dc, marcxml and solr. The OAI2 response will be manufactured by
+applying the corresponding (cached) xslt template.
+
+###The ListSets verb
+ListSets are not constructed dynamically from facets. Rather, like 'ListMetadataFormats' and 'Identify' they are
 declared in the file ListSets.xml. For example like:
 
-    <ListSets>
-            <set>
-                <setSpec>iisg_marcxml</setSpec>
-                <setName>Catalog</setName>
-            </set>
-    </ListSets>
+    <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+        http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 
-You specify the solr index field for sets in the solrconfig.xml document with the "field_index_set" field.
+        <!-- You may leave out the responseDate and request elements -->
+
+        <ListSets>
+            <set>
+                <setSpec>books</setSpec>
+                <setName>Catalog</setName>
+                <setDescription>All the books from the library</setDescription>
+            </set>
+            <set>
+                <setSpec>video</setSpec>
+                <setName>Video and audio</setName>
+                <setDescription>All digitally available audio and video</setDescription>
+            </set>
+        </ListSets>
+    </OAI-PMH>
+
+You specify the solr index field for sets in the solrconfig.xml document with the "field_index_set" field. For example
+if your Solr schema has an appropriate field for set queries such as 'catalog_source'
+
+    <field name="catalog_source" type="string" indexed="true" stored="true" multiValued="true" />
+
+Then indicate the value in your solrconfig.xml document so:
+
+    <str name="field_index_set">catalog_source</str>
 
 ##OAI Identifier
 An OAI identifier has the format 'oai:[domain]:[identifier]'. When this value is passed on with the GetRecord verb using the -identifier parameter,
-the 'oai:[domain]:' bit is stripped of and the remaining (low local) identifier is used for the query.
+the 'oai:[domain]:' bit is stripped of and the remaining (low local) identifier is used for the Lucene query.
 
 Indicate the domain with the 'prefix' parameter. For example like so:
 
@@ -41,51 +189,29 @@ So in this example an oai identifier like 'oai:localhost:12345' would translate 
 
 
 ##Datestamps
-The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields that contain the indexed datestamps are of type 'date'. For example:
+The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields
+that contain the indexed datestamps are of type 'date' to allow for sorting. For example:
 
     <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
-    <field name="iisg_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
+    <field name="my_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
 
-##Mapping your schema
-To map your Solr
- documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, MODS, etc,
- you need to make a corresponding XSLT document.
+The plugin will need to know which index fields can be used for querying and sorting. Set it  so:
 
-In some cases, you can add the schema as a document in a resource field...
-and just datadump it ( see the marc.xsl as an example ). In other you need
- to map individual stored Solr fields to the schema you want to expose ( see
- oai_dc.xml where such a mapping takes place).
+        <str name="field_sort_datestamp">my_datestamp</str>
+        <str name="field_index_datestamp">my_datestamp</str>
 
-## XSLT 2
-Depending on your approach you may want to use xslt 2. If you do, add an xslt parser like Saxon in your web container's classpath. For example from:
+##Resultset length
+The default is 200 records per response before the resumptionToken kicks in. You can set a maximum record length per
+ schema with the maxrecords parameter:
 
-http://repo1.maven.org/maven2/net/sf/saxon/saxon/8.7/saxon-8.7.jar
+    <lst name="maxrecords">
+        <int name="default">200</int>
 
-http://repo1.maven.org/maven2/net/sf/saxon/saxon-dom/8.7/saxon-dom-8.7.jar
+        <!-- EAD documents are large, so we want to page per document -->
+        <int name="ead">1</int>
+    </lst>
 
-Place the libraries in the class path:
-
-I.e.
-
-.../webapps/solr/WEB-INF/lib
-
-or /tomcat6/lib
-
-##Configuration
-In the solrconfig.xml add a requestHandler. In that section you map
-OAI parameters to your schema's identifier and datestamps index fields.
-Further more you can add the metadataPrefici you support and set paging.
-
-##The oai folder
-For each metadataPrefix you need an associated xslt document that must be
-placed in a "oai" folder. There are sample xslt documents already
-in the folder of this distribution.
-
-##Non dynamic documents
-In this release the Identify, ListSets and ListMetadataPrefix verbs are
- xml documents you need to set manually.
-
-##Solrconfig.xml configuration
+##Solrconfig.xml configuration in full
 Set the following in the solrconfig.xml document:
 
     <config>
@@ -156,13 +282,165 @@ Set the following in the solrconfig.xml document:
 
     </config>
 
+##Mapping tips
+To map your Solr documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, MODS, etc., make a corresponding XSLT
+ document for each.
+
+###1. From stored Solr index fields
+These are typically the stored index fields that you define and will see in a raw XML Solr result set.
+
+For example, if you want to create an oai_dc response with a dc:title and the suitable Solr index field
+was defined as 'main_title'
+
+    <field name="main_title" type="string" indexed="true" stored="true" multiValued="false" />
+
+then map it to a dc:title in the oai_dc.xsl document so:
+
+    <dc:title>
+        <xsl:value-of select="$doc//str[@name='main_title']"/>
+    </dc:title>
+
+###2. Map a single stored XML document
+In some cases, you may find it more convenient to - apart from the indexed fields - add the complete document of a
+particular metadata schema as an unindexed and compressed resource field and just data dump it.
+
+For example, if you stored an MARCXML document:
+
+    <marc:record xmlns:marc="http://www.loc.gov/MARC21/slim">
+        <marc:leader>00620nam a22 7i</marc:leader>
+        <!-- snip snip -->
+        <marc:datafield ind1="1" ind2="0" tag="245">
+            <marc:subfield code="a">Artis-gids :</marc:subfield>
+            <marc:subfield code="b">125 jaar /</marc:subfield>
+            <marc:subfield code="c">samenst. H. v.d. Werken.; tekeningen Ies Spreekmeester.</marc:subfield>
+        </marc:datafield>
+        <!-- snip snip -->
+    </marc:record>
+
+into an Solr index field that is named let's say 'resource':
+
+    <field name="resource" type="string" indexed="false" stored="true" required="true" compressed="true"/>
+
+then the typical Solr XML response would indicate:
+
+        <str name="resource">
+            &lt;marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"&gt;
+                &lt;marc:leader&gt;00620nam a22 7i&lt;/marc:leader&gt;
+                &lt;!-- snip snip --&gt;
+                &lt;marc:datafield ind1="1" ind2="0" tag="245"&gt;
+                    &lt;marc:subfield code="a"&gt;Artis-gids :&lt;/marc:subfield&gt;
+                    &lt;marc:subfield code="b"&gt;125 jaar /&lt;/marc:subfield&gt;
+                    &lt;marc:subfield code="c"&gt;samenst. H. v.d. Werken.; tekeningen Ies Spreekmeester.&lt;/marc:subfield&gt;
+                &lt;/marc:datafield&gt;
+                &lt;!-- snip snip --&gt;
+            &lt;/marc:record&gt;
+        </str>
+        
+In your marcxml.xsl that supports a 'marxcml' metadataPrefix you can then map this so:
+
+    <xsl:template name="metadata">
+        <metadata>
+            <xsl:variable name="record" select="saxon:parse($doc//str[@name='resource']/text())/node()"/>
+            <xsl:copy-of select="$record"/>
+        </metadata>
+    </xsl:template>
+
+Note: we used an xslt 2 method here.
+
+###3. Combine
+The two mentioned techniques above can be used together. For example you can use a stored xml document and map that,
+rather than the index fields, into another format such as oai_dc. 
+
+See the oai_dc.xml example document where both techniques are used. One for the header that directly maps values from
+the stored Solr index fields:
+
+        <header>
+            <identifier>
+                <xsl:value-of select="$doc//str[@name='iisg_oai']"/>
+            </identifier>
+            <datestamp>
+                <xsl:value-of select="$doc//date[@name='iisg_datestamp']"/>
+            </datestamp>
+            <xsl:for-each select="$doc//arr[@name='iisg_collectionName']/str">
+                <setSpec>
+                    <xsl:value-of select="."/>
+                </setSpec>
+            </xsl:for-each>
+        </header>
+
+And the xslt mapping where a stored MARCXML record is directly mapped to dc:
+
+    <xsl:template name="metadata">
+        <xsl:variable name="metadata" select="saxon:parse($doc//str[@name='resource']/text())/node()"/>
+        <metadata>
+            <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                       xmlns:dc="http://purl.org/dc/elements/1.1/">
+                <xsl:for-each select="$metadata//marc:datafield">
+                    <xsl:choose>
+                        <xsl:when
+                                test="@tag='100' or @tag='110' or @tag='111' or @tag='700' or @tag='710' or tag='711' or @tag='720'">
+                            <dc:contributor>
+                                <xsl:value-of select="marc:subfield/text()"/>
+                            </dc:contributor>
+                        </xsl:when>
+                        <!-- etc -->
+    </xsl:template>
+
+Note: we used an xslt 2 method here.
+
 ##Download
 You can download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/
 
 ##To build from source
-Download from the repository and use the maven command:
+Download from the repository and use one the two maven commands:
 
     $ mvn clean package
 
+The -Dsolr.solr.home VM property may need to be set manually if the unit tests cannot derive it.s location. In that case add:
+
+    $ mvn -Dsolr.solr.home=[absolute path to oai4solr/solr] clean package
+
+The end result is a package in oai4solr/oai2-plugin/target/oai2-plugin-1.0.jar ( or your maven local repository if you used 'install').
+
 ##Install
-To install place the oai4solr.jar in the designated "lib" folder of your Solr application.
+Place oai2-plugin-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
+that points to the jar.
+
+##Runable demo
+Once build, the demo module will contain an embedded Solr Jetty server. If you start it, it will load 11 test records.
+
+Before you start it, make sure to copy the oai2-plugin-1.0.jar into it's Solr lib folder. Or place a symbolic link to it. The
+directory structure should look like this:
+
+    ----
+    -demo
+        -solr
+            -core0
+                +conf
+                +oai
+            +docs
+            -lib
+                oai2-plugin-1.0.jar
+
+Start the mode with:
+
+    java -jar demo/target/demo-1.0.jar
+
+Then explore the test OAI2 repository with your request to it, e.g.
+
+    http://localhost:8983/solr/core0/oai?verb=Identify
+
+## XSLT 2
+Depending on your approach you may want to use xslt 2. If you do, add an xslt parser like Saxon in your web container's classpath. For example from:
+
+http://repo1.maven.org/maven2/net/sf/saxon/saxon/8.7/saxon-8.7.jar
+
+http://repo1.maven.org/maven2/net/sf/saxon/saxon-dom/8.7/saxon-dom-8.7.jar
+
+Place the libraries in the class path, i.e.
+
+../webapps/solr/WEB-INF/lib
+
+or /tomcat6/lib
+
+or the web-container-classpath-of-your-choice equivalent.

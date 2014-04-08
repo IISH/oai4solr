@@ -10,6 +10,7 @@ index
 *.exe
 *.o
 *.so
+target
 
 # Packages #
 ############
@@ -42,3 +43,6 @@ IDEA
 *.ipr
 *.iws
 .idea
+
+# maven
+dependency-reduced-pom.xml

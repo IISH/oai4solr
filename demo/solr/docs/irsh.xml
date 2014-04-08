@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog marc="http://www.loc.gov/MARC21/slim">
+<record>
+<leader>00857nas a22001810a 45 0</leader>
+<controlfield tag="001">S0020859000009780</controlfield>
+<controlfield tag="003">NL-AMISG</controlfield>
+<controlfield tag="005">20130725173629</controlfield>
+<controlfield tag="008">199902suuuuuuuu||||||||||||||||||||||| d</controlfield>
+<datafield tag="100" ind1=" " ind2=" ">
+<subfield code="a">Bernecker, Walther L.</subfield>
+</datafield>
+<datafield tag="245" ind1=" " ind2=" ">
+<subfield code="a">Review of "Dictatorship, Workers, and the City. Labour in Greater Barcelona since 1939"
+                                     by Sebastian,
+                                        Balfour. Oxford</subfield>
+<subfield code="k">book-review</subfield>
+</datafield>
+<datafield tag="260" ind1=" " ind2=" ">
+<subfield code="a">Cambridge, UK :</subfield>
+<subfield code="b">Cambridge University Press,</subfield>
+<subfield code="c">1990</subfield>
+</datafield>
+<datafield tag="300" ind1=" " ind2=" ">
+<subfield code="a">2 p.</subfield>
+</datafield>
+<datafield tag="773" ind1="0" ind2="#">
+<subfield code="a">International Review of Social History</subfield>
+<subfield code="g">vol. 35(1990) no.1, p. 138-139.</subfield>
+</datafield>
+<datafield tag="540" ind1=" " ind2=" ">
+<subfield code="b">Copyright © Internationaal Instituut voor Sociale Geschiedenis 1990</subfield>
+</datafield>
+<datafield tag="852" ind1=" " ind2=" ">
+<subfield code="a">IISG</subfield>
+<subfield code="b">IISG</subfield>
+<subfield code="c">IRSH</subfield>
+<subfield code="j">IRSH</subfield>
+</datafield>
+<datafield tag="856" ind1=" " ind2=" ">
+<subfield code="u">http://hdl.handle.net/10622/S0020859000009780?locatt=view:master</subfield>
+<subfield code="q">application/pdf</subfield>
+</datafield>
+<datafield tag="902" ind1=" " ind2=" ">
+<subfield code="a">10622/S0020859000009780</subfield>
+</datafield>
+</record>
+<record>
+<leader>00857nas a22001810a 45 0</leader>
+<controlfield tag="001">S0020859000005940</controlfield>
+<controlfield tag="003">NL-AMISG</controlfield>
+<controlfield tag="005">20130725173629</controlfield>
+<controlfield tag="008">199902suuuuuuuu||||||||||||||||||||||| d</controlfield>
+<datafield tag="100" ind1=" " ind2=" ">
+<subfield code="a">Baker, Donald N.</subfield>
+</datafield>
+<datafield tag="245" ind1=" " ind2=" ">
+<subfield code="a">The Socialists and the Workers of Paris: , 1936–40</subfield>
+<subfield code="k">research-article</subfield>
+</datafield>
+<datafield tag="260" ind1=" " ind2=" ">
+<subfield code="a">Cambridge, UK :</subfield>
+<subfield code="b">Cambridge University Press,</subfield>
+<subfield code="c">1979</subfield>
+</datafield>
+<datafield tag="300" ind1=" " ind2=" ">
+<subfield code="a">33 p.</subfield>
+</datafield>
+<datafield tag="520" ind1=" " ind2=" ">
+<subfield code="a">The Popular Front's victory in the legislative elections of April-May 1936 caused a great sense of relief and then a joyful upsurge of hope and idealism in its supporters. Spontaneously, thousands of workers began to occupy shops and factories. On June 4, when the Blum government came to office, the strikes had begun to paralyze the economy. In the next two weeks, perhaps because it was clear that the Blum government was not going to suppress the strikes but rather to negotiate an end to them, perhaps because by that time it was also clear that neither the Confédération Générale du Travail nor the Communist and Socialist parties would try to take advantage of the situation for an insurrectionary purpose, the strikes spread like wildfire throughout the country. Hundreds of thousands of workers apparently wanted to guarantee, through “direct action”, that the benefits of the Matignon accords and of the promised legislation would apply in their industry or region. It was in these conditions that the Blum government managed to get the conservative Senate's approval for the most progressive social reforms of the Third Republic.</subfield>
+</datafield>
+<datafield tag="773" ind1="0" ind2="#">
+<subfield code="a">International Review of Social History</subfield>
+<subfield code="g">vol. 24(1979) no.1, p. 1-33.</subfield>
+</datafield>
+<datafield tag="540" ind1=" " ind2=" ">
+<subfield code="b">Copyright © Internationaal Instituut voor Sociale Geschiedenis 1979</subfield>
+</datafield>
+<datafield tag="852" ind1=" " ind2=" ">
+<subfield code="a">IISG</subfield>
+<subfield code="b">IISG</subfield>
+<subfield code="c">IRSH</subfield>
+<subfield code="j">IRSH</subfield>
+</datafield>
+<datafield tag="856" ind1=" " ind2=" ">
+<subfield code="u">http://hdl.handle.net/10622/S0020859000005940?locatt=view:master</subfield>
+<subfield code="q">application/pdf</subfield>
+</datafield>
+<datafield tag="902" ind1=" " ind2=" ">
+<subfield code="a">10622/S0020859000005940</subfield>
+</datafield>
+</record>
+<record>
+<leader>00857nas a22001810a 45 0</leader>
+<controlfield tag="001">S002085900000496X</controlfield>
+<controlfield tag="003">NL-AMISG</controlfield>
+<controlfield tag="005">20130725173629</controlfield>
+<controlfield tag="008">199902suuuuuuuu||||||||||||||||||||||| d</controlfield>
+<datafield tag="245" ind1=" " ind2=" ">
+<subfield code="a">Bibliography</subfield>
+<subfield code="k">other</subfield>
+</datafield>
+<datafield tag="260" ind1=" " ind2=" ">
+<subfield code="a">Cambridge, UK :</subfield>
+<subfield code="b">Cambridge University Press,</subfield>
+<subfield code="c">1975</subfield>
+</datafield>
+<datafield tag="300" ind1=" " ind2=" ">
+<subfield code="a">39 p.</subfield>
+</datafield>
+<datafield tag="773" ind1="0" ind2="#">
+<subfield code="a">International Review of Social History</subfield>
+<subfield code="g">vol. 20(1975) no.2, p. 273-311.</subfield>
+</datafield>
+<datafield tag="540" ind1=" " ind2=" ">
+<subfield code="b">Copyright © Internationaal Instituut voor Sociale Geschiedenis 1975</subfield>
+</datafield>
+<datafield tag="852" ind1=" " ind2=" ">
+<subfield code="a">IISG</subfield>
+<subfield code="b">IISG</subfield>
+<subfield code="c">IRSH</subfield>
+<subfield code="j">IRSH</subfield>
+</datafield>
+<datafield tag="856" ind1=" " ind2=" ">
+<subfield code="u">http://hdl.handle.net/10622/S002085900000496X?locatt=view:master</subfield>
+<subfield code="q">application/pdf</subfield>
+</datafield>
+<datafield tag="902" ind1=" " ind2=" ">
+<subfield code="a">10622/S002085900000496X</subfield>
+</datafield>
+</record>
+<record>
+<leader>00857nas a22001810a 45 0</leader>
+<controlfield tag="001">S0020859000000900</controlfield>
+<controlfield tag="003">NL-AMISG</controlfield>
+<controlfield tag="005">20130725173629</controlfield>
+<controlfield tag="008">199902suuuuuuuu||||||||||||||||||||||| d</controlfield>
+<datafield tag="100" ind1=" " ind2=" ">
+<subfield code="a">Dyos, H. J.</subfield>
+</datafield>
+<datafield tag="245" ind1=" " ind2=" ">
+<subfield code="a">Urban Transformation</subfield>
+<subfield code="k">research-article</subfield>
+</datafield>
+<datafield tag="260" ind1=" " ind2=" ">
+<subfield code="a">Cambridge, UK :</subfield>
+<subfield code="b">Cambridge University Press,</subfield>
+<subfield code="c">1957</subfield>
+</datafield>
+<datafield tag="300" ind1=" " ind2=" ">
+<subfield code="a">7 p.</subfield>
+</datafield>
+<datafield tag="520" ind1=" " ind2=" ">
+<subfield code="a">The gradual acceptance by politically influential people of the belief that deliberate control of town growth was both feasible and fruitful is a theme in the history of town planning which has many aspects. The transformation of nineteenth century cities by means of street improvement was one of these; and Mr. David Pinkney has recently made a mature assessment of the range of motives underlying the sweeping changes wrought in the configuration of Parisian streets under the Second Empire. By contrast with Paris under the prefecture of Baron Haussmann, the transformation of London was tentative, not to say hesitating, and not undertaken for all the same reasons. In Paris, Mr. Pinkney has shown that political and strategic aims were mixed with desires for aesthetic and social amelioration. “In London”, Napoleon III is reported as saying, “they are concerned only with giving the best possible satisfaction to the needs of traffic.” But were they? It is the purpose of this brief note to comment on the validity of this assertion, and in doing so to illustrate an early approach to matters of urban improvement which are still at the heart of some contemporary town-planning problems.</subfield>
+</datafield>
+<datafield tag="773" ind1="0" ind2="#">
+<subfield code="a">International Review of Social History</subfield>
+<subfield code="g">vol. 2(1957) no.2, p. 259-265.</subfield>
+</datafield>
+<datafield tag="540" ind1=" " ind2=" ">
+<subfield code="b">Copyright © Internationaal Instituut voor Sociale Geschiedenis 1957</subfield>
+</datafield>
+<datafield tag="852" ind1=" " ind2=" ">
+<subfield code="a">IISG</subfield>
+<subfield code="b">IISG</subfield>
+<subfield code="c">IRSH</subfield>
+<subfield code="j">IRSH</subfield>
+</datafield>
+<datafield tag="856" ind1=" " ind2=" ">
+<subfield code="u">http://hdl.handle.net/10622/S0020859000000900?locatt=view:master</subfield>
+<subfield code="q">application/pdf</subfield>
+</datafield>
+<datafield tag="902" ind1=" " ind2=" ">
+<subfield code="a">10622/S0020859000000900</subfield>
+</datafield>
+</record>
+<record>
+<leader>00857nas a22001810a 45 0</leader>
+<controlfield tag="001">S0020859000002364</controlfield>
+<controlfield tag="003">NL-AMISG</controlfield>
+<controlfield tag="005">20130725173629</controlfield>
+<controlfield tag="008">199902suuuuuuuu||||||||||||||||||||||| d</controlfield>
+<datafield tag="100" ind1=" " ind2=" ">
+<subfield code="a">Kendall, Walter</subfield>
+</datafield>
+<datafield tag="245" ind1=" " ind2=" ">
+<subfield code="a">Russian Emigration and British Marxist Socialism</subfield>
+<subfield code="k">research-article</subfield>
+</datafield>
+<datafield tag="260" ind1=" " ind2=" ">
+<subfield code="a">Cambridge, UK :</subfield>
+<subfield code="b">Cambridge University Press,</subfield>
+<subfield code="c">1963</subfield>
+</datafield>
+<datafield tag="300" ind1=" " ind2=" ">
+<subfield code="a">28 p.</subfield>
+</datafield>
+<datafield tag="520" ind1=" " ind2=" ">
+<subfield code="a">Britain's tradition of political asylum has for centuries brought refugees of many nationalities to her shores. The influence both direct and indirect, which they have exerted on British life has been a factor of no small importance. The role of religious immigration has frequently been examined, that of the socialist emigrés from Central Europe has so far received less detailed attention.</subfield>
+</datafield>
+<datafield tag="773" ind1="0" ind2="#">
+<subfield code="a">International Review of Social History</subfield>
+<subfield code="g">vol. 8(1963) no.3, p. 351-378.</subfield>
+</datafield>
+<datafield tag="540" ind1=" " ind2=" ">
+<subfield code="b">Copyright © Internationaal Instituut voor Sociale Geschiedenis 1963</subfield>
+</datafield>
+<datafield tag="852" ind1=" " ind2=" ">
+<subfield code="a">IISG</subfield>
+<subfield code="b">IISG</subfield>
+<subfield code="c">IRSH</subfield>
+<subfield code="j">IRSH</subfield>
+</datafield>
+<datafield tag="856" ind1=" " ind2=" ">
+<subfield code="u">http://hdl.handle.net/10622/S0020859000002364?locatt=view:master</subfield>
+<subfield code="q">application/pdf</subfield>
+</datafield>
+<datafield tag="902" ind1=" " ind2=" ">
+<subfield code="a">10622/S0020859000002364</subfield>
+</datafield>
+</record>
+</catalog>
