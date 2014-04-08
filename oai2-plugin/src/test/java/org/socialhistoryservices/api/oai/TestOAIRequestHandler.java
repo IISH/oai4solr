@@ -36,30 +36,27 @@ public class TestOAIRequestHandler extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        String solr_home = System.getProperty("solr.solr.home", deriveSolrHome());
+        String solr_home = System.getProperty("solr.solr.home");
+        if (solr_home == null)
+            solr_home = deriveSolrHome();
+
         Utils.clearParams();
         server = new EmbeddedServer(new CoreContainer(solr_home, new File(solr_home, "solr.xml")), CORE);
     }
 
     private String deriveSolrHome() {
 
-        String solr_relative_home = "/oai2-plugin/src/test/solr";
-
-        File file = new File(System.getProperty("user.dir"));
-        while (!file.getName().equals("oai4solr")) {
-            file = file.getParentFile();
-            if (file == null)
-                break;
+        File file = new File(System.getProperty("user.dir"), "/oai2-plugin/src/test/solr");
+        if (!file.exists()) {
+            file = new File(System.getProperty("user.dir"), "/src/test/solr");
+            if (!file.exists()) {
+                log.fatal("PWD=" + System.getProperty("user.dir") + "\nCannot find the Solr directory. Please set the VM property with -Dsolr.solr.home=[path?]/oai4solr/oai2-plugin/src/test/solr");
+                System.exit(-1);
+            }
         }
 
-        if (file == null) {
-            log.fatal("Cannot find the Solr directory. Please set the VM property with -Dsolr.solr.home=[path?]/oai4solr" + solr_relative_home);
-            System.exit(-1);
-        }
-
-        String solr_home = new File(file, solr_relative_home).getAbsolutePath();
-        System.setProperty("solr.solr.home", solr_home);
-        return solr_home;
+        System.setProperty("solr.solr.home", file.getAbsolutePath());
+        return file.getAbsolutePath();
     }
 
     protected void tearDown() {
@@ -165,7 +162,7 @@ public class TestOAIRequestHandler extends TestCase {
             for (MetadataFormatType metadataFormatTypeFromFile : oaipmHtype.getListMetadataFormats().getMetadataFormat()) {
                 match = metadataFormatTypeFromRequest.getSchema().equals(metadataFormatTypeFromFile.getSchema()) ||
                         metadataFormatTypeFromRequest.getMetadataNamespace().equals(metadataFormatTypeFromFile.getMetadataNamespace()) ||
-                        metadataFormatTypeFromRequest.getMetadataPrefix().equals(metadataFormatTypeFromFile.getMetadataPrefix()) ;
+                        metadataFormatTypeFromRequest.getMetadataPrefix().equals(metadataFormatTypeFromFile.getMetadataPrefix());
                 if (match)
                     break;
             }
