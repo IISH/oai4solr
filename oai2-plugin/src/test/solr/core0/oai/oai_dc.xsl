@@ -28,7 +28,7 @@
             <datestamp>
                 <xsl:value-of select="$doc//date[@name='datestamp']"/>
             </datestamp>
-            <xsl:for-each select="$doc//arr[@name='collection']/str">
+            <xsl:for-each select="$doc//arr[@name='theme']/str">
                 <setSpec>
                     <xsl:value-of select="."/>
                 </setSpec>
@@ -40,7 +40,7 @@
         <metadata>
             <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
                        xmlns:dc="http://purl.org/dc/elements/1.1/">
-               <dc:title><xsl:value-of select="$doc//str[@name='full_title']"/></dc:title>
+               <dc:title><xsl:value-of select="$doc//str[@name='resource']"/></dc:title>
             </oai_dc:dc>
         </metadata>
     </xsl:template>

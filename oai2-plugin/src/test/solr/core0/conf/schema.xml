@@ -236,7 +236,8 @@ but may be good for SKUs.  Can insert dashes in the wrong place and still match.
     <fields>
         <field name="identifier" type="string" indexed="true" stored="true" required="true"/>
         <field name="datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
-        <field name="full_title" type="string" indexed="false" stored="true" required="true" />
+        <field name="theme" type="string" indexed="true" stored="true" required="true" multiValued="true" />
+        <field name="resource" type="string" indexed="false" stored="true" compressed="true" required="true" />
     </fields>
 
 

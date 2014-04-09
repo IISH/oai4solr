@@ -152,6 +152,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
      *
      * @throws IOException
      */
+    @SuppressWarnings("unchecked")
     private void norecords(Writer writer, OAIPMHtype oai) throws IOException {
 
         final Marshaller marshaller = (Marshaller) Utils.getParam("marshaller");

@@ -44,7 +44,7 @@ The oai folder can be placed in each core; or higher up in de solr_home director
         oai_dc.xsl
         solr.xsl
     -lib
-        oai2-plugin-3.x-1.0.jar
+        oai2-plugin-3.1.jar
 
 then the setting ought to be
 

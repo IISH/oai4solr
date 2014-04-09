@@ -48,7 +48,7 @@
     </xsl:template>
 
     <!--
-    Usefull for debugging
+    Useful for debugging
         <xsl:template match="@*|node()">
             <xsl:copy>
                 <xsl:apply-templates select="@*|node()"/>

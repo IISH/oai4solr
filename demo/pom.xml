@@ -22,11 +22,11 @@ limitations under the License.
     <parent>
         <groupId>org.socialhistoryservices.solr</groupId>
         <artifactId>oai4solr</artifactId>
-        <version>${project.version}</version>
+        <version>3.1</version>
     </parent>
 
     <artifactId>demo</artifactId>
-    <version>${project.version}</version>
+    <version>3.1</version>
 
     <packaging>jar</packaging>
 
@@ -66,6 +66,17 @@ limitations under the License.
                                     <mainClass>org.socialhistoryservices.api.oai.Demo</mainClass>
                                 </transformer>
                             </transformers>
+                            <!-- Some jars are signed, so we need to filter them out. -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
