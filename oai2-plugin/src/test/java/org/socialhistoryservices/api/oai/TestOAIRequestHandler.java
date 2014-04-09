@@ -50,7 +50,7 @@ public class TestOAIRequestHandler extends TestCase {
      * @throws Exception
      */
     protected void setUp() throws Exception {
-        if (server == null) {
+        if ( server == null ) {
             super.setUp();
             String solr_home = System.getProperty("solr.solr.home");
             if (solr_home == null)
