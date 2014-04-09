@@ -226,8 +226,9 @@ public class OAIRequestHandler extends RequestHandlerBase {
         final SortField sortField = new SortField((String) Utils.getParam("field_sort_datestamp"), SortField.Type.LONG, false);
         final Sort sort = new Sort(sortField);
 
-        String[] queryParts = q.toArray(new String[0]);
+        String[] queryParts = q.toArray(new String[q.size()]);
         final QParser parser = QParser.getParser(Utils.join(queryParts, " AND "), QParserPlugin.DEFAULT_QTYPE, request);
+
         Query filter = null; // not implemented
         return request.getSearcher().getDocList(parser.getQuery(), filter, sort, cursor, len);
     }

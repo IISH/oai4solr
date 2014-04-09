@@ -16,8 +16,10 @@
  limitations under the License.
 -->
 
-<!-- This configuration is for a demonstration of the OAI2 plugin -->
-
+<!--
+ This is a stripped down config file used for a simple example...  
+ It is *not* a good example to work from. 
+-->
 <config>
 
     <requestHandler name="/oai" default="false" class="org.socialhistoryservices.api.oai.OAIRequestHandler">
@@ -63,7 +65,9 @@
         <!-- Some documents may be large or small, depending on the schema.
         In that case, we set the step of the paging to a lower count. -->
         <lst name="maxrecords">
-            <int name="default">5</int>
+            <int name="default">200</int>
+            <int name="ead">1</int>
+            <int name="eci">1</int>
         </lst>
 
         <!-- The resumption token is build up from string parameters (from,until,set and metadataprefix). The separator
@@ -76,26 +80,59 @@
     <!-- Custom wt that is being used by the OAI handler -->
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
 
-    <luceneMatchVersion>LUCENE_46</luceneMatchVersion>
+
+    <luceneMatchVersion>4.7</luceneMatchVersion>
     <!--  The DirectoryFactory to use for indexes.
           solr.StandardDirectoryFactory, the default, is filesystem based.
           solr.RAMDirectoryFactory is memory based, not persistent, and doesn't work with replication. -->
     <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
 
+    <dataDir>${solr.core0.data.dir:}</dataDir>
 
-    <updateHandler class="solr.DirectUpdateHandler2"/>
+    <!-- To enable dynamic schema REST APIs, use the following for <schemaFactory>:
 
-    <requestDispatcher handleSelect="true">
-        <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048"/>
-    </requestDispatcher>
-    <requestHandler name="/search" class="org.apache.solr.handler.component.SearchHandler"/>
-    <requestHandler name="standard" class="solr.StandardRequestHandler" default="true">
+         <schemaFactory class="ManagedIndexSchemaFactory">
+           <bool name="mutable">true</bool>
+           <str name="managedSchemaResourceName">managed-schema</str>
+         </schemaFactory>
+
+         When ManagedIndexSchemaFactory is specified, Solr will load the schema from
+         he resource named in 'managedSchemaResourceName', rather than from schema.xml.
+         Note that the managed schema resource CANNOT be named schema.xml.  If the managed
+         schema does not exist, Solr will create it after reading schema.xml, then rename
+         'schema.xml' to 'schema.xml.bak'.
+
+         Do NOT hand edit the managed schema - external modifications will be ignored and
+         overwritten as a result of schema modification REST API calls.
+
+         When ManagedIndexSchemaFactory is specified with mutable = true, schema
+         modification REST API calls will be allowed; otherwise, error responses will be
+         sent back for these requests.
+    -->
+    <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+    <updateHandler class="solr.DirectUpdateHandler2">
+        <updateLog>
+            <str name="dir">${solr.core0.data.dir:}</str>
+        </updateLog>
+    </updateHandler>
+
+    <!-- realtime get handler, guaranteed to return the latest stored fields
+      of any document, without the need to commit or open a new searcher. The current
+      implementation relies on the updateLog feature being enabled. -->
+    <requestHandler name="/get" class="solr.RealTimeGetHandler">
         <lst name="defaults">
-            <str name="echoParams">explicit</str>
+            <str name="omitHeader">true</str>
         </lst>
     </requestHandler>
-    <requestHandler name="/update" class="solr.XmlUpdateRequestHandler"/>
 
+    <requestDispatcher handleSelect="true" >
+        <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" formdataUploadLimitInKB="2048" />
+    </requestDispatcher>
+
+    <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
+    <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />
+    <requestHandler name="/update" class="solr.UpdateRequestHandler"  />
+    <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
 
 </config>
-

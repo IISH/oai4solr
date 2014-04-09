@@ -51,9 +51,9 @@ public class Demo {
     }
 
     private static void checkLib(String solr_home) {
-        File checkLib = new File( solr_home, "/lib/");
+        File checkLib = new File(solr_home, "/lib/");
         File[] files = checkLib.listFiles();
-        if ( files == null ||files.length == 0 ) {
+        if (files == null || files.length == 0) {
             log.fatal("No library plugins found. Please make sure the /demo/solr/lib folder has the oai2-plugin jar file.");
             System.exit(-1);
         }

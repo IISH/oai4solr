@@ -1,7 +1,7 @@
 #This is a OAI2 library plugin for Solr
 
 ##What is it ?
-A plugin that exposes your Solr 3.x indexes with the OAI2 protocol.
+A plugin that exposes your Solr 4.x indexes with the OAI2 protocol.
 
 ##How it works
 You can use simple xslt documents to map the raw Solr XML response into the oai_dc metadata format; and any other
@@ -44,7 +44,7 @@ The oai folder can be placed in each core; or higher up in de solr_home director
         oai_dc.xsl
         solr.xsl
     -lib
-        oai2-plugin-3.x-1.0.jar
+        oai2-plugin-4.1.jar
 
 then the setting ought to be
 
@@ -192,7 +192,7 @@ So in this example an oai identifier like 'oai:localhost:12345' would translate 
 The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields
 that contain the indexed datestamps are of type 'date' to allow for sorting. For example:
 
-    <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="date" class="solr.TrieDateField" sortMissingLast="true" omitNorms="true"/>
     <field name="my_datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
 
 The plugin will need to know which index fields can be used for querying and sorting. Set it  so:
@@ -398,7 +398,7 @@ directory structure should look like this:
                 +oai
             +docs
             -lib
-                oai2-plugin-3.x-1.0.jar
+                oai2-plugin-4.1.jar
 
 Start the demo with:
 
