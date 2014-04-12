@@ -167,10 +167,16 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
                 if (!Utils.isValidDatestamp(oaiRequest.getFrom(), "from", response))
                     return;
-                String from = Utils.parseRange(oaiRequest.getFrom());
 
-                if (!Utils.isValidDatestamp(oaiRequest.getUntil(), "until", response))
+                if (!Utils.isValidDatestamp(oaiRequest.getUntil(), "until", response)) {
                     return;
+                }
+
+                if (!Utils.isValidFromUntilCombination(Utils.parseRange(oaiRequest.getFrom()), oaiRequest.getUntil(), response)) {
+                    return;
+                }
+
+                String from = Utils.parseRange(oaiRequest.getFrom());
                 String until = Utils.parseRange(oaiRequest.getUntil());
 
                 q.add(String.format("%s:[%s TO %s]", Utils.getParam("field_index_datestamp"), from, until));
@@ -305,6 +311,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         } catch (JAXBException e) {
             log.error(e);
         }
+
 
         addStylesheets(file);
     }

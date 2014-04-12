@@ -185,6 +185,15 @@ public class Utils {
         return date2;
     }
 
+    private static Date parseDatestamp(String datestamp) throws ParseException {
+
+        final OAIPMHtype oaipmHtype = getParam(VerbType.IDENTIFY);
+        final SimpleDateFormat dateFormat = (oaipmHtype.getIdentify().getGranularity() == GranularityType.YYYY_MM_DD_THH_MM_SS_Z) ?
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS'Z'") :
+                new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.parse(datestamp);
+    }
+
     /**
      * getGregorianDate
      * <p/>
@@ -192,11 +201,9 @@ public class Utils {
      */
     public static XMLGregorianCalendar getGregorianDate(String datestamp) {
 
-        final OAIPMHtype oaipmHtype = getParam(VerbType.IDENTIFY);
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(oaipmHtype.getIdentify().getGranularity().value().replace("T", "'T'").replace("Z", "'Z'"));
         XMLGregorianCalendar gregorianDate = null;
         try {
-            gregorianDate = getGregorianDate(dateFormat.parse(datestamp));
+            gregorianDate = getGregorianDate(parseDatestamp(datestamp));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -301,14 +308,30 @@ public class Utils {
 
     public static boolean isValidDatestamp(String datestamp, String range, SolrQueryResponse response) {
 
-        return
-                datestamp == null || (
-                        datestampPattern.matcher(datestamp).matches() &&
-                                getParam(VerbType.IDENTIFY).getIdentify().getGranularity().value().length() >= datestamp.length()
-                ) ||
-                        error(response,
-                                String.format("The '%s' argument '%s' is not a valid UTCdatetime.", range, datestamp),
-                                OAIPMHerrorcodeType.BAD_ARGUMENT);
+        if (datestamp == null) return true;
+
+        if (!datestampPattern.matcher(datestamp).matches()) {
+            return error(response,
+                    String.format("The '%s' argument '%s' is not a valid UTCdatetime.", range, datestamp),
+                    OAIPMHerrorcodeType.BAD_ARGUMENT);
+        }
+
+        final String granularity = getParam(VerbType.IDENTIFY).getIdentify().getGranularity().value();
+        return granularity.length() >= datestamp.length() || error(response, String.format("The '%s' argument '%s' is outside the repository's granularity of '%s'.", range, datestamp, granularity), OAIPMHerrorcodeType.BAD_ARGUMENT);
+    }
+
+    /**
+     * isValidFromUntilCombination
+     * <p/>
+     * Check if the from parameter is not behind the until.
+     *
+     * @param from  The from datestamp
+     * @param until The until datestamp
+     * @return True if from <= until
+     */
+    public static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
+
+        return (from == null || until == null || parseDatestamp(from).getTime() <= parseDatestamp(until).getTime()) || error(response, "Bad date values, must have from<=until", OAIPMHerrorcodeType.BAD_ARGUMENT);
     }
 
     /**

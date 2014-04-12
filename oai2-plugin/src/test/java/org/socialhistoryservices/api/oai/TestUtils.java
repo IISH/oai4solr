@@ -5,6 +5,7 @@ import org.apache.solr.response.SolrQueryResponse;
 import org.openarchives.oai2.*;
 
 import java.math.BigInteger;
+import java.text.ParseException;
 
 /**
  * TestUtils
@@ -198,6 +199,29 @@ public class TestUtils extends TestCase {
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
+    }
+
+    public void testFromUntil() throws ParseException {
+
+        OAIPMHtype oaiForIdentify = new OAIPMHtype();
+        IdentifyType identify = new IdentifyType();
+        oaiForIdentify.setIdentify(identify);
+        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+        identify.setGranularity(GranularityType.YYYY_MM_DD);
+
+        assertTrue(Utils.isValidFromUntilCombination(null, null, response));
+        assertTrue(Utils.isValidFromUntilCombination("some from date", null, response));
+        assertTrue(Utils.isValidFromUntilCombination(null, "some until date", response));
+        assertTrue(Utils.isValidFromUntilCombination("2012-02-03", "2012-02-03", response));
+        assertFalse(Utils.isValidFromUntilCombination("2012-02-03", "2012-02-02", response));
+
+        identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
+        assertTrue(Utils.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:06Z", response));
+        assertFalse(Utils.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:05Z", response));
+
+        OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
+        oai.getError().clear();
     }
 
     public void testResumptionToken() throws Exception {
