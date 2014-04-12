@@ -32,7 +32,9 @@ import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.handler.RequestHandlerBase;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
-import org.apache.solr.search.*;
+import org.apache.solr.search.DocList;
+import org.apache.solr.search.QParser;
+import org.apache.solr.search.QParserPlugin;
 import org.openarchives.oai2.*;
 
 import javax.xml.bind.JAXBContext;
@@ -48,7 +50,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,7 +77,6 @@ public class OAIRequestHandler extends RequestHandlerBase {
         request.setParams(SolrParams.toSolrParams(list));
 
         final OAIPMHtype oai = new OAIPMHtype();
-        oai.setResponseDate(Utils.getGregorianDate(new Date()));
         response.add("oai", oai);
 
 
@@ -101,7 +101,8 @@ public class OAIRequestHandler extends RequestHandlerBase {
             case LIST_SETS:
             case LIST_METADATA_FORMATS:
                 response.getValues().remove("oai");
-                response.add("oai", Utils.loadStaticVerb(verb));
+                response.add("oai", Utils.getParam(verb));
+
                 break;
             case GET_RECORD:
             case LIST_IDENTIFIERS:
@@ -166,10 +167,16 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
                 if (!Utils.isValidDatestamp(oaiRequest.getFrom(), "from", response))
                     return;
-                String from = Utils.parseRange(oaiRequest.getFrom());
 
-                if (!Utils.isValidDatestamp(oaiRequest.getUntil(), "until", response))
+                if (!Utils.isValidDatestamp(oaiRequest.getUntil(), "until", response)) {
                     return;
+                }
+
+                if (!Utils.isValidFromUntilCombination(Utils.parseRange(oaiRequest.getFrom()), oaiRequest.getUntil(), response)) {
+                    return;
+                }
+
+                String from = Utils.parseRange(oaiRequest.getFrom());
                 String until = Utils.parseRange(oaiRequest.getUntil());
 
                 q.add(String.format("%s:[%s TO %s]", Utils.getParam("field_index_datestamp"), from, until));
@@ -268,6 +275,12 @@ public class OAIRequestHandler extends RequestHandlerBase {
         Utils.setParam(args, "field_sort_datestamp", "datestamp");
         Utils.setParam(args, "field_index_set", "set");
 
+        final File file = getOaiHome(args);
+        if (!file.exists()) {
+            log.fatal("Could not locate the oai_directory. Set the oai_home property in the solrconfig.xml's OAIRequestHandler section");
+            return;
+        }
+
         final List maxrecords = args.getAll("maxrecords");
         if (maxrecords == null)
             Utils.setParam(args, "maxrecords_default", 200);
@@ -280,23 +293,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
             }
         }
 
-        // Find the application's solr home folder
-        String solr_home = SolrResourceLoader.locateSolrHome();
-        if (solr_home == null)
-            solr_home = System.getProperty("solr.solr.home");
-        String oai_home = (String) args.get("oai_home");
-        oai_home = (oai_home == null)
-                ? solr_home + File.separatorChar + "oai"
-                : solr_home + oai_home;
-        File file = new File(oai_home);
-        if (!file.exists()) {
-            log.fatal("Could not locate the oai_directory: " + oai_home + " Set the oai_home property in the solrconfig.xml's OAIRequestHandler section");
-            return;
-        }
-        log.info("oai_home=" + oai_home);
-        args.remove("oai_home");
-        Utils.setParam(args, "oai_home", oai_home);
-
+        // Add our marchallers
         try {
             final JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class);
             Utils.setParam("marshaller", jc.createMarshaller());
@@ -306,7 +303,9 @@ public class OAIRequestHandler extends RequestHandlerBase {
         }
 
         try {
-            Utils.setParam(args, "ListSets", Utils.loadStaticVerb(VerbType.LIST_SETS));
+            Utils.setParam(VerbType.IDENTIFY, Utils.loadStaticVerb(VerbType.IDENTIFY));
+            Utils.setParam(VerbType.LIST_SETS, Utils.loadStaticVerb(VerbType.LIST_SETS));
+            Utils.setParam(VerbType.LIST_METADATA_FORMATS, Utils.loadStaticVerb(VerbType.LIST_METADATA_FORMATS));
         } catch (FileNotFoundException e) {
             log.warn(e);
         } catch (JAXBException e) {
@@ -315,6 +314,21 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
 
         addStylesheets(file);
+    }
+
+    private File getOaiHome(NamedList args) {
+        String solr_home = SolrResourceLoader.locateSolrHome();
+        if (solr_home == null)
+            solr_home = System.getProperty("solr.solr.home");
+        String oai_home = (String) args.get("oai_home");
+        oai_home = (oai_home == null)
+                ? solr_home + File.separatorChar + "oai"
+                : solr_home + oai_home;
+        File file = new File(oai_home);
+        log.info("oai_home=" + oai_home);
+        args.remove("oai_home");
+        Utils.setParam(args, "oai_home", oai_home);
+        return file;
     }
 
     private void addStylesheets(File oai_home) {

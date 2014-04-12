@@ -5,6 +5,7 @@ import org.apache.solr.response.SolrQueryResponse;
 import org.openarchives.oai2.*;
 
 import java.math.BigInteger;
+import java.text.ParseException;
 
 /**
  * TestUtils
@@ -25,7 +26,7 @@ public class TestUtils extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        response.getValues().remove("oai")  ;
+        response.getValues().remove("oai");
     }
 
     public void testIsValidIdentifier() {
@@ -105,11 +106,18 @@ public class TestUtils extends TestCase {
         assertEquals(OAIPMHerrorcodeType.NO_METADATA_FORMATS, oai.getError().get(0).getCode());
         oai.getError().clear();
 
-        Utils.setParam("some_schema", true);
+        ListMetadataFormatsType listMetadataFormatsType = new ListMetadataFormatsType();
+        final MetadataFormatType metadataFormatType = new MetadataFormatType();
+        metadataFormatType.setMetadataPrefix("some_schema");
+        listMetadataFormatsType.getMetadataFormat().add(metadataFormatType);
+        final OAIPMHtype forListlistMetadataFormats = new OAIPMHtype();
+        forListlistMetadataFormats.setListMetadataFormats(listMetadataFormatsType);
+        Utils.setParam(VerbType.LIST_METADATA_FORMATS, forListlistMetadataFormats);
+
         oaiRequest.setMetadataPrefix("some_schema");
         assertTrue(Utils.isValidMetadataPrefix(response, oaiRequest));
 
-        Utils.setParam("some_schema", null);
+        oaiRequest.setMetadataPrefix("some_other_schema");
         assertFalse(Utils.isValidMetadataPrefix(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.CANNOT_DISSEMINATE_FORMAT, oai.getError().get(0).getCode());
@@ -158,6 +166,21 @@ public class TestUtils extends TestCase {
 
     public void testIsValidDatestampRange() {
 
+        OAIPMHtype oaiForIdentify = new OAIPMHtype();
+        IdentifyType identify = new IdentifyType();
+        oaiForIdentify.setIdentify(identify);
+        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+
+        identify.setGranularity(GranularityType.YYYY_MM_DD);
+        assertTrue(Utils.isValidDatestamp("2012", "a range", response));
+        assertTrue(Utils.isValidDatestamp("2012-01", "a range", response));
+        assertTrue(Utils.isValidDatestamp("2012-02-03", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
+
+        identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
         assertTrue(Utils.isValidDatestamp("2012", "a range", response));
         assertTrue(Utils.isValidDatestamp("2012-01", "a range", response));
         assertTrue(Utils.isValidDatestamp("2012-02-03", "a range", response));
@@ -176,6 +199,29 @@ public class TestUtils extends TestCase {
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
+    }
+
+    public void testFromUntil() throws ParseException {
+
+        OAIPMHtype oaiForIdentify = new OAIPMHtype();
+        IdentifyType identify = new IdentifyType();
+        oaiForIdentify.setIdentify(identify);
+        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+        identify.setGranularity(GranularityType.YYYY_MM_DD);
+
+        assertTrue(Utils.isValidFromUntilCombination(null, null, response));
+        assertTrue(Utils.isValidFromUntilCombination("some from date", null, response));
+        assertTrue(Utils.isValidFromUntilCombination(null, "some until date", response));
+        assertTrue(Utils.isValidFromUntilCombination("2012-02-03", "2012-02-03", response));
+        assertFalse(Utils.isValidFromUntilCombination("2012-02-03", "2012-02-02", response));
+
+        identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
+        assertTrue(Utils.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:06Z", response));
+        assertFalse(Utils.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:05Z", response));
+
+        OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
+        oai.getError().clear();
     }
 
     public void testResumptionToken() throws Exception {
@@ -201,7 +247,7 @@ public class TestUtils extends TestCase {
         assertEquals(oaiResumptionToken.getMetadataPrefix(), resumptionTokenDecoded.getMetadataPrefix());
     }
 
-    public void testParams(){
+    public void testParams() {
 
         String key = "Now it is there";
         Utils.setParam(key, true);
@@ -214,7 +260,7 @@ public class TestUtils extends TestCase {
         assertNull(Utils.getParam(key));
     }
 
-    public void testJoin(){
+    public void testJoin() {
 
         String[] queryParts = {"a", "b", "c"};
         String join = Utils.join(queryParts, " AND ");
