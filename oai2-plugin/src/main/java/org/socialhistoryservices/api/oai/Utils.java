@@ -327,7 +327,7 @@ public class Utils {
      *
      * @param from  The from datestamp
      * @param until The until datestamp
-     * @return
+     * @return True if from <= until
      */
     public static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
 
