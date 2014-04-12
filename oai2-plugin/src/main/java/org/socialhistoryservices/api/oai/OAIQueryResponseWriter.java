@@ -61,20 +61,19 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
     public void write(Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
 
-        final OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
+        OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         oai.setResponseDate(Utils.getGregorianDate(new Date()));
-
-        writer.write("<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" \n" +
-                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "         xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/\n" +
-                "         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">");
-        addResponseDate(writer, oai.getResponseDate());
-        addRequest(writer, oai.getRequest());
 
         Object tmp = response.getValues().get("docList");
         boolean hasRecord = (tmp != null) && ((DocList) tmp).size() != 0;
 
         if (hasRecord) {
+            writer.write("<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" \n" +
+                    "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                    "         xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/\n" +
+                    "         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">");
+            addResponseDate(writer, oai.getResponseDate());
+            addRequest(writer, oai.getRequest());
             openXmlElement(writer, oai.getRequest().getVerb().value());
             ResumptionTokenType resumptionToken = null;
             switch (oai.getRequest().getVerb()) {
@@ -94,11 +93,10 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
             addResumptionToken(writer, resumptionToken);
 
             closeXmlElement(writer, oai.getRequest().getVerb().value());
+            writer.write("</OAI-PMH>");
         } else {
             norecords(writer, oai);
         }
-
-        writer.write("</OAI-PMH>");
     }
 
     private void addResponseDate(Writer writer, XMLGregorianCalendar calendar) throws IOException {
@@ -161,7 +159,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     private void norecords(Writer writer, OAIPMHtype oai) throws IOException {
 
         final Marshaller marshaller = (Marshaller) Utils.getParam("marshaller");
-        final JAXBElement element = new JAXBElement(qname, OAIPMHtype.class, oai.getIdentify());
+        final JAXBElement element = new JAXBElement(qname, OAIPMHtype.class, oai);
         try {
             marshaller.marshal(element, writer);
         } catch (JAXBException e) {
