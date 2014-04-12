@@ -26,7 +26,9 @@
         <header>
             <identifier>oai:localhost:<xsl:value-of select="$doc//str[@name='identifier']"/></identifier>
             <datestamp>
-                <xsl:value-of select="$doc//date[@name='datestamp']"/>
+                <xsl:call-template name="datestamp">
+                    <xsl:with-param name="solrdate" select="$doc//date[@name='datestamp']"/>
+                </xsl:call-template>
             </datestamp>
             <xsl:for-each select="$doc//arr[@name='theme']/str">
                 <setSpec>

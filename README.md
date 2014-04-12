@@ -398,7 +398,7 @@ directory structure should look like this:
                 +oai
             +docs
             -lib
-                oai2-plugin-3.x-1.0.jar
+                oai2-plugin-3.1.jar
 
 Start the demo with:
 

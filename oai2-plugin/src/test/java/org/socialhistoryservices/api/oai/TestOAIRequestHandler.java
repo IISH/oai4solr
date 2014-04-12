@@ -234,6 +234,15 @@ public class TestOAIRequestHandler extends TestCase {
         }
     }
 
+    public void testNoSuchMetadataFormat() {
+
+        final ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("verb", "ListRecords");
+        params.set("metadataPrefix", "unregistered_prefix");
+        OAIPMHtype oai2Document = server.sendRequest(params);
+        assertEquals(OAIPMHerrorcodeType.CANNOT_DISSEMINATE_FORMAT, oai2Document.getError().get(0).getCode());
+    }
+
     public void testResumptionToken() throws UnsupportedEncodingException {
 
         ResumptionToken token = new ResumptionToken();

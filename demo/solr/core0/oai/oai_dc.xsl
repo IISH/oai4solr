@@ -20,7 +20,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="2.0"
                 xmlns:saxon="http://saxon.sf.net/"
-        exclude-result-prefixes="saxon">
+                exclude-result-prefixes="saxon">
 
     <!-- Demonstrate how a Solr response can be mapped into an oai_dc format.
 
@@ -46,7 +46,9 @@
                 oai:localhost:<xsl:value-of select="$doc//str[@name='identifier']"/>
             </identifier>
             <datestamp>
-                <xsl:value-of select="$doc//date[@name='datestamp']"/>
+                <xsl:call-template name="datestamp">
+                    <xsl:with-param name="solrdate" select="$doc//date[@name='datestamp']"/>
+                </xsl:call-template>
             </datestamp>
             <xsl:for-each select="$doc//arr[@name='theme']/str">
                 <setSpec>
