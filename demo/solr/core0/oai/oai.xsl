@@ -47,6 +47,18 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template name="datestamp">
+        <xsl:param name="solrdate"/>
+        <xsl:choose>
+            <xsl:when test="string-length($solrdate) > 20">
+                <xsl:value-of select="concat(substring($solrdate, 0, 20), 'Z')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$solrdate"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!--
     Useful for debugging
         <xsl:template match="@*|node()">

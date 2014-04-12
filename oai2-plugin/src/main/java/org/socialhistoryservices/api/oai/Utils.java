@@ -34,6 +34,8 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -131,6 +133,11 @@ public class Utils {
         if (metadataPrefix == null) {
             return error(response, OAIPMHerrorcodeType.NO_METADATA_FORMATS);
         }
+
+        final OAIPMHtype oaipmHtype = getParam(VerbType.LIST_METADATA_FORMATS);
+        for (MetadataFormatType metadataFormatType : oaipmHtype.getListMetadataFormats().getMetadataFormat()) {
+            if (metadataFormatType.getMetadataPrefix().equals(metadataPrefix)) return true;
+        }
         return parameters.containsKey(metadataPrefix) || error(response, OAIPMHerrorcodeType.CANNOT_DISSEMINATE_FORMAT);
     }
 
@@ -146,11 +153,10 @@ public class Utils {
 
         if (setSpec == null || setSpec.isEmpty())
             return true;
-        final Object o = getParam("ListSets");
-        if (o == null) {
+        final OAIPMHtype oaipmHtype = getParam(VerbType.LIST_SETS);
+        if (oaipmHtype == null) {
             return error(response, OAIPMHerrorcodeType.NO_SET_HIERARCHY);
         }
-        OAIPMHtype oaipmHtype = (OAIPMHtype) o;
         final List<SetType> sets = oaipmHtype.getListSets().getSet();
         for (SetType setType : sets) {
             if (setType.getSetSpec().equals(setSpec))
@@ -162,7 +168,7 @@ public class Utils {
     /**
      * getGregorianDate
      * <p/>
-     * Convert a Java data into a GregorianCalendar date.
+     * Convert a Java date into a GregorianCalendar date in the Zulu timezone.
      */
     public static XMLGregorianCalendar getGregorianDate(Date date) {
 
@@ -171,10 +177,45 @@ public class Utils {
         XMLGregorianCalendar date2 = null;
         try {
             date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+            date2.setTimezone(0); // Zulu
         } catch (DatatypeConfigurationException e) {
             e.printStackTrace();
         }
+
         return date2;
+    }
+
+    /**
+     * getGregorianDate
+     * <p/>
+     * Convert a String into a GregorianCalendar date in the Zulu timezone.
+     */
+    public static XMLGregorianCalendar getGregorianDate(String datestamp) {
+
+        final OAIPMHtype oaipmHtype = getParam(VerbType.IDENTIFY);
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(oaipmHtype.getIdentify().getGranularity().value().replace("T", "'T'").replace("Z", "'Z'"));
+        XMLGregorianCalendar gregorianDate = null;
+        try {
+            gregorianDate = getGregorianDate(dateFormat.parse(datestamp));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return gregorianDate;
+    }
+
+    /**
+     * parseGregorianDate
+     * <p/>
+     * returns a datestamp in the allowed OAI2 datestamp format:
+     *
+     * @param date A milliseconds aware date
+     * @return A datestamp in the OAI2 proscribed format
+     */
+    public static String parseGregorianDate(XMLGregorianCalendar date) {
+
+        date.setTimezone(0); // Zulu
+        final OAIPMHtype oaipmHtype = getParam(VerbType.IDENTIFY);
+        return date.toString().substring(0, oaipmHtype.getIdentify().getGranularity().value().length() - 1) + "Z";
     }
 
     public static String join(String[] s, String glue) {
@@ -186,6 +227,16 @@ public class Utils {
         for (int x = 1; x < k; ++x)
             out.append(glue).append(s[x]);
         return out.toString();
+    }
+
+    public static OAIPMHtype getParam(VerbType verb) {
+
+        return (OAIPMHtype) parameters.get(verb.value());
+    }
+
+    public static void setParam(VerbType verb, Object def) {
+
+        setParam(verb.value(), def);
     }
 
     public static Object getParam(String key) {
@@ -204,7 +255,7 @@ public class Utils {
         Object value = args.get(key);
         if (value == null)
             value = def;
-        Utils.setParam(key, value);
+        setParam(key, value);
     }
 
     public static void setParam(String key, Object o) {
@@ -250,9 +301,14 @@ public class Utils {
 
     public static boolean isValidDatestamp(String datestamp, String range, SolrQueryResponse response) {
 
-        return datestamp == null || datestampPattern.matcher(datestamp).matches() || error(response,
-                String.format("The '%s' argument '%s' is not a valid UTCdatetime.", range, datestamp),
-                OAIPMHerrorcodeType.BAD_ARGUMENT);
+        return
+                datestamp == null || (
+                        datestampPattern.matcher(datestamp).matches() &&
+                                getParam(VerbType.IDENTIFY).getIdentify().getGranularity().value().length() >= datestamp.length()
+                ) ||
+                        error(response,
+                                String.format("The '%s' argument '%s' is not a valid UTCdatetime.", range, datestamp),
+                                OAIPMHerrorcodeType.BAD_ARGUMENT);
     }
 
     /**
@@ -266,7 +322,7 @@ public class Utils {
      */
     public static String stripOaiPrefix(String identifier) {
 
-        final String prefix = (String) Utils.getParam("prefix");
+        final String prefix = (String) getParam("prefix");
         final String id = identifier.substring(prefix.length());
         System.out.println("Prefix is " + prefix);
         System.out.println("Identifier is " + identifier);
@@ -286,10 +342,11 @@ public class Utils {
      */
     @SuppressWarnings("unchecked")
     public static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
-        final File f = new File(Utils.getParam("oai_home") + File.separator + verb.value() + ".xml");
+        final File f = new File(getParam("oai_home") + File.separator + verb.value() + ".xml");
         final FileInputStream fis = new FileInputStream(f);
         final Source source = new StreamSource(fis);
-        final Unmarshaller marshaller = (Unmarshaller) Utils.getParam("unmarshaller");
+        final Unmarshaller marshaller = (Unmarshaller) getParam("unmarshaller");
         return ((JAXBElement<OAIPMHtype>) marshaller.unmarshal(source)).getValue();
     }
+
 }

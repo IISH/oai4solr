@@ -44,6 +44,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.Date;
 
 /**
  * OAIQueryResponseWriter
@@ -61,6 +62,8 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     public void write(Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
+        oai.setResponseDate(Utils.getGregorianDate(new Date()));
+
         Object tmp = response.getValues().get("docList");
         boolean hasRecord = (tmp != null) && ((DocList) tmp).size() != 0;
 
