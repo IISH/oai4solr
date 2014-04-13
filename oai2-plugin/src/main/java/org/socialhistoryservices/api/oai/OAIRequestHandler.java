@@ -76,7 +76,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         list.add("wt", Utils.getParam("wt", "oai")); // The request writer
         request.setParams(SolrParams.toSolrParams(list));
 
-        final OAIPMHtype oai = new OAIPMHtype();
+        OAIPMHtype oai = new OAIPMHtype();
         response.add("oai", oai);
 
 
@@ -101,7 +101,9 @@ public class OAIRequestHandler extends RequestHandlerBase {
             case LIST_SETS:
             case LIST_METADATA_FORMATS:
                 response.getValues().remove("oai");
-                response.add("oai", Utils.getParam(verb));
+                oai = Utils.getParam(verb);
+                oai.setRequest(oaiRequest);
+                response.add("oai", oai);
 
                 break;
             case GET_RECORD:
@@ -172,12 +174,12 @@ public class OAIRequestHandler extends RequestHandlerBase {
                     return;
                 }
 
-                if (!Utils.isValidFromUntilCombination(Utils.parseRange(oaiRequest.getFrom()), oaiRequest.getUntil(), response)) {
+                if (!Utils.isValidFromUntilCombination(oaiRequest.getFrom(), oaiRequest.getUntil(), response)) {
                     return;
                 }
 
-                String from = Utils.parseRange(oaiRequest.getFrom());
-                String until = Utils.parseRange(oaiRequest.getUntil());
+                String from = Utils.parseRange(oaiRequest.getFrom(), "from");
+                String until = Utils.parseRange(oaiRequest.getUntil(), "until");
 
                 q.add(String.format("%s:[%s TO %s]", Utils.getParam("field_index_datestamp"), from, until));
 

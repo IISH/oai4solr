@@ -153,15 +153,20 @@ public class TestUtils extends TestCase {
 
     public void testFormatDate() {
 
-        assertEquals("*", Utils.parseRange(null));
-        assertEquals("2012-01-01T00:00:00Z", Utils.parseRange("2012"));
-        assertEquals("2012-02-01T00:00:00Z", Utils.parseRange("2012-02"));
-        assertEquals("2012-02-03T00:00:00Z", Utils.parseRange("2012-02-03"));
-        assertEquals("2012-02-03T04:00:00Z", Utils.parseRange("2012-02-03T04"));
-        assertEquals("2012-02-03T04:05:00Z", Utils.parseRange("2012-02-03T04:05"));
-        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06"));
-        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06Z"));
-        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06.789sZ"));
+        OAIPMHtype oaiForIdentify = new OAIPMHtype();
+        IdentifyType identify = new IdentifyType();
+        oaiForIdentify.setIdentify(identify);
+        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+
+        assertEquals("*", Utils.parseRange(null, "from"));
+
+        identify.setGranularity(GranularityType.YYYY_MM_DD);
+        assertEquals("2012-02-03T00:00:00Z", Utils.parseRange("2012-02-03", "from"));
+        assertEquals("2012-02-03T23:59:59Z", Utils.parseRange("2012-02-03", "until"));
+
+        identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
+        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06Z", "from"));
+        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06Z", "until"));
     }
 
     public void testIsValidDatestampRange() {
@@ -172,8 +177,8 @@ public class TestUtils extends TestCase {
         Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
 
         identify.setGranularity(GranularityType.YYYY_MM_DD);
-        assertTrue(Utils.isValidDatestamp("2012", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-01", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-01", "a range", response));
         assertTrue(Utils.isValidDatestamp("2012-02-03", "a range", response));
         assertFalse(Utils.isValidDatestamp("2012-02-03T04", "a range", response));
         assertFalse(Utils.isValidDatestamp("2012-02-03T04:05", "a range", response));
@@ -181,20 +186,20 @@ public class TestUtils extends TestCase {
         assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
-        assertTrue(Utils.isValidDatestamp("2012", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-01", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-01", "a range", response));
         assertTrue(Utils.isValidDatestamp("2012-02-03", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-02-03T04", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-02-03T04:05", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05", "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
         assertTrue(Utils.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
 
-        assertFalse(Utils.isValidDatestamp(Utils.parseRange(""), "a range", response));
+        assertFalse(Utils.isValidDatestamp("nonsense", "a range", response));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
-        assertFalse(Utils.isValidDatestamp(Utils.parseRange("2012-02-a"), "a range", response));
+        assertFalse(Utils.isValidDatestamp("2012-02-a", "a range", response));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();

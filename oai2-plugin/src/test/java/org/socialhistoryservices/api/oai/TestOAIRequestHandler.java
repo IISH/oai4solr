@@ -247,7 +247,7 @@ public class TestOAIRequestHandler extends TestCase {
         ResumptionToken token = new ResumptionToken();
         token.setVerb(VerbType.LIST_IDENTIFIERS);
         token.setMetadataPrefix("oai_dc");
-        token.setFrom("2001");
+        token.setFrom("2001-01-01T00:00:00Z");
         ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(token, 0, 200, 1000, (Integer) Utils.getParam("resumptionTokenExpirationInSeconds"));
 
         String bad_token = resumptionTokenType.getValue().concat("12345");

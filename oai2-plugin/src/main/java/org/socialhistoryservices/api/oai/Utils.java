@@ -47,7 +47,8 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
-    final private static Pattern datestampPattern = Pattern.compile("^([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?$");
+    final private static Pattern datestampSLong = Pattern.compile("^\\d{4}-[0-1][0-2]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z$|^\\d{4}-[0-1][0-2]-[0-3][0-9]$");
+    final private static Pattern datestampShort = Pattern.compile("^\\d{4}-[0-1][0-2]-[0-3][0-9]");
 
     final private static HashMap<String, Object> parameters = new HashMap<String, Object>();
 
@@ -187,8 +188,7 @@ public class Utils {
 
     private static Date parseDatestamp(String datestamp) throws ParseException {
 
-        final OAIPMHtype oaipmHtype = getParam(VerbType.IDENTIFY);
-        final SimpleDateFormat dateFormat = (oaipmHtype.getIdentify().getGranularity() == GranularityType.YYYY_MM_DD_THH_MM_SS_Z) ?
+        final SimpleDateFormat dateFormat = (datestamp.length() == GranularityType.YYYY_MM_DD_THH_MM_SS_Z.value().length()) ?
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS'Z'") :
                 new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.parse(datestamp);
@@ -278,46 +278,39 @@ public class Utils {
     }
 
     /**
-     * formatDate
-     * <p/>
-     * Use the template to supply default date parameters to pad the given date in to a ISO 8601 date YYYY-mm-DDTHH:MM:SSZ format
-     */
-    public static String formatDate(String date) {
-
-        String template = "YYYY-01-01T00:00:00Z";
-
-        final int tl = template.length();
-        final int dl = date.length();
-        if (dl > tl)
-            return date.substring(0, tl - 1) + "Z";
-        else if (dl < tl)
-            return date + template.substring(dl);
-        return date;
-    }
-
-    /**
      * parseRange
+     * <p/>
+     * The range will determine to pad to the present or future:
+     * range(from)  => 2001-02-03 => 2001-02-03T00:00:00Z
+     * range(until) => 2001-02-03 => 2001-02-03T23:59:59Z
      * <p/>
      *
      * @return An ISO 8601 formatted date or an infinite range Lucene character when the date is null
      */
-    public static String parseRange(String date) {
+    public static String parseRange(String datestamp, String range) {
 
-        return (date == null) ? "*" : formatDate(date);
+        if (datestamp == null) return "*";
+
+        return (datestamp.length() == GranularityType.YYYY_MM_DD_THH_MM_SS_Z.value().length()) ? datestamp
+                : (range.equalsIgnoreCase("from")) ? datestamp.concat("T00:00:00Z") : datestamp.concat("T23:59:59Z");
     }
 
     public static boolean isValidDatestamp(String datestamp, String range, SolrQueryResponse response) {
 
         if (datestamp == null) return true;
 
-        if (!datestampPattern.matcher(datestamp).matches()) {
-            return error(response,
-                    String.format("The '%s' argument '%s' is not a valid UTCdatetime.", range, datestamp),
-                    OAIPMHerrorcodeType.BAD_ARGUMENT);
-        }
+        final GranularityType granularity = getParam(VerbType.IDENTIFY).getIdentify().getGranularity();
+        Pattern pattern = (granularity == GranularityType.YYYY_MM_DD_THH_MM_SS_Z) ? datestampSLong : datestampShort;
 
-        final String granularity = getParam(VerbType.IDENTIFY).getIdentify().getGranularity().value();
-        return granularity.length() >= datestamp.length() || error(response, String.format("The '%s' argument '%s' is outside the repository's granularity of '%s'.", range, datestamp, granularity), OAIPMHerrorcodeType.BAD_ARGUMENT);
+        if (!pattern.matcher(datestamp).matches()) return error(response,
+                String.format("The '%s' argument '%s' is not a valid UTCdatetime.", range, datestamp),
+                OAIPMHerrorcodeType.BAD_ARGUMENT);
+
+        return (granularity == GranularityType.YYYY_MM_DD_THH_MM_SS_Z ||
+                datestamp.length() == GranularityType.YYYY_MM_DD.value().length())
+                || error(response,
+                String.format("The '%s' argument '%s' is outside this repository's granularity '%s'.", range, datestamp, granularity.value()),
+                OAIPMHerrorcodeType.BAD_ARGUMENT);
     }
 
     /**
