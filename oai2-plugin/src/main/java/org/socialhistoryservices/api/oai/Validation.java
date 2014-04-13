@@ -33,8 +33,8 @@ import java.util.regex.Pattern;
  */
 public class Validation {
 
-    final private static Pattern datestampSLong = Pattern.compile("^\\d{4}-[0-1][0-2]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z$|^\\d{4}-[0-1][0-2]-[0-3][0-9]$");
-    final private static Pattern datestampShort = Pattern.compile("^\\d{4}-[0-1][0-2]-[0-3][0-9]");
+    final private static Pattern datestampSLong = Pattern.compile("^\\d{4}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z$|^\\d{4}-[0-1][0-9]-[0-3][0-9]$");
+    final private static Pattern datestampShort = Pattern.compile("^\\d{4}-[0-1][0-9]-[0-3][0-9]");
 
     public static boolean error(SolrQueryResponse response, OAIPMHerrorcodeType code) {
 
