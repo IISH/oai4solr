@@ -102,7 +102,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     private void addResponseDate(Writer writer, XMLGregorianCalendar calendar) throws IOException {
 
         openXmlElement(writer, "responseDate");
-        writer.write(Utils.formatDate(calendar.toString()));
+        writer.write(Utils.parseGregorianDate(calendar));
         closeXmlElement(writer, "responseDate");
     }
 
@@ -124,11 +124,11 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
     private void addResumptionToken(Writer writer, ResumptionTokenType resumptionToken) throws IOException {
 
-        if ( resumptionToken != null ) {
+        if (resumptionToken != null) {
             writer.write("<resumptionToken");
             writeAttribute(writer, "cursor", String.valueOf(resumptionToken.getCursor()));
             writeAttribute(writer, "completeListSize", String.valueOf(resumptionToken.getCompleteListSize()));
-            writeAttribute(writer, "expirationDate", Utils.formatDate(resumptionToken.getExpirationDate().toString()));
+            writeAttribute(writer, "expirationDate", Utils.parseGregorianDate(resumptionToken.getExpirationDate()));
             writer.write(">" + resumptionToken.getValue());
             closeXmlElement(writer, "resumptionToken");
         }
@@ -150,7 +150,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
     /**
      * norecords
-     *
+     * <p/>
      * Marshalls the Identifier, ListSets, ListMetadataFormats and errors.
      *
      * @throws IOException
