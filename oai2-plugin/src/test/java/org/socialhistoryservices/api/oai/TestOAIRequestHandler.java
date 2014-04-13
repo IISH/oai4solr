@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -56,20 +55,19 @@ public class TestOAIRequestHandler extends TestCase {
             if (solr_home == null)
                 solr_home = deriveSolrHome();
 
-            Utils.clearParams();
+            Parameters.clearParams();
             server = new EmbeddedServer(new CoreContainer(solr_home, new File(solr_home, "solr.xml")), CORE);
 
             deleteIndex();
 
-            final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd'T'hh:MM:ss'Z'");
-            marker_from = simpleDateFormat.parse(datestamp_from).getTime();
-            marker_until = simpleDateFormat.parse(datestamp_until).getTime();
+            marker_from = Parsing.parseDatestamp(datestamp_from).getTime();
+            marker_until = Parsing.parseDatestamp(datestamp_until).getTime();
 
             for (int i = 0; i < testRecordCount; i++) {
                 SolrInputDocument document = new SolrInputDocument();
                 document.addField("identifier", i);
                 String datestamp = String.valueOf(1000 + i) + "-06-21T12:00:00Z";
-                Date date = simpleDateFormat.parse(datestamp);
+                Date date = Parsing.parseDatestamp(datestamp);
                 document.addField("datestamp", date);
                 document.addField("resource", "A title " + i);
                 String theme = "setSpec" + i % 3;
@@ -128,7 +126,7 @@ public class TestOAIRequestHandler extends TestCase {
         params.set("verb", "Identify");
         OAIPMHtype oai2Document = server.sendRequest(params);
 
-        OAIPMHtype oaipmHtype = Utils.loadStaticVerb(VerbType.IDENTIFY);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.IDENTIFY);
         IdentifyType identify = oai2Document.getIdentify();
         assertNotNull(identify);
 
@@ -154,7 +152,7 @@ public class TestOAIRequestHandler extends TestCase {
         OAIPMHtype oai2Document = server.sendRequest(params);
         ListSetsType listSets = oai2Document.getListSets();
 
-        OAIPMHtype oaipmHtype = Utils.loadStaticVerb(VerbType.LIST_SETS);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.LIST_SETS);
 
         for (SetType setTypeFromRequest : listSets.getSet()) {
             boolean match = false;
@@ -202,7 +200,7 @@ public class TestOAIRequestHandler extends TestCase {
         OAIPMHtype oai2Document = server.sendRequest(params);
         assertEquals(OAIPMHerrorcodeType.NO_RECORDS_MATCH, oai2Document.getError().get(0).getCode());
 
-        Utils.setParam("ListSets", null);
+        Parameters.setParam("ListSets", null);
         oai2Document = server.sendRequest(params);
         assertEquals(OAIPMHerrorcodeType.NO_SET_HIERARCHY, oai2Document.getError().get(0).getCode());
     }
@@ -219,7 +217,7 @@ public class TestOAIRequestHandler extends TestCase {
         ListMetadataFormatsType listMetadataFormats = oai2Document.getListMetadataFormats();
         assertNotNull(listMetadataFormats);
 
-        OAIPMHtype oaipmHtype = Utils.loadStaticVerb(VerbType.LIST_METADATA_FORMATS);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.LIST_METADATA_FORMATS);
 
         for (MetadataFormatType metadataFormatTypeFromRequest : listMetadataFormats.getMetadataFormat()) {
             boolean match = false;
@@ -249,7 +247,7 @@ public class TestOAIRequestHandler extends TestCase {
         token.setVerb(VerbType.LIST_IDENTIFIERS);
         token.setMetadataPrefix("oai_dc");
         token.setFrom("2001-01-01T00:00:00Z");
-        ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(token, 0, 200, 1000, (Integer) Utils.getParam("resumptionTokenExpirationInSeconds"));
+        ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(token, 0, 200, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds"));
 
         String bad_token = resumptionTokenType.getValue().concat("12345");
         final ModifiableSolrParams params = new ModifiableSolrParams();
@@ -287,7 +285,7 @@ public class TestOAIRequestHandler extends TestCase {
             final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
             for (HeaderType header : listIdentifiers.getHeader()) {
                 int i = count++;
-                String expected = Utils.getParam("prefix") + String.valueOf(i);
+                String expected = Parameters.getParam("prefix") + String.valueOf(i);
                 String actual = header.getIdentifier();
                 assertEquals(expected, actual);
 
@@ -321,8 +319,6 @@ public class TestOAIRequestHandler extends TestCase {
      */
     public void testFromUntil() throws java.text.ParseException {
 
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd'T'hh:MM:ss'Z'");
-
         final ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("verb", "ListIdentifiers");
         params.set("from", datestamp_from);
@@ -339,7 +335,7 @@ public class TestOAIRequestHandler extends TestCase {
             final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
             for (HeaderType header : listIdentifiers.getHeader()) {
                 count++;
-                long datestamp = simpleDateFormat.parse(header.getDatestamp()).getTime();
+                long datestamp = Parsing.parseDatestamp(header.getDatestamp()).getTime();
                 assertTrue("datestamp < from : " + header.getDatestamp() + " < " + datestamp_from, datestamp >= marker_from);
                 assertTrue("datestamp > until : " + header.getDatestamp() + " > " + datestamp_until, datestamp <= marker_until);
             }

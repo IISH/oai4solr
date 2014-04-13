@@ -16,21 +16,28 @@
   ~
   ~     You should have received a copy of the GNU General Public License
   ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+-->
+
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
                 xmlns="http://www.openarchives.org/OAI/2.0/">
+
+    <!--
+    Demonstrate how a Solr response can be mapped into an raw format.
+
+    This is not a proper OAI2 response, because the solr namespace is not added anywhere.
+    -->
 
     <xsl:import href="oai.xsl"/>
 
     <xsl:template name="header">
         <header>
             <identifier>
-                <xsl:value-of select="$doc//str[@name='iisg_oai']"/>
+                oai:localhost:<xsl:value-of select="$doc//str[@name='identifier']"/>
             </identifier>
             <datestamp>
-                <xsl:value-of select="$doc//date[@name='iisg_datestamp']"/>
+                <xsl:value-of select="$doc//date[@name='datestamp']"/>
             </datestamp>
-            <xsl:for-each select="$doc//arr[@name='iisg_collectionName']/str">
+            <xsl:for-each select="$doc//arr[@name='theme']/str">
                 <setSpec>
                     <xsl:value-of select="."/>
                 </setSpec>
@@ -40,7 +47,25 @@
 
     <xsl:template name="metadata">
         <metadata>
-            <xsl:copy-of select="$doc"/>
+            <solr:doc xmlns:solr="http://wiki.apache.org/solr/">
+                <xsl:for-each select="$doc/*">
+                    <xsl:element name="solr:{local-name(.)}">
+                        <xsl:choose>
+                            <xsl:when test="local-name()='arr'">
+                                <xsl:copy-of select="@*"/>
+                                <xsl:for-each select="str">
+                                    <solr:str>
+                                        <xsl:value-of select="text()"/>
+                                    </solr:str>
+                                </xsl:for-each>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:copy-of select="text()|@*"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:element>
+                </xsl:for-each>
+            </solr:doc>
         </metadata>
     </xsl:template>
 

@@ -47,7 +47,25 @@
 
     <xsl:template name="metadata">
         <metadata>
-            <xsl:copy-of select="$doc/*"/>
+            <solr:doc xmlns:solr="http://wiki.apache.org/solr/">
+                <xsl:for-each select="$doc/*">
+                    <xsl:element name="solr:{local-name(.)}">
+                        <xsl:choose>
+                            <xsl:when test="local-name()='arr'">
+                                <xsl:copy-of select="@*"/>
+                                <xsl:for-each select="str">
+                                    <solr:str>
+                                        <xsl:value-of select="text()"/>
+                                    </solr:str>
+                                </xsl:for-each>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:copy-of select="text()|@*"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:element>
+                </xsl:for-each>
+            </solr:doc>
         </metadata>
     </xsl:template>
 
