@@ -62,7 +62,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     public void write(Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
-        oai.setResponseDate(Utils.getGregorianDate(new Date()));
+        oai.setResponseDate(Parsing.getGregorianDate(new Date()));
 
         Object tmp = response.getValues().get("docList");
         boolean hasRecord = (tmp != null) && ((DocList) tmp).size() != 0;
@@ -102,7 +102,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     private void addResponseDate(Writer writer, XMLGregorianCalendar calendar) throws IOException {
 
         openXmlElement(writer, "responseDate");
-        writer.write(Utils.parseGregorianDate(calendar));
+        writer.write(Parsing.parseGregorianDate(calendar));
         closeXmlElement(writer, "responseDate");
     }
 
@@ -128,7 +128,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
             writer.write("<resumptionToken");
             writeAttribute(writer, "cursor", String.valueOf(resumptionToken.getCursor()));
             writeAttribute(writer, "completeListSize", String.valueOf(resumptionToken.getCompleteListSize()));
-            writeAttribute(writer, "expirationDate", Utils.parseGregorianDate(resumptionToken.getExpirationDate()));
+            writeAttribute(writer, "expirationDate", Parsing.parseGregorianDate(resumptionToken.getExpirationDate()));
             writer.write(">" + resumptionToken.getValue());
             closeXmlElement(writer, "resumptionToken");
         }
@@ -158,7 +158,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     @SuppressWarnings("unchecked")
     private void norecords(Writer writer, OAIPMHtype oai) throws IOException {
 
-        final Marshaller marshaller = (Marshaller) Utils.getParam("marshaller");
+        final Marshaller marshaller = (Marshaller) Parameters.getParam("marshaller");
         final JAXBElement element = new JAXBElement(qname, OAIPMHtype.class, oai);
         try {
             marshaller.marshal(element, writer);
@@ -226,9 +226,9 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
         StreamSource source = new StreamSource(new ByteArrayInputStream(baos.toByteArray()));
         Result result = new StreamResult(writer);
-        Templates t = (Templates) Utils.getParam(metadataPrefix);
+        Templates t = (Templates) Parameters.getParam(metadataPrefix);
         Transformer transformer = t.newTransformer();
-        transformer.setParameter("prefix", Utils.getParam("prefix"));
+        transformer.setParameter("prefix", Parameters.getParam("prefix"));
         transformer.transform(source, result);
     }
 

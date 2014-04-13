@@ -107,7 +107,7 @@ public class EmbeddedServer extends EmbeddedSolrServer {
         // unmarchall (is that a verb ?) the response into the main OAIPMHtype instance
         byte[] bytes = is.toByteArray();
         final Source source = new StreamSource(new ByteArrayInputStream(bytes));
-        final Unmarshaller marshaller = (Unmarshaller) Utils.getParam("unmarshaller");
+        final Unmarshaller marshaller = (Unmarshaller) Parameters.getParam("unmarshaller");
         JAXBElement<OAIPMHtype> oai = null;
         try {
             oai = (JAXBElement<OAIPMHtype>) marshaller.unmarshal(source);

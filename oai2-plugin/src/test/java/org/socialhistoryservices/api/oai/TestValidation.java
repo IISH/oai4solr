@@ -8,11 +8,11 @@ import java.math.BigInteger;
 import java.text.ParseException;
 
 /**
- * TestUtils
+ * TestValidation
  * <p/>
  * Assert core logic
  */
-public class TestUtils extends TestCase {
+public class TestValidation extends TestCase {
 
     SolrQueryResponse response;
 
@@ -34,63 +34,63 @@ public class TestUtils extends TestCase {
         final RequestType oaiRequest = new RequestType();
 
         oaiRequest.setIdentifier(null);
-        assertFalse(Utils.isValidIdentifier(response, oaiRequest));
+        assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai");
-        assertFalse(Utils.isValidIdentifier(response, oaiRequest));
+        assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:");
-        assertFalse(Utils.isValidIdentifier(response, oaiRequest));
+        assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla");
-        assertFalse(Utils.isValidIdentifier(response, oaiRequest));
+        assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla:");
-        assertFalse(Utils.isValidIdentifier(response, oaiRequest));
+        assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla:valid");
-        assertTrue(Utils.isValidIdentifier(response, oaiRequest));
+        assertTrue(Validation.isValidIdentifier(response, oaiRequest));
 
         oaiRequest.setIdentifier("oai:bla:valid:also");
-        assertTrue(Utils.isValidIdentifier(response, oaiRequest));
+        assertTrue(Validation.isValidIdentifier(response, oaiRequest));
     }
 
     public void testIsAvailableIdentifier() {
 
-        assertFalse(Utils.isAvailableIdentifier(response, 0));
+        assertFalse(Validation.isAvailableIdentifier(response, 0));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
-        assertFalse(Utils.isAvailableIdentifier(response, 2));
+        assertFalse(Validation.isAvailableIdentifier(response, 2));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
         oai.getError().clear();
 
-        assertTrue(Utils.isAvailableIdentifier(response, 1));
+        assertTrue(Validation.isAvailableIdentifier(response, 1));
     }
 
     public void testHasMatchingRecords() {
 
-        assertTrue(Utils.hasMatchingRecords(response, 1));
-        assertTrue(Utils.hasMatchingRecords(response, 2));
+        assertTrue(Validation.hasMatchingRecords(response, 1));
+        assertTrue(Validation.hasMatchingRecords(response, 2));
 
-        assertFalse(Utils.hasMatchingRecords(response, 0));
+        assertFalse(Validation.hasMatchingRecords(response, 0));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.NO_RECORDS_MATCH, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -101,7 +101,7 @@ public class TestUtils extends TestCase {
         final RequestType oaiRequest = new RequestType();
 
         oaiRequest.setMetadataPrefix(null);
-        assertFalse(Utils.isValidMetadataPrefix(response, oaiRequest));
+        assertFalse(Validation.isValidMetadataPrefix(response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.NO_METADATA_FORMATS, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -112,13 +112,13 @@ public class TestUtils extends TestCase {
         listMetadataFormatsType.getMetadataFormat().add(metadataFormatType);
         final OAIPMHtype forListlistMetadataFormats = new OAIPMHtype();
         forListlistMetadataFormats.setListMetadataFormats(listMetadataFormatsType);
-        Utils.setParam(VerbType.LIST_METADATA_FORMATS, forListlistMetadataFormats);
+        Parameters.setParam(VerbType.LIST_METADATA_FORMATS, forListlistMetadataFormats);
 
         oaiRequest.setMetadataPrefix("some_schema");
-        assertTrue(Utils.isValidMetadataPrefix(response, oaiRequest));
+        assertTrue(Validation.isValidMetadataPrefix(response, oaiRequest));
 
         oaiRequest.setMetadataPrefix("some_other_schema");
-        assertFalse(Utils.isValidMetadataPrefix(response, oaiRequest));
+        assertFalse(Validation.isValidMetadataPrefix(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.CANNOT_DISSEMINATE_FORMAT, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -127,9 +127,9 @@ public class TestUtils extends TestCase {
 
     public void testListSets() {
 
-        assertTrue(Utils.isValidSet(null, response));
+        assertTrue(Validation.isValidSet(null, response));
 
-        assertFalse(Utils.isValidSet("some_set", response));
+        assertFalse(Validation.isValidSet("some_set", response));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.NO_SET_HIERARCHY, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -140,15 +140,15 @@ public class TestUtils extends TestCase {
         setType.setSetSpec("some_other_set");
         value.getSet().add(setType);
         oai_with_set.setListSets(value);
-        Utils.setParam("ListSets", oai_with_set);
+        Parameters.setParam("ListSets", oai_with_set);
 
-        assertFalse(Utils.isValidSet("some_set", response));
+        assertFalse(Validation.isValidSet("some_set", response));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.NO_RECORDS_MATCH, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         setType.setSetSpec("some_set");
-        assertTrue(Utils.isValidSet("some_set", response));
+        assertTrue(Validation.isValidSet("some_set", response));
     }
 
     public void testFormatDate() {
@@ -156,17 +156,17 @@ public class TestUtils extends TestCase {
         OAIPMHtype oaiForIdentify = new OAIPMHtype();
         IdentifyType identify = new IdentifyType();
         oaiForIdentify.setIdentify(identify);
-        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+        Parameters.setParam(VerbType.IDENTIFY, oaiForIdentify);
 
-        assertEquals("*", Utils.parseRange(null, "from"));
+        assertEquals("*", Parsing.parseRange(null, "from"));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD);
-        assertEquals("2012-02-03T00:00:00Z", Utils.parseRange("2012-02-03", "from"));
-        assertEquals("2012-02-03T23:59:59Z", Utils.parseRange("2012-02-03", "until"));
+        assertEquals("2012-02-03T00:00:00Z", Parsing.parseRange("2012-02-03", "from"));
+        assertEquals("2012-02-03T23:59:59Z", Parsing.parseRange("2012-02-03", "until"));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
-        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06Z", "from"));
-        assertEquals("2012-02-03T04:05:06Z", Utils.parseRange("2012-02-03T04:05:06Z", "until"));
+        assertEquals("2012-02-03T04:05:06Z", Parsing.parseRange("2012-02-03T04:05:06Z", "from"));
+        assertEquals("2012-02-03T04:05:06Z", Parsing.parseRange("2012-02-03T04:05:06Z", "until"));
     }
 
     public void testIsValidDatestampRange() {
@@ -174,32 +174,32 @@ public class TestUtils extends TestCase {
         OAIPMHtype oaiForIdentify = new OAIPMHtype();
         IdentifyType identify = new IdentifyType();
         oaiForIdentify.setIdentify(identify);
-        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+        Parameters.setParam(VerbType.IDENTIFY, oaiForIdentify);
 
         identify.setGranularity(GranularityType.YYYY_MM_DD);
-        assertFalse(Utils.isValidDatestamp("2012", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-01", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-02-03", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-01", "a range", response));
+        assertTrue(Validation.isValidDatestamp("2012-02-03", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
-        assertFalse(Utils.isValidDatestamp("2012", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-01", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-02-03", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05", "a range", response));
-        assertFalse(Utils.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
-        assertTrue(Utils.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-01", "a range", response));
+        assertTrue(Validation.isValidDatestamp("2012-02-03", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
+        assertTrue(Validation.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
 
-        assertFalse(Utils.isValidDatestamp("nonsense", "a range", response));
+        assertFalse(Validation.isValidDatestamp("nonsense", "a range", response));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
-        assertFalse(Utils.isValidDatestamp("2012-02-a", "a range", response));
+        assertFalse(Validation.isValidDatestamp("2012-02-a", "a range", response));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -211,18 +211,18 @@ public class TestUtils extends TestCase {
         OAIPMHtype oaiForIdentify = new OAIPMHtype();
         IdentifyType identify = new IdentifyType();
         oaiForIdentify.setIdentify(identify);
-        Utils.setParam(VerbType.IDENTIFY, oaiForIdentify);
+        Parameters.setParam(VerbType.IDENTIFY, oaiForIdentify);
         identify.setGranularity(GranularityType.YYYY_MM_DD);
 
-        assertTrue(Utils.isValidFromUntilCombination(null, null, response));
-        assertTrue(Utils.isValidFromUntilCombination("some from date", null, response));
-        assertTrue(Utils.isValidFromUntilCombination(null, "some until date", response));
-        assertTrue(Utils.isValidFromUntilCombination("2012-02-03", "2012-02-03", response));
-        assertFalse(Utils.isValidFromUntilCombination("2012-02-03", "2012-02-02", response));
+        assertTrue(Validation.isValidFromUntilCombination(null, null, response));
+        assertTrue(Validation.isValidFromUntilCombination("some from date", null, response));
+        assertTrue(Validation.isValidFromUntilCombination(null, "some until date", response));
+        assertTrue(Validation.isValidFromUntilCombination("2012-02-03", "2012-02-03", response));
+        assertFalse(Validation.isValidFromUntilCombination("2012-02-03", "2012-02-02", response));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
-        assertTrue(Utils.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:06Z", response));
-        assertFalse(Utils.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:05Z", response));
+        assertTrue(Validation.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:06Z", response));
+        assertFalse(Validation.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:05Z", response));
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
@@ -238,7 +238,7 @@ public class TestUtils extends TestCase {
         oaiResumptionToken.setMetadataPrefix("prefix");
 
         int nextCursor = 200;
-        final ResumptionTokenType resumptionTokenEncoded = ResumptionToken.encodeResumptionToken(oaiResumptionToken, 0, nextCursor, 1000, (Integer) Utils.getParam("resumptionTokenExpirationInSeconds", 86400));
+        final ResumptionTokenType resumptionTokenEncoded = ResumptionToken.encodeResumptionToken(oaiResumptionToken, 0, nextCursor, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds", 86400));
 
         final ResumptionToken resumptionTokenDecoded = ResumptionToken.decodeResumptionToken(resumptionTokenEncoded.getValue());
 
@@ -255,20 +255,20 @@ public class TestUtils extends TestCase {
     public void testParams() {
 
         String key = "Now it is there";
-        Utils.setParam(key, true);
-        assertTrue((Boolean) Utils.getParam(key));
+        Parameters.setParam(key, true);
+        assertTrue((Boolean) Parameters.getParam(key));
 
-        assertEquals("b", Utils.getParam("a", "b"));
-        assertNull(Utils.getParam("c"));
+        assertEquals("b", Parameters.getParam("a", "b"));
+        assertNull(Parameters.getParam("c"));
 
-        Utils.setParam(key, null);
-        assertNull(Utils.getParam(key));
+        Parameters.setParam(key, null);
+        assertNull(Parameters.getParam(key));
     }
 
     public void testJoin() {
 
         String[] queryParts = {"a", "b", "c"};
-        String join = Utils.join(queryParts, " AND ");
+        String join = Parsing.join(queryParts, " AND ");
         assertEquals("a AND b AND c", join);
     }
 

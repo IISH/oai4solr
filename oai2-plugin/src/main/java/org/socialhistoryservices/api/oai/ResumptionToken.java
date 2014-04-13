@@ -67,11 +67,11 @@ public class ResumptionToken extends RequestType {
         final ResumptionTokenType resumptionToken = new ResumptionTokenType();
         resumptionToken.setCursor(BigInteger.valueOf(cursor));
         final long t = new Date().getTime() + 1000L * resumptionTokenExpirationInSeconds;
-        resumptionToken.setExpirationDate(Utils.getGregorianDate(new Date(t)));
+        resumptionToken.setExpirationDate(Parsing.getGregorianDate(new Date(t)));
         resumptionToken.setCompleteListSize(BigInteger.valueOf(matches));
 
         // Parameters are in fixed order: "verb", "from", "until","set","metadataPrefix","cursor"
-        final String s = (String) Utils.getParam("separator", ",");
+        final String s = (String) Parameters.getParam("separator", ",");
         String token = oaiResumptionToken.getVerb().value() + s + getValue(oaiResumptionToken.getFrom()) + s + getValue(oaiResumptionToken.getUntil()) + s + getValue(oaiResumptionToken.getSet()) + s + getValue(oaiResumptionToken.getMetadataPrefix()) + s + nextCursor;
         final byte[] bytes = token.getBytes("utf-8");
         resumptionToken.setValue(Base64.byteArrayToBase64(bytes, 0, bytes.length));
@@ -99,7 +99,7 @@ public class ResumptionToken extends RequestType {
             return null;
         final byte[] bytes = Base64.base64ToByteArray(token);
         String pt = new String(bytes, "utf-8");
-        final String separator = (String) Utils.getParam("separator", ",");
+        final String separator = (String) Parameters.getParam("separator", ",");
         final String[] split = pt.split(separator, 6);
         ResumptionToken re = new ResumptionToken();
 
