@@ -65,9 +65,8 @@
         <!-- Some documents may be large or small, depending on the schema.
         In that case, we set the step of the paging to a lower count. -->
         <lst name="maxrecords">
-            <int name="default">200</int>
+            <int name="default">5</int>
             <int name="ead">1</int>
-            <int name="eci">1</int>
         </lst>
 
         <!-- The resumption token is build up from string parameters (from,until,set and metadataprefix). The separator
