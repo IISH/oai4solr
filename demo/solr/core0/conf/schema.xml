@@ -238,6 +238,9 @@ but may be good for SKUs.  Can insert dashes in the wrong place and still match.
         <field name="datestamp" type="date" indexed="true" stored="true" required="true" default="NOW"/>
         <field name="theme" type="string" indexed="true" stored="true" required="true" multiValued="true" />
         <field name="resource" type="string" indexed="false" stored="true" compressed="true" required="true" />
+        <field name="allfields" type="text" indexed="true" stored="false" required="true" multiValued="true" />
+        <dynamicField name="marc_*" type="text" indexed="true" stored="false" multiValued="true"/>
+        <copyField source="marc_*" dest="allfields" multiValued="true"/>
     </fields>
 
 

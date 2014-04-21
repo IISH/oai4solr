@@ -76,6 +76,123 @@
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
 
 
+
+
+    <!-- Custom IISG SRU handler.
+   If you use multicore and want to use a specific SRW implementation for each core, then you can
+   set the str[@name=solr.data] and str[@name=explain] fields accordingly.
+   -->
+    <requestHandler name="/srw" class="org.socialhistoryservices.api.srw.SRURequestHandler">
+        <str name="wt">srw</str>
+        <lst name="srw_properties">
+
+            <str name="srw_home">/core0/srw</str>
+
+            <!--
+               Set this value to use a folder other than the core's solr.home config directory.
+               All paths you specify here are relative to this folder.
+
+               You can also specify databaseInfo and metaInfo in the explain.xml document. The values
+               used here are for the xslt processor
+            -->
+            <str name="dbname">Our SRW database</str>
+
+            <int name="maximumTerms">100</int>
+            <int name="maximumRecords">50</int>
+
+            <str name="xmlSchemas">solr dc marcxml ead</str>
+            <str name="defaultSchema">marcxml</str>
+
+            <str name="solr.identifier">info:srw/cql-context-set/2/solr</str>
+            <str name="solr.transformer">solr.xsl</str>
+            <str name="solr.location">.</str>
+            <str name="solr.title">Solr response format</str>
+            <!--
+            If you want to add some parameters to the stylesheet...
+            <str name="solr.parameter.p1">p1</str>
+            <str name="solr.parameter.p2">p2</str>
+            -->
+
+            <str name="dc.identifier">info:srw/schema/1/dc-v1.1</str>
+            <str name="dc.transformer">dc-v1.1.xsl</str>
+            <str name="dc.location">.</str>
+            <str name="dc.title">Simple Dublin Core: http://purl.org/dc/elements/1.1/</str>
+
+            <str name="marcxml.identifier">info:srw/schema/1/marcxml-v1.1</str>
+            <str name="marcxml.transformer">marcxml-v1.1.xsl</str>
+            <str name="marcxml.location">.</str>
+            <str name="marcxml.title">Slim MarcXml: http://www.loc.gov/MARC21/slim</str>
+
+            <str name="ead.identifier">info:srw/schema/1/ead-2002</str>
+            <str name="ead.transformer">ead-2002.xsl</str>
+            <str name="ead.location">.</str>
+            <str name="ead.title">EAD Version 2002</str>
+
+            <!-- System xslts... -->
+            <str name="system.xmlSchemas">cql-2-lucene xml-2-json</str>
+            <str name="cql-2-lucene.identifier">cql-2-lucene</str>
+            <str name="cql-2-lucene.transformer">cql-2-lucene.xsl</str>
+            <str name="cql-2-lucene.location">.</str>
+            <str name="cql-2-lucene.title">Converts an CQL query into a Lucene console query string</str>
+
+            <!--
+            The explain, search and scan stylesheets will be used in the xml response, so the
+            browser can make html. For this to work, declare ShowFileRequestHandler
+            <requestHandler name="/file" class="solr.admin.ShowFileRequestHandler"/>
+            -->
+            <str name="explainStyleSheet">../file?file=explainResponse.xsl&amp;contentType=application/xml</str>
+            <str name="searchStyleSheet">../file?file=searchRetrieveResponse.xsl&amp;contentType=application/xml</str>
+            <str name="scanStyleSheet">../file?file=scanResponse.xsl&amp;contentType=application/xml</str>
+
+            <str name="explain">explain.xml</str>
+
+            <str name="xml-2-json.identifier">xml-2-json</str>
+            <str name="xml-2-json.transformer">xml-2-json.xsl</str>
+            <str name="xml-2-json.location">.</str>
+            <str name="xml-2-json.parameter.debug">false</str>
+            <str name="xml-2-json.parameter.use-rabbitfish">true</str>
+            <str name="xml-2-json.parameter.use-badgerfish">false</str>
+            <str name="xml-2-json.parameter.use-rayfish">false</str>
+            <str name="xml-2-json.parameter.use-namespaces">false</str>
+            <str name="xml-2-json.parameter.skip-root">false</str>
+            <str name="xml-2-json.callbackkey">callback</str>
+
+        </lst>
+
+        <!-- SimpleFacetParameters
+                Set to include FacetedResults in the ExtraResponseData. The setting will call method:
+                SimpleFacets::NamedList getFieldCacheCounts(SolrIndexSearcher searcher, DocSet docs, String fieldName, int offset, int limit, int mincount, boolean missing, String sort, String prefix)
+                and will produce a facet of list of FacetedResults
+
+                These parameters are the same as described in:
+                http://wiki.apache.org/solr/SimpleFacetParameters
+                Such as: facet.field, facet.query,facet.prefix,facet.limit, etc.
+
+                Do not use Lucene fieldnames in facet.field, but the CQL indices you mapped to Lucene index fields in the
+                explain.xml document's indexInfo element.
+                For example, use: <str name="facet.field">dc.creator</str> but NOT <str name="facet.field">author</str>
+
+                The use of facet.query may lead to unpredictable results
+
+                You may want to add the same facet str parameters to the solr.QuerySenderListener.arr.queries.lst
+        -->
+        <lst name="facets">
+            <str name="facet.field">dc.contributor</str>
+            <str name="facet.field">dc.subject</str>
+            <str name="facet.limit">10</str>
+            <str name="facet.mincount">1</str>
+        </lst>
+
+    </requestHandler>
+
+    <requestHandler name="/file" class="solr.admin.ShowFileRequestHandler"/>
+
+    <!-- Custom IISG wt that is being called from the SRU handler -->
+    <queryResponseWriter name="srw" default="false" class="org.socialhistoryservices.api.srw.SRUQueryResponseWriter"
+                        />
+
+
+
     <!-- Copy and past from the Solr 3.6.2 example -->
 
     <luceneMatchVersion>LUCENE_36</luceneMatchVersion>
@@ -439,6 +556,5 @@
 
         -->
     </requestHandler>
-
 
 </config>

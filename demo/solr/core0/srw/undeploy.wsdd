@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<undeployment
+    xmlns="http://xml.apache.org/axis/wsdd/">
+  <service name="ExplainHTTPGet" provider=""/>
+  <service name="SRW" provider=""/>
+  <service name="ExplainSOAP" provider=""/>
+</undeployment>

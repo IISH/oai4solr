@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2010 International Institute for Social History, The Netherlands.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+	http://www.loc.gov/standards/sru/resources/diagnostics-list.html
+-->
+
+<diagnostics>
+    <diagnostic>
+        <code>1</code>
+        <category>general</category>
+        <description>General system error</description>
+        <details>The server returns this error when it is unable to supply a more specific diagnostic. The sever may
+            also optionally supply debugging information.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>2</code>
+        <category>general</category>
+        <description>System temporarily unavailable</description>
+        <details>The server cannot respond right now, perhaps because it&apos;s in a maintenance cycle, but will be able
+            to in the future.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>3</code>
+        <category>general</category>
+        <description>Authentication error</description>
+        <details>The request could not be processed due to lack of authentication.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>4</code>
+        <category>general</category>
+        <description>Unsupported operation</description>
+        <details>Currently three operations are defined -- searchRetrieve, explain, and scan. searchRetrieve and explain
+            are mandatory, so this diagnostic would apply only to scan, or in SRU where an undefined operation is sent.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>5</code>
+        <category>general</category>
+        <description>Unsupported version</description>
+        <details>Currently only version 1.1 is defined and so this diagnostic has no meaning. In the future, when
+            another version is defined, for example version 1.2, this diagnostic may be returned when the server
+            receives a request where the version parameter indicates 1.2, and the server doesn&apos;t support version
+            1.2.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>6</code>
+        <category>general</category>
+        <description>Unsupported parameter value</description>
+        <details>This diagnostic might be returned for a searchRetrieve request which includes the recordPacking
+            parameter with a value of &apos;xml&apos;, when the server does not support that value. The diagnostic might
+            supply the name of parameter, in this case &apos;recordPacking&apos;.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>7</code>
+        <category>general</category>
+        <description>Mandatory parameter not supplied</description>
+        <details>This diagnostic might be returned for a searchRetrieve request which omits the query parameter. The
+            diagnostic might supply the name of missing parameter, in this case &apos;query&apos;.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>8</code>
+        <category>general</category>
+        <description>Unsupported Parameter</description>
+        <details>This diagnostic might be returned for a searchRetrieve request which includes the recordXPath parameter
+            when the server does not support that parameter. The diagnostic might supply the name of unsupported
+            parameter, in this case &apos;recordXPath&apos;.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>10</code>
+        <category>query</category>
+        <description>Query syntax error</description>
+        <details>The query was invalid, but no information is given for exactly what was wrong with it. Eg. dc.title foo
+            fish (The reason is that foo isn&apos;t a valid relation in the default context set, but the server isn&apos;t
+            telling you this for some reason)
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>12</code>
+        <category>query</category>
+        <description>Too many characters in query</description>
+        <details>The length (number of characters) of the query exceeds the maximum length supported by the server.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>13</code>
+        <category>query</category>
+        <description>Invalid or unsupported use of parentheses</description>
+        <details>The query couldn&apos;t be processed due to the use of parentheses. Typically either that they are
+            mismatched, or in the wrong place. Eg. (((fish) or (sword and (b or ) c)
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>14</code>
+        <category>query</category>
+        <description>Invalid or unsupported use of quotes</description>
+        <details>The query couldn&apos;t be processed due to the use of quotes. Typically that they are mismatched Eg.
+            &quot;fish&apos;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>15</code>
+        <category>query</category>
+        <description>Unsupported context set</description>
+        <details>A context set given in the query isn&apos;t known to the server. Eg. foo.title any fish</details>
+    </diagnostic>
+    <diagnostic>
+        <code>16</code>
+        <category>query</category>
+        <description>Unsupported index</description>
+        <details>The index isn&apos;t known, possibly within a context set. Eg. dc.author any sanderson (dc has a
+            creator index, not author)
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>18</code>
+        <category>query</category>
+        <description>Unsupported combination of indexes</description>
+        <details>The particular use of indexes in a boolean query can&apos;t be processed. Eg. The server may not be
+            able to do title queries merged with description queries.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>19</code>
+        <category>query</category>
+        <description>Unsupported relation</description>
+        <details>A relation in the query is unknown or unsupported. Eg. The server can&apos;t handle &apos;within&apos;
+            searches for dates, but can handle equality searches.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>20</code>
+        <category>query</category>
+        <description>Unsupported relation modifier</description>
+        <details>A relation modifier in the query is unknown or unsupported by the server. Eg. &apos;dc.title any/fuzzy
+            starfish&apos; when fuzzy isn&apos;t supported.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>21</code>
+        <category>query</category>
+        <description>Unsupported combination of relation modifers</description>
+        <details>Two (or more) relation modifiers can&apos;t be used together. Eg. dc.title any/cql.word/cql.string
+            &quot;star fish&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>22</code>
+        <category>query</category>
+        <description>Unsupported combination of relation and index</description>
+        <details>While the index and relation are supported, they can&apos;t be used together. Eg. dc.author within
+            &quot;1 5&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>23</code>
+        <category>query</category>
+        <description>Too many characters in term</description>
+        <details>The term is too long. Eg. The server may simply refuse to process a term longer than a given length.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>24</code>
+        <category>query</category>
+        <description>Unsupported combination of relation and term</description>
+        <details>The relation cannot be used to process the term. Eg dc.title within &quot;sanderson&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>26</code>
+        <category>query</category>
+        <description>Non special character escaped in term</description>
+        <details>Characters may be escaped incorrectly Eg &quot;\a\r\n\s&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>27</code>
+        <category>query</category>
+        <description>Empty term unsupported</description>
+        <details>Some servers do not support the use of an empty term for search or for scan. Eg: dc.title &gt; &quot;&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>28</code>
+        <category>query</category>
+        <description>Masking character not supported</description>
+        <details>A masking character given in the query is not supported. Eg. The server may not support * or ? or both
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>29</code>
+        <category>query</category>
+        <description>Masked words too short</description>
+        <details>The masked words are too short, so the server won&apos;t process them as they would likely match too
+            many terms. Eg. dc.title any *
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>30</code>
+        <category>query</category>
+        <description>Too many masking characters in term</description>
+        <details>The query has too many masking characters, so the server won&apos;t process them. Eg. dc.title any
+            &quot;???a*f??b* *a?&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>31</code>
+        <category>query</category>
+        <description>Anchoring character not supported</description>
+        <details>The server doesn&apos;t support the anchoring character (^) Eg dc.title = &quot;^jaws&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>32</code>
+        <category>query</category>
+        <description>Anchoring character in unsupported position</description>
+        <details>The anchoring character appears in an invalid part of the term, typically the middle of a word. Eg
+            dc.title any &quot;fi^sh&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>33</code>
+        <category>query</category>
+        <description>Combination of proximity/adjacency and masking characters not supported</description>
+        <details>The server cannot handle both adjacency (= relation for words) or proximity (the boolean) in
+            combination with masking characters. Eg. dc.title = &quot;this is a titl* fo? a b*k&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>34</code>
+        <category>query</category>
+        <description>Combination of proximity/adjacency and anchoring characters not supported</description>
+        <details>Similarly, the server cannot handle anchoring characters.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>35</code>
+        <category>query</category>
+        <description>Term contains only stopwords</description>
+        <details>If the server does not index words such as &apos;the&apos; or &apos;a&apos;, and the term consists only
+            of these words, then while there may be records that match, the server cannot find any. Eg. dc.title any
+            &quot;the&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>36</code>
+        <category>query</category>
+        <description>Term in invalid format for index or relation</description>
+        <details>This might happen when the index is of dates or numbers, but the term given is a word. Eg dc.date &gt;
+            &quot;fish&quot;</details>
+    </diagnostic>
+    <diagnostic>
+        <code>37</code>
+        <category>query</category>
+        <description>Unsupported boolean operator</description>
+        <details>For cases when the server does not support all of the boolean operators defined by CQL. The most
+            commonly unsupported is Proximity, but could be used for NOT, OR or AND.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>38</code>
+        <category>query</category>
+        <description>Too many boolean operators in query</description>
+        <details>There were too many search clauses given for the server to process.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>39</code>
+        <category>query</category>
+        <description>Proximity not supported</description>
+        <details>Proximity is not supported at all.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>40</code>
+        <category>query</category>
+        <description>Unsupported proximity relation</description>
+        <details>The relation given for the proximity is unsupported. Eg the server can only process = and &gt; was
+            given.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>41</code>
+        <category>query</category>
+        <description>Unsupported proximity distance</description>
+        <details>The distance was too big or too small for the server to handle, or didn&apos;t make sense. Eg 0
+            characters or less than 100000 words
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>42</code>
+        <category>query</category>
+        <description>Unsupported proximity unit</description>
+        <details>The unit of proximity is unsupported, possibly because it is not defined.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>43</code>
+        <category>query</category>
+        <description>Unsupported proximity ordering</description>
+        <details>The server cannot process the requested order or lack thereof for the proximity boolean</details>
+    </diagnostic>
+    <diagnostic>
+        <code>44</code>
+        <category>query</category>
+        <description>Unsupported combination of proximity modifiers</description>
+        <details>While all of the modifiers are supported individually, this particular combination is not.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>46</code>
+        <category>query</category>
+        <description>Unsupported boolean modifier</description>
+        <details>A boolean modifier on the request isn&apos;t supported.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>47</code>
+        <category>query</category>
+        <description>Cannot process query; reason unknown</description>
+        <details>The server can&apos;t tell (or isn&apos;t telling) you why it can&apos;t execute the query, maybe it&apos;s
+            a bad query or maybe it requests an unsupported capability.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>48</code>
+        <category>query</category>
+        <description>Query feature unsupported</description>
+        <details>the server is able (contrast with 47) to tell you that something you asked for is not supported.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>49</code>
+        <category>query</category>
+        <description>Masking character in unsupported position</description>
+        <details>eg, a server that can handle xyz* but not *xyz or x*yz</details>
+    </diagnostic>
+    <diagnostic>
+        <code>50</code>
+        <category>result set</category>
+        <description>Result sets not supported</description>
+        <details>The server cannot create a persistent result set.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>51</code>
+        <category>result set</category>
+        <description>Result set does not exist</description>
+        <details>The client asked for a result set in the query which does not exist, either because it never did or
+            because it had expired.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>52</code>
+        <category>result set</category>
+        <description>Result set temporarily unavailable</description>
+        <details>The result set exists, it cannot be accessed, but will be able to be accessed again in the future.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>53</code>
+        <category>result set</category>
+        <description>Result sets only supported for retrieval</description>
+        <details>Other operations on results apart from retrieval, such as sorting them or combining them, are not
+            supported.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>55</code>
+        <category>result set</category>
+        <description>Combination of result sets with search terms not supported</description>
+        <details>Existing result sets cannot be combined with new terms to create new result sets. eg cql.resultsetid =
+            foo not dc.title any fish
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>58</code>
+        <category>result set</category>
+        <description>Result set created with unpredictable partial results available</description>
+        <details>The result set is not complete, possibly due to the processing being interupted mid way through. Some
+            of the results may not even be matches.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>59</code>
+        <category>result set</category>
+        <description>Result set created with valid partial results available</description>
+        <details>All of the records in the result set are matches, but not all records that should be there are.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>60</code>
+        <category>result set</category>
+        <description>Result set not created: too many matching records</description>
+        <details>There were too many records to create a persistent result set.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>61</code>
+        <category>records</category>
+        <description>First record position out of range</description>
+        <details>For example, if the request matches 10 records, but the start position is greater than 10.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>64</code>
+        <category>records</category>
+        <description>Record temporarily unavailable</description>
+        <details>The record requested cannot be accessed currently, but will be able to be in the future.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>65</code>
+        <category>records</category>
+        <description>Record does not exist</description>
+        <details>The record does not exist, either because it never did, or because it has subsequently been deleted.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>66</code>
+        <category>records</category>
+        <description>Unknown schema for retrieval</description>
+        <details>The record schema requested is unknown. Eg. the client asked for MODS when the server can only return
+            simple Dublin Core
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>67</code>
+        <category>records</category>
+        <description>Record not available in this schema</description>
+        <details>The record schema is known, but this particular record cannot be transformed into it.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>68</code>
+        <category>records</category>
+        <description>Not authorised to send record</description>
+        <details>This particular record requires additional authorisation in order to receive it.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>69</code>
+        <category>records</category>
+        <description>Not authorised to send record in this schema</description>
+        <details>The record can be retrieved in other schemas, but the one requested requires futher authorisation.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>70</code>
+        <category>records</category>
+        <description>Record too large to send</description>
+        <details>The record is too large to send.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>71</code>
+        <category>records</category>
+        <description>Unsupported record packing</description>
+        <details>The server supports only one of string or xml, or the client requested a recordPacking which is
+            unknown.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>72</code>
+        <category>records</category>
+        <description>XPath retrieval unsupported</description>
+        <details>The server does not support the retrieval of nodes from within the record.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>73</code>
+        <category>records</category>
+        <description>XPath expression contains unsupported feature</description>
+        <details>Some aspect of the XPath expression is unsupported. For example, the server might be able to process
+            element nodes, but not functions.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>74</code>
+        <category>records</category>
+        <description>Unable to evaluate XPath expression</description>
+        <details>The server could not evaluate the expression, either because it was invalid or it lacks some
+            capability.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>80</code>
+        <category>sort</category>
+        <description>Sort not supported</description>
+        <details>the server cannot perform any sort; that is the server only returns data in the default sequence.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>82</code>
+        <category>sort</category>
+        <description>Unsupported sort sequence</description>
+        <details>The particular sequence of sort keys is not supported, but the keys may be supported individually.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>83</code>
+        <category>sort</category>
+        <description>Too many records to sort</description>
+        <details>used when the server will only sort result sets under a certain size and the request returned a set
+            larger than that limit.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>84</code>
+        <category>sort</category>
+        <description>Too many sort keys to sort</description>
+        <details>the server can accept a sort statement within a request but cannot deliver as requested, e.g. the
+            server can sort by a maximum of 2 keys only such as &quot;title&quot; and &quot;date&quot; but was requested
+            to sort by &quot;title&quot;, &quot;author&quot; and &quot;date&quot;.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>86</code>
+        <category>sort</category>
+        <description>Cannot sort: incompatible record formats</description>
+        <details>The result set includes records in different schemas and there is insufficient commonality among the
+            schemas to enable a sort.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>87</code>
+        <category>sort</category>
+        <description>Unsupported schema for sort</description>
+        <details>the server does not support sort for records in a particular schema, e.g. it supports sort for records
+            in the DC schema but not in the ONIX schema.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>88</code>
+        <category>sort</category>
+        <description>Unsupported path for sort</description>
+        <details>the server can accept a sort statement within a request but cannot deliver as requested, e.g. the
+            server can deliver in title or date sequence but subject was requested.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>89</code>
+        <category>sort</category>
+        <description>Path unsupported for schema</description>
+        <details>The path given cannot be generated for the schema requested. For example asking for /record/fulltext
+            within the simple Dublin Core schema
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>90</code>
+        <category>sort</category>
+        <description>Unsupported direction</description>
+        <details>the server can accept a sort statement within a request but cannot deliver as requested, e.g. the
+            server can deliver in ascending only but descending was requested.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>91</code>
+        <category>sort</category>
+        <description>Unsupported case</description>
+        <details>the server can accept a sort statement within a request but cannot deliver as requested, e.g. the
+            server&apos;s index is single case so sorting case sensitive is unsupported
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>92</code>
+        <category>sort</category>
+        <description>Unsupported missing value action</description>
+        <details>the server can accept a sort statement within a request but cannot deliver as requested. For example,
+            the request includes a constant that the server should use where a record being sorted lacks the data field
+            but the server cannot use the constant to override its normal behavior, e.g. sorting as a high value.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>93</code>
+        <category>sort</category>
+        <description>Sort ended due to missing value</description>
+        <details>missingValue of ‘abort’</details>
+    </diagnostic>
+    <diagnostic>
+        <code>110</code>
+        <category>stylesheet</category>
+        <description>Stylesheets not supported</description>
+        <details>The SRU server does not support stylesheets, or a stylesheet was requested from an SRW server.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>111</code>
+        <category>stylesheet</category>
+        <description>Unsupported stylesheet</description>
+        <details>This particular stylesheet is not supported, but others may be.</details>
+    </diagnostic>
+    <diagnostic>
+        <code>120</code>
+        <category>scan</category>
+        <description>Response position out of range</description>
+        <details>The request includes a position in response that is not valid for the list. For example a request
+            indicates a response position = 15 and maximum terms = 20, meaning that it wants a response to include 15
+            entries before the term, plus the term, then another 4. The server would return this diagnostic if there
+            were not 15 previous entries.
+        </details>
+    </diagnostic>
+    <diagnostic>
+        <code>121</code>
+        <category>scan</category>
+        <description>Too many terms requested</description>
+        <details>Say you ask for 500 terms and the server has a (fixed) maximum of 300. It would supply a value of
+            &apos;300&apos; for details. If &apos;details&apos; is not supplied, this might mean that the server doesn&apos;t
+            have a fixed maximum and was just unable to deliver all the requested terms.
+        </details>
+    </diagnostic>
+</diagnostics>

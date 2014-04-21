@@ -25,6 +25,7 @@ limitations under the License.
 
     <modules>
         <module>oai2-plugin</module>
+        <module>srw-plugin</module>
         <module>demo</module>
     </modules>
 
