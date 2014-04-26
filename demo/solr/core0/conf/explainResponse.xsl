@@ -5,7 +5,7 @@
     xmlns:srw="http://www.loc.gov/zing/srw/"
     xmlns:zr="http://explain.z3950.org/dtd/2.0/">
 
-<xsl:import href="../file?file=stdiface.xsl&amp;contentType=application/xml"/>
+<xsl:import href="?file=stdiface.xsl&amp;contentType=application/xml"/>
 
 <xsl:output method="html" doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN" doctype-system="http://www.w3.org/TR/html4/loose.dtd"/>
 

@@ -137,7 +137,7 @@
 
             <!--
             The explain, search and scan stylesheets will be used in the xml response, so the
-            browser can make html. For this to work, declare ShowFileRequestHandler
+            browser can make html. For this to work, declare a ShowFileRequestHandler class
             <requestHandler name="/file" class="solr.admin.ShowFileRequestHandler"/>
             -->
             <str name="explainStyleSheet">../file?file=explainResponse.xsl&amp;contentType=application/xml</str>
@@ -155,14 +155,10 @@
             <str name="xml-2-json.parameter.use-rayfish">false</str>
             <str name="xml-2-json.parameter.use-namespaces">false</str>
             <str name="xml-2-json.parameter.skip-root">false</str>
-            <str name="xml-2-json.callbackkey">callback</str>
 
         </lst>
 
-        <!-- SimpleFacetParameters
-                Set to include FacetedResults in the ExtraResponseData. The setting will call method:
-                SimpleFacets::NamedList getFieldCacheCounts(SolrIndexSearcher searcher, DocSet docs, String fieldName, int offset, int limit, int mincount, boolean missing, String sort, String prefix)
-                and will produce a facet of list of FacetedResults
+        <!-- facets can be added as ExtraResponse data.
 
                 These parameters are the same as described in:
                 http://wiki.apache.org/solr/SimpleFacetParameters
@@ -170,11 +166,7 @@
 
                 Do not use Lucene fieldnames in facet.field, but the CQL indices you mapped to Lucene index fields in the
                 explain.xml document's indexInfo element.
-                For example, use: <str name="facet.field">dc.creator</str> but NOT <str name="facet.field">author</str>
-
-                The use of facet.query may lead to unpredictable results
-
-                You may want to add the same facet str parameters to the solr.QuerySenderListener.arr.queries.lst
+                For example, use dc.creator and NOT <str name="facet.field">author</str>
         -->
         <lst name="facets">
             <str name="facet.field">dc.contributor</str>

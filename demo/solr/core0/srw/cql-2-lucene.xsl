@@ -35,6 +35,8 @@ limitations under the License.
             CQL structure
         </triple or searchClause>
     </cql2lucene>
+
+    Which we will convert into a Solr query string.
     
     -->
 

@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.DOMUtil;
 import org.apache.solr.common.util.NamedList;
-import org.apache.solr.schema.IndexSchema;
+import org.apache.solr.schema.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -51,24 +51,21 @@ import java.util.*;
  */
 class Config {
 
-    private IndexSchema schema;
     private static int c;
-    private String setSolr, xml2json_callback_key;
-
-    private final Log log = LogFactory.getLog(Config.class);
+    private static String setSolr;
+    private static final Log log = LogFactory.getLog(Config.class);
 
     /**
+     * init
+     * <p/>
      * Reads all configuration parameters and loads the CQL-2-Lucene list into memory.
      *
      * @param args Solr namedlist parameters as they were set in the solrconfig core document.
      * @return An instance of a SolrSRWDatabase.
-     * @throws Exception
      */
-    public SolrSRWDatabase init(IndexSchema schema, String solr_solr_home, NamedList args) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    public static SolrSRWDatabase init(IndexSchema schema, String solr_solr_home, NamedList args) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
 
-        this.schema = schema;
-
-        NamedList srw_properties = (NamedList) args.getAll("srw_properties").get(0);
+        NamedList srw_properties = (NamedList) args.get("srw_properties");
 
         Properties properties = new Properties();
         for (int i = 0; i < srw_properties.size(); i++) {
@@ -113,28 +110,38 @@ class Config {
             FileProvider provider = new FileProvider(is);
             db.setAxisServer(new AxisServer(provider));
         }
-        Map<String, ArrayList> explainMap = getExplainMap(srw_absolute_home, properties.getProperty("explain"));
+
+        Map<String, ArrayList> explainMap = loadExplainMap(schema, srw_absolute_home, properties.getProperty("explain"));
         db.setExplainMap(explainMap);
         db.setFacets(getFacets(args.get("facets"), explainMap));
-
-        xml2json_callback_key = properties.getProperty("xml-2-json.callbackkey");
 
         return db;
     }
 
-    private void getExplainVariables(Properties properties) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+    /**
+     * getExplainVariables
+     * <p/>
+     * Take the information from the explain record and add them to the server's properties as cached data.
+     *
+     * @param properties
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws XPathExpressionException
+     */
+    private static void getExplainVariables(Properties properties) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
 
-        File f = Utilities.findFile(properties.getProperty("explain"), properties.getProperty("dbHome"), properties.getProperty("srwHome"));
-        Document doc = GetDOMDocument(f);
+        final File f = Utilities.findFile(properties.getProperty("explain"), properties.getProperty("dbHome"), properties.getProperty("srwHome"));
+        final Document doc = GetDOMDocument(f);
 
-        NodeList infos = GetNodes(doc, "zr:explain/zr:serverInfo | zr:explain/zr:databaseInfo | zr:explain/zr:metaInfo");
+        final NodeList infos = GetNodes(doc, "zr:explain/zr:serverInfo | zr:explain/zr:databaseInfo | zr:explain/zr:metaInfo");
         for (int i = 0; i < infos.getLength(); i++) {
-            Element info = (Element) infos.item(i);
-            NodeList c = info.getChildNodes();
+            final Element info = (Element) infos.item(i);
+            final NodeList c = info.getChildNodes();
             for (int j = 0; j < c.getLength(); j++) {
-                Node node = c.item(j);
+                final Node node = c.item(j);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    String text = node.getTextContent();
+                    final String text = node.getTextContent();
                     if (text != null)
                         properties.setProperty(info.getLocalName() + "." + node.getLocalName(), text);
                 }
@@ -142,7 +149,7 @@ class Config {
         }
     }
 
-    private NamedList getFacets(Object o, Map<String, ArrayList> indexFields) {
+    private static NamedList getFacets(Object o, Map<String, ArrayList> indexFields) {
         if (o == null)
             return null;
 
@@ -174,18 +181,46 @@ class Config {
     }
 
 
-    private Map<String, ArrayList> getExplainMap(String solr_home, String explain_file) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+    /**
+     * loadExplainMap
+     * <p/>
+     * Iterates through the explain.xml document and locates all indexInfo set elements.
+     * For each set, determine the mapped Solr indexFields and their type ( scan or searchable ).
+     *
+     * @param srw_absolute_home
+     * @param explain_file
+     * @return The result is a map with set names as keys, and a list of solr fields as values:
+     * map<String set as key, List solrFields>
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws XPathExpressionException
+     */
+    private static Map<String, ArrayList> loadExplainMap(IndexSchema indexSchema, String srw_absolute_home, String explain_file) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
 
+
+        // Load the explain.xml document
+        final File f = Utilities.findFile(explain_file, null, srw_absolute_home);
+        final Document explainDocument = GetDOMDocument(f);
         Map<String, ArrayList> explainMap = new HashMap();
+
+        log.info("Added " + cacheIndexFields(indexSchema, explainMap, explainDocument) + " index fields to the cache.");
+        log.info("Removed " + removeNonIndexedMaps(explainDocument) + " maps because they referred to non indexed Solr fields.");
+        log.info("Removed " + remoteEmptyIndexes(explainDocument) + " empty index elements from the explain document.");
+        log.info("Removed " + removeSolrMaps(explainDocument) + " solr maps from the explain document");
+        log.info("Removed " + removeAllSolrSets(explainDocument) + " solr maps from the explain document");
+        log.info("Added " + addSolrFieldsToExplainDocument(indexSchema, explainMap, explainDocument) + " Solr field definitions to the explain document");
+        log.info("Added " + cacheExplainElements(explainMap, explainDocument) + " to the cache.");
+
+        return explainMap;
+    }
+
+    private static int cacheIndexFields(IndexSchema indexSchema, Map<String, ArrayList> explainMap, Document explainDocument) throws XPathExpressionException {
+        // Locate the indexInfo sets
 
         SolrSRWDatabase.IndexOptions[] options = SolrSRWDatabase.IndexOptions.values();
 
-        // get fields and indexed fields
-        File f = Utilities.findFile(explain_file, null, solr_home);
-        Document doc = GetDOMDocument(f);
-
-        NodeList schemaInfos = GetNodes(doc, "zr:explain/zr:indexInfo/zr:set[not(@identifier='" + setSolr + "')]");
-
+        final NodeList schemaInfos = GetNodes(explainDocument, "zr:explain/zr:indexInfo/zr:set[not(@identifier='" + setSolr + "')]");
         for (int i = 0; i < schemaInfos.getLength(); i++) {
             Element schema = (Element) schemaInfos.item(i);
             String identifier = DOMUtil.getAttr(schema, "identifier");
@@ -194,7 +229,7 @@ class Config {
             String name = DOMUtil.getAttr(schema, "name");
             String xquery = "zr:map/zr:name[@set='" + name + "']";
 
-            NodeList indexInfos = GetNodes(doc, "zr:explain/zr:indexInfo/zr:index");
+            NodeList indexInfos = GetNodes(explainDocument, "zr:explain/zr:indexInfo/zr:index");
             for (int l = 0; l < indexInfos.getLength(); l++) {
                 Element indexInfo = (Element) indexInfos.item(l);
 
@@ -205,7 +240,7 @@ class Config {
 
                     for (SolrSRWDatabase.IndexOptions option1 : options) {
                         String option = option1.name();
-                        ArrayList list = GetSolrIndices(element_name, option);
+                        ArrayList list = GetSolrIndices(indexSchema, element_name, option);
                         int index = option.indexOf("_");
                         String alt_option = (index == -1)
                                 ? option
@@ -215,7 +250,7 @@ class Config {
                         if (indexInfo.hasAttribute(alt_option))
                             attr = indexInfo.getAttributeNode(alt_option);
                         else {
-                            attr = doc.createAttribute(alt_option);
+                            attr = explainDocument.createAttribute(alt_option);
                             indexInfo.setAttributeNode(attr);
                         }
 
@@ -234,89 +269,23 @@ class Config {
                                 explainMap.put("index.title." + index_name, title_list);
                             }
                         }
-
-
                     }
                 }
             }
         }
+        return explainMap.size();
+    }
 
-        // remove all CQL mappings with no solr index mapped to it...
-        NodeList solr_set = GetNodes(doc, "//zr:index[not(zr:map/zr:name/@set='solr')]/zr:map");
-        for (int i = solr_set.getLength() - 1; i != -1; i--) {
-            Node child = solr_set.item(i);
-            child.getParentNode().removeChild(child);
-        }
+    /**
+     * cacheExplainElements
+     *
+     * @param explainMap The cache.
+     * @param doc        The The explain document.
+     * @throws XPathExpressionException
+     */
+    private static int cacheExplainElements(Map<String, ArrayList> explainMap, Document doc) throws XPathExpressionException {
 
-        // Remove all indexes without a CQL map.
-        solr_set = GetNodes(doc, "//zr:index[not(zr:map)]");
-        for (int i = solr_set.getLength() - 1; i != -1; i--) {
-            Node child = solr_set.item(i);
-            child.getParentNode().removeChild(child);
-        }
-
-
-        // Remove all solr map references
-        solr_set = GetNodes(doc, "//zr:map[not(zr:name/@set!='solr')]"); // All solr maps, without other schema.
-        for (int i = solr_set.getLength() - 1; i != -1; i--) {
-            Node child = solr_set.item(i);
-            child.getParentNode().removeChild(child);
-        }
-
-
-        // Remove all solr sets
-        solr_set = GetNodes(doc, "//zr:name[@set='solr']"); // All remaining solr names.
-        for (int i = solr_set.getLength() - 1; i != -1; i--) {
-            Node child = solr_set.item(i);
-            child.getParentNode().removeChild(child);
-        }
-
-        // Merge scan, search and sort indexes with the same name.
-
-
-        // If there is an element:
-        // <set name="solr" identifier="info:srw/cql-context-set/2/solr"/>
-        // We want to be able to search indexed solr fields, so...
-        Node indexInfoSolr = GetNode(doc, "zr:explain/zr:indexInfo/zr:set[@identifier='" + setSolr + "']");
-        if (indexInfoSolr != null) {
-            Node schemaInfoSolr = GetNode(doc, "zr:explain/zr:schemaInfo/zr:schema[@identifier='" + setSolr + "']");
-            if (schemaInfoSolr == null)
-                log.info("The explain/indexInfo/set[@identifier='" + setSolr + "'] was declared, but no corresponding output format was defined in the explain/schemaInfo element.");
-
-            Node title = (schemaInfoSolr == null)
-                    ? null
-                    : GetNode(schemaInfoSolr, "zr:title");
-
-            String Title = (title == null)
-                    ? setSolr
-                    : title.getTextContent();
-
-            StringBuilder sb = new StringBuilder("<index search='true' scan='true'><title>" + Title + "</title>");
-            for (String fieldName : schema.getFields().keySet()) {
-                if (schema.getField(fieldName).indexed()) {
-                    ArrayList list = new ArrayList(1);
-                    list.add(fieldName);
-                    explainMap.put("search.solr." + fieldName, list);
-
-                    sb.append("<map><name set='solr'>").append(fieldName).append("</name></map>");
-                }
-            }
-            sb.append("</index>");
-
-            // Cast our string to a document
-            ByteArrayInputStream bais = new ByteArrayInputStream(sb.toString().getBytes("utf-8")); // Would not be utf-8 ?
-            DocumentBuilder db = XMLUtils.getDocumentBuilder();
-            Document doc_solr = db.parse(bais);
-            XMLUtils.releaseDocumentBuilder(db);
-
-            // Add the document to the explain document.
-            Node child = doc.importNode(doc_solr.getDocumentElement(), true);
-            Node indexInfo = GetNode(doc, "zr:explain/zr:indexInfo");
-            indexInfo.appendChild(child);
-        }
-
-        // Gather all information elements
-        NodeList info = GetNodes(doc, "zr:explain/zr:*");
+        final NodeList info = GetNodes(doc, "zr:explain/zr:*");
         for (int i = 0; i < info.getLength(); i++) {
             Element element = (Element) info.item(i);
 
@@ -337,12 +306,145 @@ class Config {
             }
             explainMap.put("explain." + element.getLocalName(), list);
         }
-
-        return explainMap;
+        return info.getLength();
     }
 
-    private ArrayList GetSolrIndices(Element name, String option) throws XPathExpressionException {
-        ArrayList<String> list = new ArrayList();
+    /**
+     * addSolrFieldsToExplainDocument
+     * <p/>
+     * Whenever there is an element:
+     * <set name="solr" identifier="info:srw/cql-context-set/2/solr"/>
+     * we add add indexed solr fields to the explain document.
+     *
+     * @param indexSchema
+     * @param explainMap
+     * @param doc         The explain document.
+     * @throws XPathExpressionException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    private static int addSolrFieldsToExplainDocument(IndexSchema indexSchema, Map<String, ArrayList> explainMap, Document doc) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
+
+        int count = 0;
+        final Node indexInfoSolr = GetNode(doc, "zr:explain/zr:indexInfo/zr:set[@identifier='" + setSolr + "']");
+        if (indexInfoSolr != null) {
+            Node schemaInfoSolr = GetNode(doc, "zr:explain/zr:schemaInfo/zr:schema[@identifier='" + setSolr + "']");
+            if (schemaInfoSolr == null)
+                log.info("The explain/indexInfo/set[@identifier='" + setSolr + "'] was declared, but no corresponding output format was defined in the explain/schemaInfo element.");
+
+            Node title = (schemaInfoSolr == null)
+                    ? null
+                    : GetNode(schemaInfoSolr, "zr:title");
+
+            String Title = (title == null)
+                    ? setSolr
+                    : title.getTextContent();
+
+            boolean scan = false;
+            StringBuilder sb = new StringBuilder();
+            for (String fieldName : indexSchema.getFields().keySet()) {
+                count++;
+                final SchemaField field = indexSchema.getField(fieldName);
+                if (field.indexed()) {
+                    ArrayList list = new ArrayList(1);
+                    list.add(fieldName);
+                    explainMap.put("search.solr." + fieldName, list);
+
+                    scan = scan || (field.getType() instanceof StrField || field.getType() instanceof DateField);
+                    sb.append("<map><name set='solr'>").append(fieldName).append("</name></map>");
+                }
+            }
+            sb.append("</index>");
+            sb.insert(0, "<index search='true' scan='" + scan + "' sort='" + scan + "'><title>" + Title + "</title>");
+
+            // Cast our string to a document
+            final ByteArrayInputStream bais = new ByteArrayInputStream(sb.toString().getBytes("utf-8"));
+            DocumentBuilder db = XMLUtils.getDocumentBuilder();
+            Document doc_solr = db.parse(bais);
+            XMLUtils.releaseDocumentBuilder(db);
+
+            // Add the document to the explain document.
+            Node child = doc.importNode(doc_solr.getDocumentElement(), true);
+            Node indexInfo = GetNode(doc, "zr:explain/zr:indexInfo");
+            indexInfo.appendChild(child);
+        }
+        return count;
+    }
+
+    /**
+     * removeAllSolrSets
+     *
+     * @param doc The explain document.
+     * @return The number of deleted Solr map declarations.
+     * @throws XPathExpressionException
+     */
+    private static int removeAllSolrSets(Document doc) throws XPathExpressionException {
+
+        final NodeList nodelist = GetNodes(doc, "//zr:name[@set='solr']"); // All remaining solr names.
+        for (int i = nodelist.getLength() - 1; i != -1; i--) {
+            Node child = nodelist.item(i);
+            child.getParentNode().removeChild(child);
+        }
+        return nodelist.getLength();
+    }
+
+    /**
+     * removeSolrMaps
+     * <p/>
+     * Remove all solr maps.
+     *
+     * @param doc The explain document.
+     * @return The number of deleted maps.
+     * @throws XPathExpressionException
+     */
+    private static int removeSolrMaps(Document doc) throws XPathExpressionException {
+
+        final NodeList nodelist = GetNodes(doc, "//zr:map[not(zr:name/@set!='solr')]"); // All solr maps, without other schema.
+        for (int i = nodelist.getLength() - 1; i != -1; i--) {
+            Node child = nodelist.item(i);
+            child.getParentNode().removeChild(child);
+        }
+        return nodelist.getLength();
+    }
+
+    /**
+     * remoteEmptyIndexes
+     * <p/>
+     * Removed any empty index elements from the explain document.
+     *
+     * @param doc The explain document.
+     * @return he number of deleted index definitions.
+     */
+    private static int remoteEmptyIndexes(Document doc) throws XPathExpressionException {
+        final NodeList nodelist = GetNodes(doc, "//zr:index[not(zr:map)]");
+        for (int i = nodelist.getLength() - 1; i != -1; i--) {
+            Node child = nodelist.item(i);
+            child.getParentNode().removeChild(child);
+        }
+        return nodelist.getLength();
+    }
+
+    /**
+     * removeNonIndexedMaps
+     * <p/>
+     * Remove all declared map declarations that are in fact not searchable.
+     *
+     * @param doc The explain document.
+     * @throws XPathExpressionException
+     */
+    private static int removeNonIndexedMaps(Document doc) throws XPathExpressionException {
+
+        final NodeList nodelist = GetNodes(doc, "//zr:index[not(zr:map/zr:name/@set='solr')]/zr:map");
+        for (int i = nodelist.getLength() - 1; i != -1; i--) {
+            Node child = nodelist.item(i);
+            child.getParentNode().removeChild(child);
+        }
+        return nodelist.getLength();
+    }
+
+    private static ArrayList GetSolrIndices(IndexSchema indexSchema, Element name, String option) throws XPathExpressionException {
+        ArrayList list = new ArrayList();
 
         /* Sibling map elements that only relate to a specific index
        <index search="true" scan="true">
@@ -361,8 +463,7 @@ class Config {
         NodeList solr_indices = GetNodes(map_name, "zr:name[@set='solr' and @" + option + "]");
         for (int i = 0; i < solr_indices.getLength(); i++) {
             Element map = (Element) solr_indices.item(i);
-            String opt = DOMUtil.getAttr(map, option);
-            boolean match = AddToList(list, opt);
+            boolean match = AddToList(indexSchema, list, map.getTextContent());
             if (!match)
                 removal.add(map);
         }
@@ -381,8 +482,7 @@ class Config {
         solr_indices = GetNodes(index, "zr:map[not(zr:name/@set!='solr')]/zr:name[@set='solr' and @" + option + "]");
         for (int i = 0; i < solr_indices.getLength(); i++) {
             Element map = (Element) solr_indices.item(i);
-            String opt = DOMUtil.getAttr(map, option);
-            boolean match = AddToList(list, opt);
+            boolean match = AddToList(indexSchema, list, map.getTextContent());
             if (!match)
                 removal.add(map);
         }
@@ -395,7 +495,7 @@ class Config {
         return list;
     }
 
-    private boolean AddToList(ArrayList list, String indexname) {
+    private static boolean AddToList(IndexSchema schema, ArrayList list, String indexname) {
 
         if (indexname == null) return false;
 
@@ -415,7 +515,7 @@ class Config {
         return list.add(indexname);
     }
 
-    private Document GetDOMDocument(File file) throws ParserConfigurationException, IOException, SAXException {
+    private static Document GetDOMDocument(File file) throws ParserConfigurationException, IOException, SAXException {
 
         DocumentBuilder db = XMLUtils.getDocumentBuilder();
         Document doc = db.parse(file);
@@ -425,33 +525,20 @@ class Config {
         return doc;
     }
 
-    /*
-    private String GetAttributeValue(Element element, String TagName)
-    {
-        Attr attribute = element.getAttributeNode(TagName) ;
-        String text = ( attribute == null )
-                ? null
-                : attribute.getValue() ;
-        
-        return text ;
-    }
-    */
+    private static Node GetNode(Object item, String xquery) throws XPathExpressionException {
 
-    private Node GetNode(Object item, String xquery) throws XPathExpressionException {
         XPathExpression expr = getXPathExpression(xquery);
-        Node node = (Node) expr.evaluate(item, XPathConstants.NODE);
-
-        return node;
+        return (Node) expr.evaluate(item, XPathConstants.NODE);
     }
 
-    private NodeList GetNodes(Object item, String xquery) throws XPathExpressionException {
+    private static NodeList GetNodes(Object item, String xquery) throws XPathExpressionException {
+
         XPathExpression expr = getXPathExpression(xquery);
-        NodeList nodelist = (NodeList) expr.evaluate(item, XPathConstants.NODESET);
-
-        return nodelist;
+        return (NodeList) expr.evaluate(item, XPathConstants.NODESET);
     }
 
-    private XPathExpression getXPathExpression(String xquery) throws XPathExpressionException {
+    private static XPathExpression getXPathExpression(String xquery) throws XPathExpressionException {
+
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
 
@@ -484,13 +571,7 @@ class Config {
         };
 
         xpath.setNamespaceContext(ns);
-        XPathExpression expr = xpath.compile(xquery);
-        return expr;
-    }
-
-    public String getXml2json_callback_key() {
-
-        return xml2json_callback_key;
+        return xpath.compile(xquery);
     }
 
 }

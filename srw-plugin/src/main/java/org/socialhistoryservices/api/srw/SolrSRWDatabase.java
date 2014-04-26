@@ -751,7 +751,12 @@ public class SolrSRWDatabase extends SRWDatabase {
     }
 
     public enum IndexOptions {
-        search, search_exact, search_range, scan, scan_exact, sort
+        search,
+        search_exact,
+        search_range,
+        scan,
+        scan_exact,
+        sort
     }
 
     public enum RequestTypes {

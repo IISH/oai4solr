@@ -40,7 +40,9 @@ import java.util.*;
  */
 class SolrTermList extends TermList
 {
-    // facetquery could have been an alternative to enumTerm...
+
+    private final Log log = LogFactory.getLog(this.getClass());
+
     public SolrTermList(CQLTermNode term, int position, int maxTerms, Map<String,ArrayList> getExplainMap){
         MessageContext msgContext = MessageContext.getCurrentContext();
         SolrQueryRequest req = (SolrQueryRequest)msgContext.getProperty("SolrQueryRequest");
@@ -197,25 +199,10 @@ class SolrTermList extends TermList
         {
             if ( fld.equals( enumerator.term().field() ) )
                 return enumerator.term() ;
-            
         }
 
         return enumerator.term() ;
     }
-
-    /*
-    @Override
-    public TermType[] getTerms()
-    {
-        return super.getTerms() ;
-    }
-
-    @Override
-    public void setTerms(TermType[] terms)
-    {
-        super.setTerms(terms);
-    }
-    */
 
     public class TermTypeRecord implements Comparable<TermTypeRecord>
     {
@@ -229,12 +216,8 @@ class SolrTermList extends TermList
         @Override
         public int compareTo(TermTypeRecord o)
         {
-            int compare = term.getValue().compareTo(o.term.getValue()) ;
-
-            return compare ;
+            return term.getValue().compareTo(o.term.getValue());
         }
     }
-
-    private final Log log = LogFactory.getLog(this.getClass());
 
 }

@@ -16,6 +16,8 @@ limitations under the License.
 
 package org.socialhistoryservices.api.srw;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.SolrCore;
@@ -28,8 +30,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**
@@ -41,8 +41,10 @@ import java.net.URL;
 
 // Process the request's SRU parameters and construct a valid Lucene query.
 public class SRURequestHandler extends SRURequestHandlerSOAP implements SolrCoreAware {
+
     final private static String version = "1.1"; // Our only hardcoded variable, because our OCLC database only supports this version.
     private String wt;
+    private final Log log = LogFactory.getLog(this.getClass());
 
     @Override
     public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws Exception {
@@ -55,8 +57,6 @@ public class SRURequestHandler extends SRURequestHandlerSOAP implements SolrCore
         if (params.get("version") == null)
             list.add("version", version);
         req.setParams(SolrParams.toSolrParams(list));
-        if (db == null)
-            lazyInit(req);
         super.handleRequestBody(req, rsp);
     }
 
@@ -70,49 +70,43 @@ public class SRURequestHandler extends SRURequestHandlerSOAP implements SolrCore
         this.wt = (wt == null)
                 ? "srw" // Assumption
                 : wt;
-
         this.initArgs = args;
-    }
-
-    private synchronized void lazyInit(SolrQueryRequest req) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
-        if (db == null) {
-            Config config = new Config();
-            db = config.init(req.getSchema(), SolrResourceLoader.locateSolrHome(), initArgs);
-            xml2json_callback_key = config.getXml2json_callback_key();
-        }
-    }
-
-    @Override
-    public String getVersion() {
-        return "$Revision: 1 $";
     }
 
     @Override
     public String getDescription() {
-        return "Solr SRW handler";
+        return "A SRU\\SRW request handler";
     }
 
     @Override
     public String getSourceId() {
-        return "$Id: SRURequestHandler.java 1 2009-07-09 $";
+        return null;
     }
 
     @Override
     public String getSource() {
-        return "$URL: http://api.iisg.nl/srw $";
+        return "$URL: https://github.com/IISH/oai4solr $";
     }
 
     @Override
-    public URL[] getDocs() {
-        try {
-            return new URL[]{new URL("http://api.iisg.nl/")};
-        } catch (MalformedURLException ex) {
-            return null;
-        }
+    public String getVersion() {
+        return "$3.x-1.0 $";
     }
 
     @Override
     public void inform(SolrCore core) {
-        core.getDataDir();
+        if (db == null) {
+            try {
+                db = Config.init(core.getSchema(), SolrResourceLoader.locateSolrHome(), initArgs);
+            } catch (SAXException e) {
+                log.error(e);
+            } catch (ParserConfigurationException e) {
+                log.error(e);
+            } catch (XPathExpressionException e) {
+                log.error(e);
+            } catch (IOException e) {
+                log.error(e);
+            }
+        }
     }
 }

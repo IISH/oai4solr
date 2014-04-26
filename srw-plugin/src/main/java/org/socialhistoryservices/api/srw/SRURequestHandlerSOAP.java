@@ -58,8 +58,8 @@ import java.lang.reflect.Method;
  public abstract class SRURequestHandlerSOAP extends RequestHandlerBase
 {
     private SolrSRWDatabase.Transport transport;
-    SolrSRWDatabase db ;
-    String xml2json_callback_key;
+    public static SolrSRWDatabase db ;
+    private static String xml2json_callback_key = "callback";
 
     public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws Exception
     {
@@ -116,9 +116,7 @@ import java.lang.reflect.Method;
             return db.setResponseMessage( targetService ) ;
         }
 
-        String jsonp = ( this.xml2json_callback_key == null )
-            ? null
-            : params.get(this.xml2json_callback_key);
+        String jsonp = params.get(xml2json_callback_key);
         if ( jsonp == null )
         {
             String targetService = params.get("targetService") ;
