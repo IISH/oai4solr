@@ -1,7 +1,7 @@
 #This is a SRU and SRW library plugin for Solr
 
 ##What is it ?
-A plugin that exposes your Solr 3.x indexes with the SRU and SOAP protocol.
+A plugin that exposes your Solr 3.x indexes with SRU and SRW SOAP.
 
 ##How do I install it ?
 I wrote this plugin in 2009 and never made proper documentation.

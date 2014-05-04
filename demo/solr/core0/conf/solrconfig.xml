@@ -78,10 +78,7 @@
 
 
 
-    <!-- Custom IISG SRU handler.
-   If you use multicore and want to use a specific SRW implementation for each core, then you can
-   set the str[@name=solr.data] and str[@name=explain] fields accordingly.
-   -->
+    <!-- Custom SRU handler. -->
     <requestHandler name="/srw" class="org.socialhistoryservices.api.srw.SRURequestHandler">
         <str name="wt">srw</str>
         <lst name="srw_properties">
@@ -128,7 +125,7 @@
             <str name="ead.location">.</str>
             <str name="ead.title">EAD Version 2002</str>
 
-            <!-- System xslts... -->
+            <!-- System xslts... Just leave them as they are. -->
             <str name="system.xmlSchemas">cql-2-lucene xml-2-json</str>
             <str name="cql-2-lucene.identifier">cql-2-lucene</str>
             <str name="cql-2-lucene.transformer">cql-2-lucene.xsl</str>
@@ -140,12 +137,13 @@
             browser can make html. For this to work, declare a ShowFileRequestHandler class
             <requestHandler name="/file" class="solr.admin.ShowFileRequestHandler"/>
             -->
-            <str name="explainStyleSheet">../file?file=explainResponse.xsl&amp;contentType=application/xml</str>
-            <str name="searchStyleSheet">../file?file=searchRetrieveResponse.xsl&amp;contentType=application/xml</str>
-            <str name="scanStyleSheet">../file?file=scanResponse.xsl&amp;contentType=application/xml</str>
+            <str name="explainStyleSheet">http://localhost:8983/solr/core0/file?file=explainResponse.xsl&amp;contentType=application/xml</str>
+            <str name="searchStyleSheet">http://localhost:8983/solr/core0/file?file=searchRetrieveResponse.xsl&amp;contentType=application/xml</str>
+            <str name="scanStyleSheet">http://localhost:8983/solr/core0/file?file=scanResponse.xsl&amp;contentType=application/xml</str>
 
             <str name="explain">explain.xml</str>
 
+            <!-- In case you want a response in JSON. Append &callback=[your callback tag to the request URL] -->
             <str name="xml-2-json.identifier">xml-2-json</str>
             <str name="xml-2-json.transformer">xml-2-json.xsl</str>
             <str name="xml-2-json.location">.</str>

@@ -18,28 +18,19 @@ limitations under the License.
                 version="2.0"
                 xmlns:saxon="http://saxon.sf.net/"
                 xmlns:marc="http://www.loc.gov/MARC21/slim"
-                xmlns:iisg="http://www.iisg.nl/api/sru/"
                 xmlns:zr="http://explain.z3950.org/dtd/2.0/"
-                exclude-result-prefixes="marc iisg zr saxon">
+                xmlns:some_schema="some_schema"
+                exclude-result-prefixes="marc zr saxon">
 
     <xsl:template match="response">
-        <xsl:variable name="record" select="saxon:parse(//doc/str[@name='resource']/text())/node()"/>
-        <xsl:variable name="transport" select="str[@name='transport']/text()"/>
-        <xsl:variable name="header" select="$record/extraRecordData"/>
-        <xsl:variable name="metadata" select="$record/recordData"/>
+        <xsl:variable name="metadata" select="saxon:parse(//doc/str[@name='resource']/text())/node()"/>
         <record>
             <recordData>
-                <xsl:copy-of select="$metadata/marc:record"/>
+                <xsl:copy-of select="$metadata"/>
             </recordData>
-            <xsl:if test="not($transport='JSON')">
-                <extraRecordData>
-                    <xsl:copy-of select="$header/*/*"/>
-                </extraRecordData>
-                <Identifier>
-                    <xsl:value-of select="$header/*/iisg:identifier"/>
-                </Identifier>
-            </xsl:if>
         </record>
+            <!--<extraRecordData><some_schema:some_element>Some extraneous information...</some_schema:some_element></extraRecordData>-->
+
     </xsl:template>
 
 </xsl:stylesheet>

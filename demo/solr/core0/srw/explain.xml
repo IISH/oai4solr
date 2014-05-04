@@ -51,7 +51,7 @@ limitations under the License.
         <set name="marc" identifier="info:srw/cql-context-set/1/marc-1.1"/>
         <set name="solr" identifier="info:srw/cql-context-set/2/solr"/>
 
-        <index>
+        <index search="true">
             <title>Any</title>
             <map>
                 <name set="cql">serverChoice</name>
@@ -59,7 +59,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Identifier</title>
             <map>
                 <name set="dc">identifier</name>
@@ -72,7 +72,6 @@ limitations under the License.
                 <name set="solr">marc_009</name>
             </map>
             <map>
-                <name set="solr">iisg_identifier</name>
                 <name set="solr">marc_020_a</name>
                 <name set="solr">marc_022_a</name>
                 <name set="solr">marc_024_a</name>
@@ -84,17 +83,13 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
-            <title>Contributor</title>
+        <index search="true" scan="true">
+            <title>Creator</title>
             <map>
-                <name set="dc">contributor</name>
+                <name set="dc">creator</name>
                 <name set="solr">marc_100</name>
                 <name set="solr">marc_110</name>
                 <name set="solr">marc_111</name>
-                <name set="solr">marc_700</name>
-                <name set="solr">marc_710</name>
-                <name set="solr">marc_711</name>
-                <name set="solr">marc_720</name>
             </map>
             <map>
                 <name set="marc">100</name>
@@ -107,6 +102,28 @@ limitations under the License.
             <map>
                 <name set="marc">111</name>
                 <name set="solr">marc_111</name>
+            </map>
+            <map>
+                <name set="ead">persname</name>
+                <name set="solr">marc_100</name>
+            </map>
+            <map>
+                <name set="ead">famname</name>
+                <name set="solr">marc_100</name>
+            </map>
+            <map>
+                <name set="ead">corpname</name>
+                <name set="solr">marc_100</name>
+            </map>
+        </index>
+        <index search="true" scan="true">
+            <title>Contributor</title>
+            <map>
+                <name set="dc">contributor</name>
+                <name set="solr">marc_700</name>
+                <name set="solr">marc_710</name>
+                <name set="solr">marc_711</name>
+                <name set="solr">marc_720</name>
             </map>
             <map>
                 <name set="marc">700</name>
@@ -124,21 +141,9 @@ limitations under the License.
                 <name set="marc">720</name>
                 <name set="solr">marc_720</name>
             </map>
-            <map>
-                <name set="ead">persname</name>
-                <name set="solr">marc_100</name>
-            </map>
-            <map>
-                <name set="ead">famname</name>
-                <name set="solr">marc_100</name>
-            </map>
-            <map>
-                <name set="ead">corpname</name>
-                <name set="solr">marc_100</name>
-            </map>
-        </index>
+          </index>
 
-        <index>
+        <index search="true">
             <title>Coverage</title>
             <map>
                 <name set="dc">coverage</name>
@@ -165,7 +170,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Date</title>
             <map>
                 <name set="dc">date</name>
@@ -187,7 +192,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Description</title>
             <map>
                 <name set="dc">description</name>
@@ -207,7 +212,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Format</title>
             <map>
                 <name set="dc">format</name>
@@ -224,7 +229,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Language</title>
             <map>
                 <name set="dc">language</name>
@@ -276,7 +281,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Publisher</title>
             <map>
                 <name set="dc">publisher</name>
@@ -293,7 +298,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Relation</title>
             <map>
                 <name set="dc">relation</name>
@@ -450,7 +455,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Rights</title>
             <map>
                 <name set="dc">rights</name>
@@ -467,7 +472,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Source</title>
             <map>
                 <name set="dc">source</name>
@@ -489,7 +494,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Subject</title>
             <map>
                 <name set="dc">subject</name>
@@ -545,7 +550,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Title</title>
             <map>
                 <name set="dc">title</name>
@@ -570,7 +575,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Type</title>
             <map>
                 <name set="dc">type</name>
@@ -583,20 +588,20 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>IISH Collections</title>
             <map>
                 <name set="solr">iisg_collectionName</name>
             </map>
         </index>
-        <index>
+        <index search="true">
             <title>Collection</title>
             <map>
                 <name set="marc">852$b</name>
                 <name set="solr">marc_852_b</name>
             </map>
         </index>
-        <index>
+        <index search="true">
             <title>Call number</title>
             <map>
                 <name set="marc">852$h</name>
@@ -604,7 +609,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Piece</title>
             <map>
                 <name set="marc">852$p</name>
@@ -612,7 +617,7 @@ limitations under the License.
             </map>
         </index>
 
-        <index>
+        <index search="true">
             <title>Cataloging Source</title>
             <map>
                 <name set="marc">040</name>
