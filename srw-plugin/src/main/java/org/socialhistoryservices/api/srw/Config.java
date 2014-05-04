@@ -502,7 +502,7 @@ class Config {
         if (list.contains(indexname)) return true;
 
         if (!schema.hasExplicitField(indexname)) {
-            log.warn("The Lucene index field '" + indexname + "' is mentioned in the crosswalk explain.xml document, but it does not (yet) occur in the index. It will not show up in the explain record.");
+            log.warn("The Lucene index field '" + indexname + "' is mentioned in the crosswalk explain.xml document, but it is not declared in the core's schema. It will not show up in the explain record.");
             return false;
         }
 
