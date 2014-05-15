@@ -21,7 +21,7 @@ limitations under the License.
 
     <xsl:strip-space elements="*"/>
 
-    <!-- The Document being passed to this stylesheet has the structure:
+    <!-- The Document being passed  by this stylesheet has the structure:
     
     <cql2lucene>
         <indices>
@@ -224,6 +224,10 @@ limitations under the License.
 
     </xsl:template>
 
+    <!--
+    getindexandrelation
+    Choose the correct lucene index for the search.
+    -->
     <xsl:template name="getindexandrelation">
         <xsl:param name="index"/>
         <xsl:param name="relation"/>

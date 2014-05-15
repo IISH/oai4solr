@@ -490,7 +490,7 @@ public class SolrSRWDatabase extends SRWDatabase {
     public QueryResult getQueryResult(String query, SearchRetrieveRequestType request) throws InstantiationException {
 
         // Get the sru query string and parse it into a CQL structure
-        CQLParser cqlParser = new CQLParser();
+        final CQLParser cqlParser = new CQLParser();
         CQLNode XQuery;
         try {
             XQuery = cqlParser.parse(query);
@@ -583,10 +583,9 @@ public class SolrSRWDatabase extends SRWDatabase {
 
     private String makeQuery(CQLNode xQuery) throws TransformerException, IOException {
 
-        Transformer t = (Transformer) transformers.get("cql-2-lucene");
-
-        ByteArrayInputStream bais = mergeCQLandIndices(xQuery);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final Transformer t = (Transformer) transformers.get("cql-2-lucene");
+        final ByteArrayInputStream bais = mergeCQLandIndices(xQuery);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         t.transform(new StreamSource(bais), new StreamResult(baos));
 
@@ -596,8 +595,7 @@ public class SolrSRWDatabase extends SRWDatabase {
     private ByteArrayInputStream mergeCQLandIndices(CQLNode xQuery) throws IOException {
         // Now create a nice document which we can sent to an XSLT transformer.
 
-        StringWriter writer = new StringWriter();
-
+        final StringWriter writer = new StringWriter();
         writer.write("<cql2lucene>");
         writer.write("<indices>");
 
