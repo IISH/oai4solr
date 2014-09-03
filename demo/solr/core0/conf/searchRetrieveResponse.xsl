@@ -4,9 +4,9 @@
      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
      xmlns:srw="http://www.loc.gov/zing/srw/">
 
-<xsl:import href="?file=stdiface.xsl&amp;contentType=text/xml"/>
-<xsl:import href="?file=dublinCoreRecord.xsl&amp;contentType=text/xml"/>
-<xsl:import href="?file=MarcXmlToTaggedText.xsl&amp;contentType=text/xml"/>
+<xsl:import href="stdiface.xsl"/>
+<xsl:import href="dublinCoreRecord.xsl"/>
+<xsl:import href="MarcXmlToTaggedText.xsl"/>
 
 <xsl:variable name="title">Results for Search: <xsl:value-of select="/srw:searchRetrieveResponse/srw:echoedSearchRetrieveRequest/srw:query"/></xsl:variable>
 <xsl:variable name="dbname"><xsl:value-of select="/srw:searchRetrieveResponse/srw:extraResponseData/databaseTitle"/></xsl:variable>

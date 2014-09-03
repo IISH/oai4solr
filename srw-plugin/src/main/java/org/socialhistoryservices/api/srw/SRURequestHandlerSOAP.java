@@ -57,7 +57,7 @@ import java.lang.reflect.Method;
 
  public abstract class SRURequestHandlerSOAP extends RequestHandlerBase
 {
-    private SolrSRWDatabase.Transport transport;
+   // private SolrSRWDatabase.Transport transport;
     public static SolrSRWDatabase db ;
     private static String xml2json_callback_key = "callback";
 
@@ -70,9 +70,7 @@ import java.lang.reflect.Method;
         // And we might say when SOLR parameters are present, it must be an SRU call.
         // However, an Axis server is capable to accept a GET with the method specified.
         MessageContext msgContext = DeserializeRequest(req) ;
-        msgContext.setProperty(SolrSRWDatabase.Transport.class.getSimpleName(), transport);
         msgContext.setProperty("stylesheet", req.getParams().get("stylesheet"));
-
         rsp.add("MessageContext", msgContext);
     }
 
@@ -83,8 +81,6 @@ import java.lang.reflect.Method;
             return Deserialization(req) ;  // Ok, so let's try to build a SOAP message then based on the given parameters.
 
         ContentStream stream = iterable.iterator().next();
-
-        transport = SolrSRWDatabase.Transport.SRW;
         return Deserialization(req, stream.getStream());
     }
 
@@ -112,9 +108,12 @@ import java.lang.reflect.Method;
                 targetService = SolrSRWDatabase.Services.SRW ;
             }
 
-            transport = SolrSRWDatabase.Transport.SRW ;
-            return db.setResponseMessage( targetService ) ;
+            final MessageContext messageContext = db.setResponseMessage(targetService);
+            messageContext.setProperty(SolrSRWDatabase.Transport.class.getSimpleName(), SolrSRWDatabase.Transport.SRW);
+            return messageContext;
         }
+
+        final SolrSRWDatabase.Transport transport;
 
         String jsonp = params.get(xml2json_callback_key);
         if ( jsonp == null )
@@ -159,6 +158,7 @@ import java.lang.reflect.Method;
         InputStream is = new ByteArrayInputStream(bytes) ;
 
         MessageContext messageContext =  Deserialization(req, is) ;
+        messageContext.setProperty(SolrSRWDatabase.Transport.class.getSimpleName(), transport);
         messageContext.setProperty("jsonp", jsonp);
 
         return messageContext ;
@@ -228,7 +228,7 @@ import java.lang.reflect.Method;
         // the internal Envelope property, so again:
         Message requestMessage = new Message(aMessage.getSOAPPartAsString());
 
-        return db.setResponseMessage(requestMessage, req, targetService, requestType, transport);
+        return db.prepairMessage(requestMessage, req, targetService, requestType, SolrSRWDatabase.Transport.SRW);
     }
 
     private Class GetClassByName(QName qName) throws ClassNotFoundException {

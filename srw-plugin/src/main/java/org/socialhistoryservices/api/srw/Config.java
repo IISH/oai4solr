@@ -463,7 +463,7 @@ class Config {
         NodeList solr_indices = GetNodes(map_name, "zr:name[@set='solr' and @" + option + "]");
         for (int i = 0; i < solr_indices.getLength(); i++) {
             Element map = (Element) solr_indices.item(i);
-            boolean match = AddToList(indexSchema, list, map.getTextContent());
+            boolean match = AddToList(indexSchema, list, map.getAttribute(option));
             if (!match)
                 removal.add(map);
         }
@@ -482,7 +482,7 @@ class Config {
         solr_indices = GetNodes(index, "zr:map[not(zr:name/@set!='solr')]/zr:name[@set='solr' and @" + option + "]");
         for (int i = 0; i < solr_indices.getLength(); i++) {
             Element map = (Element) solr_indices.item(i);
-            boolean match = AddToList(indexSchema, list, map.getTextContent());
+            boolean match = AddToList(indexSchema, list, map.getAttribute(option));
             if (!match)
                 removal.add(map);
         }
@@ -497,17 +497,17 @@ class Config {
 
     private static boolean AddToList(IndexSchema schema, ArrayList list, String indexname) {
 
-        if (indexname == null) return false;
+        if (indexname == null || indexname.isEmpty()) return false;
 
         if (list.contains(indexname)) return true;
 
         if (!schema.hasExplicitField(indexname)) {
-            log.warn("The Lucene index field '" + indexname + "' is mentioned in the crosswalk explain.xml document, but it is not declared in the core's schema. It will not show up in the explain record.");
+            log.warn("The Lucene index field '" + indexname + "' is mentioned in the crosswalk explain.xml document, but it is not declared in the core's schema. It will not show up in the explain record and cannot be used for searching.");
             return false;
         }
 
         if (!schema.getField(indexname).indexed()) {
-            log.warn("The Lucene index field '" + indexname + "' is mentioned in the crosswalk but is not indexed.");
+            log.warn("The Lucene index field '" + indexname + "' is mentioned in the crosswalk but is not indexed. It will not show up in the explain record and cannot be used for searching.");
             return false;
         }
 

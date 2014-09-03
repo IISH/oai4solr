@@ -44,8 +44,20 @@ import java.io.Writer;
 public class SRUQueryResponseWriter implements QueryResponseWriter {
     private final static String CONTENT_TYPE_JSON_UTF8 = "text/javascript; charset=UTF-8";
 
-    // Copied and adapted this method from ORG.oclc.os.SRW.SRWServlet
-    // ToDo: apply xslt logic.
+    /**
+     * cleanup
+     *
+     * Remove the SOAP wrapper from the response.
+     *
+     * Copied and adapted this method from ORG.oclc.os.SRW.SRWServlet
+     * ToDo: apply xslt logic.
+     *
+     * @param message
+     * @param nameElementClose
+     * @param cleanup
+     * @return
+     * @throws AxisFault
+     */
     private String cleanup(Message message, String nameElementClose, Boolean cleanup) throws AxisFault {
 
         String soapResponse = message.getSOAPPartAsString();
@@ -119,9 +131,6 @@ public class SRUQueryResponseWriter implements QueryResponseWriter {
 
         final MessageContext msgContext = (MessageContext) solrQueryResponse.getValues().get("MessageContext");
         final Message message = msgContext.getResponseMessage();
-
-        if (message == null)
-            return;
 
         SolrSRWDatabase.RequestTypes requestType = (SolrSRWDatabase.RequestTypes) msgContext.getProperty(SolrSRWDatabase.RequestTypes.class.getSimpleName());
         String tag = (requestType == null)

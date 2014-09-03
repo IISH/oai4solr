@@ -16,25 +16,23 @@ limitations under the License.
 -->
 
 
-<explain xmlns="http://explain.z3950.org/dtd/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://explain.z3950.org/dtd/2.0/ http://zeerex.z3950.org/dtd/zeerex-2.0.xsd">
+<explain xmlns="http://explain.z3950.org/dtd/2.0/">
 
     <serverInfo protocol="SRW/U">
-        <host>http://localhost:8983/solr/core0/srw</host>
+        <host>http://api.socialhistoryservices.org/solr/all/srw</host>
         <port>8080</port>
         <database>Solr</database>
         <authentication required="false"/>
     </serverInfo>
 
     <databaseInfo>
-        <title>Datasets and bibliographical records</title>
-        <description>The api will give you descriptive information on research data, images, archives and
+        <title>IISH datasets and bibliographical records</title>
+        <description>The api will give you descriptive information on IISH research data, images, archives and
             bibliographies.
         </description>
         <author>Luciën van Wouw</author>
         <contact>lwo@iisg.nl</contact>
-        <restrictions>GNU Licence. Copyright 2009-2014 International Institute for Social History, The Netherlands.
-        </restrictions>
+        <restrictions>Copyright 2010 International Institute for Social History, The Netherlands.</restrictions>
         <implementation identifier="http://www.oclc.org/research/software/srw" version="1.1">
             <title>OCLC Research SRW Server version 1.1</title>
         </implementation>
@@ -49,13 +47,16 @@ limitations under the License.
         <set name="cql" identifier="info:srw/cql-context-set/1/cql-v1.1"/>
         <set name="dc" identifier="info:srw/cql-context-set/1/dc-v1.1"/>
         <set name="marc" identifier="info:srw/cql-context-set/1/marc-1.1"/>
+        <set name="iisg" identifier="info:srw/cql-context-set/1/iish"/>
+        <!--<set name="ead" identifier="info:srw/cql-context-set/1/ead-v2002"/>-->
         <set name="solr" identifier="info:srw/cql-context-set/2/solr"/>
+        <!-- info:srw/cql-context-set/2/solr is just made up. Version 2.2 in the Solr response that is -->
 
         <index>
             <title>Any</title>
             <map>
                 <name set="cql">serverChoice</name>
-                <name set="solr">allfields</name>
+                <name set="solr" search="allfields"/>
             </map>
         </index>
 
@@ -69,104 +70,104 @@ limitations under the License.
             </map>
             <map>
                 <name set="ead">unitid</name>
-                <name set="solr">marc_009</name>
+                <name set="solr" search="marc_009"/>
             </map>
             <map>
-                <name set="solr">marc_020_a</name>
-                <name set="solr">marc_022_a</name>
-                <name set="solr">marc_024_a</name>
-                <name set="solr">marc_856_u</name>
+                <name set="solr" search="iisg_identifier"/>
+                <name set="solr" search="marc_020_a"/>
+                <name set="solr" search="marc_022_a"/>
+                <name set="solr" search="marc_024_a"/>
+                <name set="solr" search="marc_856_u"/>
+                <name set="solr" search="marc_852_p"/>
+                <name set="solr" search="marc_901_a"/>
+            </map>
+            <map>
+                <name set="iisg">identifier</name>
             </map>
             <map>
                 <name set="ead">eadid</name>
-                <name set="solr">marc_856</name>
+                <name set="solr" search="marc_856"/>
             </map>
         </index>
 
         <index>
-            <title>Creator</title>
-            <map>
-                <name set="dc">creator</name>
-                <name set="solr">marc_100</name>
-                <name set="solr">marc_110</name>
-                <name set="solr">marc_111</name>
-            </map>
-            <map>
-                <name set="marc">100</name>
-                <name set="solr">marc_100</name>
-            </map>
-            <map>
-                <name set="marc">110</name>
-                <name set="solr">marc_110</name>
-            </map>
-            <map>
-                <name set="marc">111</name>
-                <name set="solr">marc_111</name>
-            </map>
-            <map>
-                <name set="ead">persname</name>
-                <name set="solr">marc_100</name>
-            </map>
-            <map>
-                <name set="ead">famname</name>
-                <name set="solr">marc_100</name>
-            </map>
-            <map>
-                <name set="ead">corpname</name>
-                <name set="solr">marc_100</name>
-            </map>
-        </index>
-        <index>
             <title>Contributor</title>
             <map>
                 <name set="dc">contributor</name>
-                <name set="solr">marc_700</name>
-                <name set="solr">marc_710</name>
-                <name set="solr">marc_711</name>
-                <name set="solr">marc_720</name>
+                <name set="solr" search="marc_100"/>
+                <name set="solr" search="marc_110"/>
+                <name set="solr" search="marc_111"/>
+                <name set="solr" search="marc_700"/>
+                <name set="solr" search="marc_710"/>
+                <name set="solr" search="marc_711"/>
+                <name set="solr" search="marc_720"/>
+            </map>
+            <map>
+                <name set="marc">100</name>
+                <name set="solr" search="marc_100"/>
+            </map>
+            <map>
+                <name set="marc">110</name>
+                <name set="solr" search="marc_110"/>
+            </map>
+            <map>
+                <name set="marc">111</name>
+                <name set="solr" search="marc_111"/>
             </map>
             <map>
                 <name set="marc">700</name>
-                <name set="solr">marc_700</name>
+                <name set="solr" search="marc_700"/>
             </map>
             <map>
                 <name set="marc">710</name>
-                <name set="solr">marc_710</name>
+                <name set="solr" search="marc_710"/>
             </map>
             <map>
                 <name set="marc">711</name>
-                <name set="solr">marc_711</name>
+                <name set="solr" search="marc_711"/>
             </map>
             <map>
                 <name set="marc">720</name>
-                <name set="solr">marc_720</name>
+                <name set="solr" search="marc_720"/>
             </map>
-          </index>
+            <map>
+                <name set="ead">persname</name>
+                <name set="solr" search="marc_100"/>
+            </map>
+            <map>
+                <name set="ead">famname</name>
+                <name set="solr" search="marc_100"/>
+            </map>
+            <map>
+                <name set="ead">corpname</name>
+                <name set="solr" search="marc_100"/>
+            </map>
+        </index>
 
         <index>
             <title>Coverage</title>
             <map>
                 <name set="dc">coverage</name>
-                <name set="solr">marc_651</name>
-                <name set="solr">marc_662</name>
-                <name set="solr">marc_751</name>
-                <name set="solr">marc_752</name>
+                <name set="solr" search="marc_651"/>
+                <name set="solr" search="marc_662"/>
+                <name set="solr" search="marc_751"/>
+                <name set="solr" search="marc_752"/>
             </map>
             <map>
                 <name set="marc">651</name>
-                <name set="solr">marc_651</name>
+                <name set="solr" search="marc_651"/>
             </map>
             <map>
                 <name set="marc">662</name>
-                <name set="solr">marc_662</name>
+                <name set="solr" search="marc_662"/>
             </map>
             <map>
                 <name set="marc">751</name>
-                <name set="solr">marc_751</name>
+                <name set="solr" search="marc_751"/>
             </map>
             <map>
                 <name set="marc">752</name>
-                <name set="solr">marc_752</name>
+                <name set="solr" search="marc_752"/>
             </map>
         </index>
 
@@ -174,21 +175,21 @@ limitations under the License.
             <title>Date</title>
             <map>
                 <name set="dc">date</name>
-                <name set="solr">marc_260_c</name>
-                <name set="solr">marc_260_g</name>
+                <name set="solr" search="marc_260_c"/>
+                <name set="solr" search="marc_260_g"/>
             </map>
             <map>
                 <name set="marc">260$c</name>
-                <name set="solr">marc_260_c</name>
+                <name set="solr" search="260_c"/>
             </map>
             <map>
                 <name set="marc">260$g</name>
-                <name set="solr">marc_260_g</name>
+                <name set="solr" search="260_g"/>
             </map>
             <map>
                 <name set="ead">unitdate</name>
-                <name set="solr">marc_245_f</name>
-                <name set="solr">marc_245_g</name>
+                <name set="solr" search="marc_245_f"/>
+                <name set="solr" search="marc_245_g"/>
             </map>
         </index>
 
@@ -196,19 +197,19 @@ limitations under the License.
             <title>Description</title>
             <map>
                 <name set="dc">description</name>
-                <name set="solr">marc_5(.*)</name>
+                <name set="solr" search="marc_5(.*)"/>
             </map>
             <map>
                 <name set="marc">500</name>
-                <name set="solr">marc_5(.*)</name>
+                <name set="solr" search="marc_5(.*)"/>
             </map>
             <map>
                 <name set="marc">500$a</name>
-                <name set="solr">marc_500_a</name>
+                <name set="solr" search="marc_500_a"/>
             </map>
             <map>
                 <name set="ead">abstract</name>
-                <name set="solr">marc_520</name>
+                <name set="solr" search="marc_520"/>
             </map>
         </index>
 
@@ -216,16 +217,16 @@ limitations under the License.
             <title>Format</title>
             <map>
                 <name set="dc">format</name>
-                <name set="solr">marc_340</name>
-                <name set="solr">marc_856_q</name>
+                <name set="solr" search="marc_340"/>
+                <name set="solr" search="marc_856_q"/>
             </map>
             <map>
                 <name set="marc">340</name>
-                <name set="solr">marc_340</name>
+                <name set="solr" search="marc_340"/>
             </map>
             <map>
                 <name set="marc">856$q</name>
-                <name set="solr">marc_856_q</name>
+                <name set="solr" search="marc_856_q"/>
             </map>
         </index>
 
@@ -233,51 +234,51 @@ limitations under the License.
             <title>Language</title>
             <map>
                 <name set="dc">language</name>
-                <name set="solr">marc_041_a</name>
-                <name set="solr">marc_041_b</name>
-                <name set="solr">marc_041_d</name>
-                <name set="solr">marc_041_e</name>
-                <name set="solr">marc_041_f</name>
-                <name set="solr">marc_041_g</name>
-                <name set="solr">marc_041_h</name>
-                <name set="solr">marc_041_j</name>
-                <name set="solr">marc_546</name>
+                <name set="solr" search="marc_041_a"/>
+                <name set="solr" search="marc_041_b"/>
+                <name set="solr" search="marc_041_d"/>
+                <name set="solr" search="marc_041_e"/>
+                <name set="solr" search="marc_041_f"/>
+                <name set="solr" search="marc_041_g"/>
+                <name set="solr" search="marc_041_h"/>
+                <name set="solr" search="marc_041_j"/>
+                <name set="solr" search="marc_546"/>
             </map>
             <map>
                 <name set="marc">041a</name>
-                <name set="solr">marc_041_a</name>
+                <name set="solr" search="marc_041_a"/>
             </map>
             <map>
                 <name set="marc">041b</name>
-                <name set="solr">marc_041_b</name>
+                <name set="solr" search="marc_041_b"/>
             </map>
             <map>
                 <name set="marc">041d</name>
-                <name set="solr">marc_041_d</name>
+                <name set="solr" search="marc_041_d"/>
             </map>
             <map>
                 <name set="marc">041e</name>
-                <name set="solr">marc_041_e</name>
+                <name set="solr" search="marc_041_e"/>
             </map>
             <map>
                 <name set="marc">041f</name>
-                <name set="solr">marc_041_f</name>
+                <name set="solr" search="marc_041_f"/>
             </map>
             <map>
                 <name set="marc">041g</name>
-                <name set="solr">marc_041_g</name>
+                <name set="solr" search="marc_041_g"/>
             </map>
             <map>
                 <name set="marc">041h</name>
-                <name set="solr">marc_041_h</name>
+                <name set="solr" search="marc_041_h"/>
             </map>
             <map>
                 <name set="marc">041j</name>
-                <name set="solr">marc_041_j</name>
+                <name set="solr" search="marc_041_j"/>
             </map>
             <map>
                 <name set="marc">546</name>
-                <name set="solr">marc_546</name>
+                <name set="solr" search="marc_546"/>
             </map>
         </index>
 
@@ -285,16 +286,16 @@ limitations under the License.
             <title>Publisher</title>
             <map>
                 <name set="dc">publisher</name>
-                <name set="solr">marc_260_a</name>
-                <name set="solr">marc_260_b</name>
+                <name set="solr" search="marc_260_a"/>
+                <name set="solr" search="marc_260_b"/>
             </map>
             <map>
                 <name set="marc">260$a</name>
-                <name set="solr">marc_260_a</name>
+                <name set="solr" search="260_a"/>
             </map>
             <map>
                 <name set="marc">260$b</name>
-                <name set="solr">marc_260_b</name>
+                <name set="solr" search="260_b"/>
             </map>
         </index>
 
@@ -302,156 +303,156 @@ limitations under the License.
             <title>Relation</title>
             <map>
                 <name set="dc">relation</name>
-                <name set="solr">marc_530</name>
-                <name set="solr">marc_760</name>
-                <name set="solr">marc_761</name>
-                <name set="solr">marc_762</name>
-                <name set="solr">marc_763</name>
-                <name set="solr">marc_764</name>
-                <name set="solr">marc_765</name>
-                <name set="solr">marc_766</name>
-                <name set="solr">marc_767</name>
-                <name set="solr">marc_768</name>
-                <name set="solr">marc_769</name>
-                <name set="solr">marc_770</name>
-                <name set="solr">marc_771</name>
-                <name set="solr">marc_772</name>
-                <name set="solr">marc_773</name>
-                <name set="solr">marc_774</name>
-                <name set="solr">marc_775</name>
-                <name set="solr">marc_776</name>
-                <name set="solr">marc_777</name>
-                <name set="solr">marc_778</name>
-                <name set="solr">marc_779</name>
-                <name set="solr">marc_780</name>
-                <name set="solr">marc_781</name>
-                <name set="solr">marc_782</name>
-                <name set="solr">marc_783</name>
-                <name set="solr">marc_784</name>
-                <name set="solr">marc_785</name>
-                <name set="solr">marc_786</name>
-                <name set="solr">marc_787_o</name>
-                <name set="solr">marc_787_t</name>
+                <name set="solr" search="marc_530"/>
+                <name set="solr" search="marc_760"/>
+                <name set="solr" search="marc_761"/>
+                <name set="solr" search="marc_762"/>
+                <name set="solr" search="marc_763"/>
+                <name set="solr" search="marc_764"/>
+                <name set="solr" search="marc_765"/>
+                <name set="solr" search="marc_766"/>
+                <name set="solr" search="marc_767"/>
+                <name set="solr" search="marc_768"/>
+                <name set="solr" search="marc_769"/>
+                <name set="solr" search="marc_770"/>
+                <name set="solr" search="marc_771"/>
+                <name set="solr" search="marc_772"/>
+                <name set="solr" search="marc_773"/>
+                <name set="solr" search="marc_774"/>
+                <name set="solr" search="marc_775"/>
+                <name set="solr" search="marc_776"/>
+                <name set="solr" search="marc_777"/>
+                <name set="solr" search="marc_778"/>
+                <name set="solr" search="marc_779"/>
+                <name set="solr" search="marc_780"/>
+                <name set="solr" search="marc_781"/>
+                <name set="solr" search="marc_782"/>
+                <name set="solr" search="marc_783"/>
+                <name set="solr" search="marc_784"/>
+                <name set="solr" search="marc_785"/>
+                <name set="solr" search="marc_786"/>
+                <name set="solr" search="marc_787_o"/>
+                <name set="solr" search="marc_787_t"/>
             </map>
             <map>
                 <name set="marc">530</name>
-                <name set="solr">marc_530</name>
+                <name set="solr" search="marc_530"/>
             </map>
             <map>
                 <name set="marc">760</name>
-                <name set="solr">marc_760</name>
+                <name set="solr" search="marc_760"/>
             </map>
             <map>
                 <name set="marc">761</name>
-                <name set="solr">marc_761</name>
+                <name set="solr" search="marc_761"/>
             </map>
             <map>
                 <name set="marc">762</name>
-                <name set="solr">marc_762</name>
+                <name set="solr" search="marc_762"/>
             </map>
             <map>
                 <name set="marc">763</name>
-                <name set="solr">marc_763</name>
+                <name set="solr" search="marc_763"/>
             </map>
             <map>
                 <name set="marc">764</name>
-                <name set="solr">marc_764</name>
+                <name set="solr" search="marc_764"/>
             </map>
             <map>
                 <name set="marc">765</name>
-                <name set="solr">marc_765</name>
+                <name set="solr" search="marc_765"/>
             </map>
             <map>
                 <name set="marc">766</name>
-                <name set="solr">marc_766</name>
+                <name set="solr" search="marc_766"/>
             </map>
             <map>
                 <name set="marc">767</name>
-                <name set="solr">marc_767</name>
+                <name set="solr" search="marc_767"/>
             </map>
             <map>
                 <name set="marc">768</name>
-                <name set="solr">marc_768</name>
+                <name set="solr" search="marc_768"/>
             </map>
             <map>
                 <name set="marc">769</name>
-                <name set="solr">marc_769</name>
+                <name set="solr" search="marc_769"/>
             </map>
             <map>
                 <name set="marc">770</name>
-                <name set="solr">marc_770</name>
+                <name set="solr" search="marc_770"/>
             </map>
             <map>
                 <name set="marc">771</name>
-                <name set="solr">marc_771</name>
+                <name set="solr" search="marc_771"/>
             </map>
             <map>
                 <name set="marc">772</name>
-                <name set="solr">marc_772</name>
+                <name set="solr" search="marc_772"/>
             </map>
             <map>
                 <name set="marc">773</name>
-                <name set="solr">marc_773</name>
+                <name set="solr" search="marc_773"/>
             </map>
             <map>
                 <name set="marc">774</name>
-                <name set="solr">marc_774</name>
+                <name set="solr" search="marc_774"/>
             </map>
             <map>
                 <name set="marc">775</name>
-                <name set="solr">marc_775</name>
+                <name set="solr" search="marc_775"/>
             </map>
             <map>
                 <name set="marc">776</name>
-                <name set="solr">marc_776</name>
+                <name set="solr" search="marc_776"/>
             </map>
             <map>
                 <name set="marc">777</name>
-                <name set="solr">marc_777</name>
+                <name set="solr" search="marc_777"/>
             </map>
             <map>
                 <name set="marc">778</name>
-                <name set="solr">marc_778</name>
+                <name set="solr" search="marc_778"/>
             </map>
             <map>
                 <name set="marc">779</name>
-                <name set="solr">marc_779</name>
+                <name set="solr" search="marc_779"/>
             </map>
             <map>
                 <name set="marc">780</name>
-                <name set="solr">marc_780</name>
+                <name set="solr" search="marc_780"/>
             </map>
             <map>
                 <name set="marc">781</name>
-                <name set="solr">marc_781</name>
+                <name set="solr" search="marc_781"/>
             </map>
             <map>
                 <name set="marc">782</name>
-                <name set="solr">marc_782</name>
+                <name set="solr" search="marc_782"/>
             </map>
             <map>
                 <name set="marc">783</name>
-                <name set="solr">marc_783</name>
+                <name set="solr" search="marc_783"/>
             </map>
             <map>
                 <name set="marc">784</name>
-                <name set="solr">marc_784</name>
+                <name set="solr" search="marc_784"/>
             </map>
             <map>
                 <name set="marc">785</name>
-                <name set="solr">marc_785</name>
+                <name set="solr" search="marc_785"/>
             </map>
             <map>
                 <name set="marc">786</name>
-                <name set="solr">marc_786</name>
+                <name set="solr" search="marc_786"/>
             </map>
             <map>
                 <name set="marc">787$o</name>
-                <name set="solr">marc_787_o</name>
+                <name set="solr" search="marc_787_o"/>
             </map>
             <map>
                 <name set="marc">787$t</name>
-                <name set="solr">marc_787_t</name>
+                <name set="solr" search="marc_787_t"/>
             </map>
         </index>
 
@@ -459,16 +460,16 @@ limitations under the License.
             <title>Rights</title>
             <map>
                 <name set="dc">rights</name>
-                <name set="solr">marc_506</name>
-                <name set="solr">marc_540</name>
+                <name set="solr" search="marc_506"/>
+                <name set="solr" search="marc_540"/>
             </map>
             <map>
                 <name set="marc">506</name>
-                <name set="solr">marc_506</name>
+                <name set="solr" search="marc_506"/>
             </map>
             <map>
                 <name set="marc">540</name>
-                <name set="solr">marc_540</name>
+                <name set="solr" search="marc_540"/>
             </map>
         </index>
 
@@ -476,21 +477,21 @@ limitations under the License.
             <title>Source</title>
             <map>
                 <name set="dc">source</name>
-                <name set="solr">marc_534_t</name>
-                <name set="solr">marc_786_o</name>
-                <name set="solr">marc_786_t</name>
+                <name set="solr" search="marc_534_t"/>
+                <name set="solr" search="marc_786_o"/>
+                <name set="solr" search="marc_786_t"/>
             </map>
             <map>
                 <name set="marc">534$t</name>
-                <name set="solr">marc_534_t</name>
+                <name set="solr" search="marc_534_t"/>
             </map>
             <map>
                 <name set="marc">786$o</name>
-                <name set="solr">marc_786_o</name>
+                <name set="solr" search="marc_786_o"/>
             </map>
             <map>
                 <name set="marc">786$t</name>
-                <name set="solr">marc_786_t</name>
+                <name set="solr" search="marc_786_t"/>
             </map>
         </index>
 
@@ -498,55 +499,55 @@ limitations under the License.
             <title>Subject</title>
             <map>
                 <name set="dc">subject</name>
-                <name set="solr">marc_060</name>
-                <name set="solr">marc_080</name>
-                <name set="solr">marc_082</name>
-                <name set="solr">marc_600</name>
-                <name set="solr">marc_610</name>
-                <name set="solr">marc_611</name>
-                <name set="solr">marc_630</name>
-                <name set="solr">marc_650</name>
-                <name set="solr">marc_653</name>
+                <name set="solr" search="marc_060"/>
+                <name set="solr" search="marc_080"/>
+                <name set="solr" search="marc_082"/>
+                <name set="solr" search="marc_600"/>
+                <name set="solr" search="marc_610"/>
+                <name set="solr" search="marc_611"/>
+                <name set="solr" search="marc_630"/>
+                <name set="solr" search="marc_650"/>
+                <name set="solr" search="marc_653"/>
             </map>
             <map>
                 <name set="marc">060</name>
-                <name set="solr">marc_060</name>
+                <name set="solr" search="marc_060"/>
             </map>
             <map>
                 <name set="marc">080</name>
-                <name set="solr">marc_080</name>
+                <name set="solr" search="marc_080"/>
             </map>
             <map>
                 <name set="marc">082</name>
-                <name set="solr">marc_082</name>
+                <name set="solr" search="marc_082"/>
             </map>
             <map>
                 <name set="marc">600</name>
-                <name set="solr">marc_600</name>
+                <name set="solr" search="marc_600"/>
             </map>
             <map>
                 <name set="marc">611</name>
-                <name set="solr">marc_611</name>
+                <name set="solr" search="marc_611"/>
             </map>
             <map>
                 <name set="marc">630</name>
-                <name set="solr">marc_630</name>
+                <name set="solr" search="marc_630"/>
             </map>
             <map>
                 <name set="marc">650</name>
-                <name set="solr">marc_650</name>
+                <name set="solr" search="marc_650"/>
             </map>
             <map>
                 <name set="marc">653</name>
-                <name set="solr">marc_653</name>
+                <name set="solr" search="marc_653"/>
             </map>
             <map>
                 <name set="ead">subject</name>
-                <name set="solr">marc_650</name>
+                <name set="solr" search="marc_650"/>
             </map>
             <map>
                 <name set="ead">geoname</name>
-                <name set="solr">marc_651</name>
+                <name set="solr" search="marc_651"/>
             </map>
         </index>
 
@@ -554,24 +555,24 @@ limitations under the License.
             <title>Title</title>
             <map>
                 <name set="dc">title</name>
-                <name set="solr">marc_245</name>
-                <name set="solr">marc_246</name>
+                <name set="solr" search="marc_245"/>
+                <name set="solr" search="marc_246"/>
             </map>
             <map>
                 <name set="marc">245</name>
-                <name set="solr">marc_245</name>
+                <name set="solr" search="marc_245"/>
             </map>
             <map>
                 <name set="marc">245$a</name>
-                <name set="solr">marc_245_a</name>
+                <name set="solr" search="marc_245_a"/>
             </map>
             <map>
                 <name set="marc">246</name>
-                <name set="solr">marc_246</name>
+                <name set="solr" search="marc_246"/>
             </map>
             <map>
                 <name set="ead">unittitle</name>
-                <name set="solr">marc_245_a</name>
+                <name set="solr" search="marc_245_a"/>
             </map>
         </index>
 
@@ -584,28 +585,29 @@ limitations under the License.
                 <name set="marc">655</name>
             </map>
             <map>
-                <name set="solr">marc_655</name>
+                <name set="solr" search="marc_655"/>
             </map>
         </index>
 
         <index>
             <title>IISH Collections</title>
             <map>
-                <name set="solr">iisg_collectionName</name>
+                <name set="iisg">collectionName</name>
+                <name set="solr" search="iisg_collectionName"/>
             </map>
         </index>
         <index>
             <title>Collection</title>
             <map>
                 <name set="marc">852$b</name>
-                <name set="solr">marc_852_b</name>
+                <name set="solr" search="marc_852_b"/>
             </map>
         </index>
         <index>
             <title>Call number</title>
             <map>
                 <name set="marc">852$h</name>
-                <name set="solr">marc_852_h</name>
+                <name set="solr" search="marc_852_h"/>
             </map>
         </index>
 
@@ -613,7 +615,7 @@ limitations under the License.
             <title>Piece</title>
             <map>
                 <name set="marc">852$p</name>
-                <name set="solr">marc_852_p</name>
+                <name set="solr" search="marc_852_p"/>
             </map>
         </index>
 
@@ -621,7 +623,7 @@ limitations under the License.
             <title>Cataloging Source</title>
             <map>
                 <name set="marc">040</name>
-                <name set="solr">marc_40</name>
+                <name set="solr" search="marc_40"/>
             </map>
         </index>
     </indexInfo>

@@ -649,7 +649,7 @@ public class SolrSRWDatabase extends SRWDatabase {
         return axisServer;
     }
 
-    public MessageContext setResponseMessage(Message reqMsg, SolrQueryRequest req, Services targetService, RequestTypes requestType, Transport transport) throws IOException {
+    public MessageContext prepairMessage(Message reqMsg, SolrQueryRequest req, Services targetService, RequestTypes requestType, Transport transport) throws IOException {
         MessageContext msgContext = new MessageContext(axisServer);
 
         msgContext.setTargetService(targetService.toString());

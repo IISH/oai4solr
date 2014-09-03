@@ -5,7 +5,7 @@
      xmlns:srw="http://www.loc.gov/zing/srw/"
      xmlns:xcql="http://www.loc.gov/zing/cql/xcql/">
 
-<xsl:import href="?file=stdiface.xsl&amp;contentType=text/xml"/>
+<xsl:import href="stdiface.xsl"/>
 
 <xsl:variable name="title">Result of scan for term: <xsl:value-of select="/srw:scanResponse/srw:echoedScanRequest/srw:scanClause"/></xsl:variable>
 <xsl:variable name="maximumTerms"><xsl:value-of select="/srw:scanResponse/srw:echoedScanRequest/srw:maximumTerms"/></xsl:variable>

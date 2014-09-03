@@ -137,9 +137,9 @@
             browser can make html. For this to work, declare a ShowFileRequestHandler class
             <requestHandler name="/file" class="solr.admin.ShowFileRequestHandler"/>
             -->
-            <str name="explainStyleSheet">http://localhost:8983/solr/core0/file?file=explainResponse.xsl&amp;contentType=application/xml</str>
-            <str name="searchStyleSheet">http://localhost:8983/solr/core0/file?file=searchRetrieveResponse.xsl&amp;contentType=application/xml</str>
-            <str name="scanStyleSheet">http://localhost:8983/solr/core0/file?file=scanResponse.xsl&amp;contentType=application/xml</str>
+            <str name="explainStyleSheet">explainResponse.xsl</str>
+            <str name="searchStyleSheet">searchRetrieveResponse.xsl</str>
+            <str name="scanStyleSheet">scanResponse.xsl</str>
 
             <str name="explain">explain.xml</str>
 
