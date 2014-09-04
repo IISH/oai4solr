@@ -234,15 +234,15 @@ limitations under the License.
             <title>Language</title>
             <map>
                 <name set="dc">language</name>
-                <name set="solr" search="marc_041_a"/>
-                <name set="solr" search="marc_041_b"/>
-                <name set="solr" search="marc_041_d"/>
-                <name set="solr" search="marc_041_e"/>
-                <name set="solr" search="marc_041_f"/>
-                <name set="solr" search="marc_041_g"/>
-                <name set="solr" search="marc_041_h"/>
-                <name set="solr" search="marc_041_j"/>
-                <name set="solr" search="marc_546"/>
+                <name set="solr" search="marc_041_a" scan="marc_041_a"/>
+                <name set="solr" search="marc_041_b" scan="marc_041_b"/>
+                <name set="solr" search="marc_041_d" scan="marc_041_d"/>
+                <name set="solr" search="marc_041_e" scan="marc_041_e"/>
+                <name set="solr" search="marc_041_f" scan="marc_041_f"/>
+                <name set="solr" search="marc_041_g" scan="marc_041_g"/>
+                <name set="solr" search="marc_041_h" scan="marc_041_h"/>
+                <name set="solr" search="marc_041_j" scan="marc_041_j"/>
+                <name set="solr" search="marc_546"   scan="marc_546"/>
             </map>
             <map>
                 <name set="marc">041a</name>

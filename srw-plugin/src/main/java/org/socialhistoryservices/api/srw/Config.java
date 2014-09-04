@@ -23,7 +23,6 @@ limitations under the License.
 package org.socialhistoryservices.api.srw;
 
 
-import ORG.oclc.os.SRW.Utilities;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.server.AxisServer;
 import org.apache.axis.utils.XMLUtils;
@@ -31,7 +30,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.DOMUtil;
 import org.apache.solr.common.util.NamedList;
-import org.apache.solr.schema.*;
+import org.apache.solr.schema.DateField;
+import org.apache.solr.schema.IndexSchema;
+import org.apache.solr.schema.SchemaField;
+import org.apache.solr.schema.StrField;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -60,10 +62,12 @@ class Config {
      * <p/>
      * Reads all configuration parameters and loads the CQL-2-Lucene list into memory.
      *
-     * @param args Solr namedlist parameters as they were set in the solrconfig core document.
+     * @param schema            Solr schema instance
+     * @param srw_absolute_home full path of the srw configuration files
+     * @param args              Solr namedlist parameters as they were set in the solrconfig core document.
      * @return An instance of a SolrSRWDatabase.
      */
-    public static SolrSRWDatabase init(IndexSchema schema, String solr_solr_home, NamedList args) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    public static SolrSRWDatabase init(IndexSchema schema, String srw_absolute_home, NamedList args) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
 
         NamedList srw_properties = (NamedList) args.get("srw_properties");
 
@@ -73,15 +77,11 @@ class Config {
             properties.setProperty(field_name, String.valueOf(srw_properties.getVal(i)));
         }
 
-
         if (!properties.containsKey("SRW.Context")) {
             properties.setProperty("SRW.Context", "/");
         }
         properties.setProperty("SRW.Home", properties.getProperty("SRW.Context"));
-
-        final String srw_absolute_home = solr_solr_home + properties.getProperty("srw_home");
         properties.setProperty("dbHome", srw_absolute_home);
-
         getExplainVariables(properties);
 
         String host = properties.getProperty("serverInfo.host", "http://localhost/solr/srw");
@@ -105,13 +105,13 @@ class Config {
         properties.setProperty("db." + dbname + ".home", srw_absolute_home);
         SolrSRWDatabase db = (SolrSRWDatabase) SolrSRWDatabase.getDB(dbname, properties);
         if (db.getAxisServer() == null) {
-            // We only need to initialize the axis server once.
+            // As it is a static we only need to initialize the axis server field once.
             InputStream is = new FileInputStream(srw_absolute_home + "/deploy.wsdd");
             FileProvider provider = new FileProvider(is);
             db.setAxisServer(new AxisServer(provider));
         }
 
-        Map<String, ArrayList> explainMap = loadExplainMap(schema, srw_absolute_home, properties.getProperty("explain"));
+        Map<String, ArrayList> explainMap = loadExplainMap(schema, properties);
         db.setExplainMap(explainMap);
         db.setFacets(getFacets(args.get("facets"), explainMap));
 
@@ -131,7 +131,10 @@ class Config {
      */
     private static void getExplainVariables(Properties properties) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
 
-        final File f = Utilities.findFile(properties.getProperty("explain"), properties.getProperty("dbHome"), properties.getProperty("srwHome"));
+        final File f = new File(properties.getProperty("dbHome"), "explain.xml");
+        if (!f.exists())
+            throw new IOException("Explain document not found: " + f.getAbsolutePath());
+
         final Document doc = GetDOMDocument(f);
 
         final NodeList infos = GetNodes(doc, "zr:explain/zr:serverInfo | zr:explain/zr:databaseInfo | zr:explain/zr:metaInfo");
@@ -187,8 +190,6 @@ class Config {
      * Iterates through the explain.xml document and locates all indexInfo set elements.
      * For each set, determine the mapped Solr indexFields and their type ( scan or searchable ).
      *
-     * @param srw_absolute_home
-     * @param explain_file
      * @return The result is a map with set names as keys, and a list of solr fields as values:
      * map<String set as key, List solrFields>
      * @throws IOException
@@ -196,11 +197,9 @@ class Config {
      * @throws ParserConfigurationException
      * @throws XPathExpressionException
      */
-    private static Map<String, ArrayList> loadExplainMap(IndexSchema indexSchema, String srw_absolute_home, String explain_file) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+    private static Map<String, ArrayList> loadExplainMap(IndexSchema indexSchema, Properties properties) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
 
-
-        // Load the explain.xml document
-        final File f = Utilities.findFile(explain_file, null, srw_absolute_home);
+        final File f = new File(properties.getProperty("dbHome"), "explain.xml");
         final Document explainDocument = GetDOMDocument(f);
         Map<String, ArrayList> explainMap = new HashMap();
 

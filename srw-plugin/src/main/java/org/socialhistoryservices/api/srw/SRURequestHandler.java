@@ -95,18 +95,10 @@ public class SRURequestHandler extends SRURequestHandlerSOAP implements SolrCore
 
     @Override
     public void inform(SolrCore core) {
-        if (db == null) {
-            try {
-                db = Config.init(core.getSchema(), SolrResourceLoader.locateSolrHome(), initArgs);
-            } catch (SAXException e) {
-                log.error(e);
-            } catch (ParserConfigurationException e) {
-                log.error(e);
-            } catch (XPathExpressionException e) {
-                log.error(e);
-            } catch (IOException e) {
-                log.error(e);
-            }
+        try {
+            setDb(Config.init(core.getSchema(), SolrResourceLoader.locateSolrHome() + core.getName() + "/srw", initArgs));
+        } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
+            log.error(e);
         }
     }
 }

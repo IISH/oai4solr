@@ -75,23 +75,11 @@
     <!-- Custom wt that is being used by the OAI handler -->
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
 
-
-
-
     <!-- Custom SRU handler. -->
     <requestHandler name="/srw" class="org.socialhistoryservices.api.srw.SRURequestHandler">
         <str name="wt">srw</str>
         <lst name="srw_properties">
 
-            <str name="srw_home">/core0/srw</str>
-
-            <!--
-               Set this value to use a folder other than the core's solr.home config directory.
-               All paths you specify here are relative to this folder.
-
-               You can also specify databaseInfo and metaInfo in the explain.xml document. The values
-               used here are for the xslt processor
-            -->
             <str name="dbname">Our SRW database</str>
 
             <int name="maximumTerms">100</int>
@@ -140,8 +128,6 @@
             <str name="explainStyleSheet">explainResponse.xsl</str>
             <str name="searchStyleSheet">searchRetrieveResponse.xsl</str>
             <str name="scanStyleSheet">scanResponse.xsl</str>
-
-            <str name="explain">explain.xml</str>
 
             <!-- In case you want a response in JSON. Append &callback=[your callback tag to the request URL] -->
             <str name="xml-2-json.identifier">xml-2-json</str>

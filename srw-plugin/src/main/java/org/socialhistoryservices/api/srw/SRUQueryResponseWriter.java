@@ -46,16 +46,16 @@ public class SRUQueryResponseWriter implements QueryResponseWriter {
 
     /**
      * cleanup
-     *
+     * <p/>
      * Remove the SOAP wrapper from the response.
-     *
+     * <p/>
      * Copied and adapted this method from ORG.oclc.os.SRW.SRWServlet
      * ToDo: apply xslt logic.
      *
-     * @param message
-     * @param nameElementClose
-     * @param cleanup
-     * @return
+     * @param message The soap message
+     * @param nameElementClose <element> to be wrapped to </element>
+     * @param cleanup True to remove the SOAP wrapper.
+     * @return A cleaned up String
      * @throws AxisFault
      */
     private String cleanup(Message message, String nameElementClose, Boolean cleanup) throws AxisFault {
@@ -183,7 +183,7 @@ public class SRUQueryResponseWriter implements QueryResponseWriter {
 
                 writer.write(jsonp);
                 writer.write("(");
-                Transformer t = db.getTransformers("xml-2-json");
+                Transformer t = db.getTransformer("xml-2-json");
                 StreamSource source = new StreamSource(new StringReader(cleanup(message, tag, true)));
                 try {
                     t.transform(source, new StreamResult(writer));

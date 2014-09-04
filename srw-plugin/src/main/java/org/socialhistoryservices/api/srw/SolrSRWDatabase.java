@@ -42,15 +42,14 @@ import org.z3950.zing.cql.CQLNode;
 import org.z3950.zing.cql.CQLParser;
 import org.z3950.zing.cql.CQLTermNode;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -61,6 +60,39 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class SolrSRWDatabase extends SRWDatabase {
+
+    final private java.util.Hashtable<String, Templates> templates = new Hashtable<>();
+    final private Hashtable<String, Vector> parameterNames = new Hashtable<>();
+    final private Hashtable<String, Vector> parameterValues = new Hashtable<>();
+
+    @Override
+    public Transformer addTransformer(String schemaName, String schemaID, String transformerFileName, Vector parameterNames, Vector parameterValues) throws FileNotFoundException, TransformerConfigurationException {
+
+        File f = Utilities.findFile(transformerFileName, dbHome, srwHome);
+        if (f == null || !f.exists()) {
+            throw new FileNotFoundException(transformerFileName);
+        }
+
+        if (schemaID != null) {
+            schemas.put(schemaName, schemaID);
+            schemas.put(schemaID, schemaID);
+        }
+
+        Source xslSource = new StreamSource(Utilities.openInputStream(
+                transformerFileName, dbHome, srwHome));
+        try {
+            xslSource.setSystemId(f.toURI().toURL().toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        final Templates template = TransformerFactory.newInstance().newTemplates(xslSource);
+        templates.put(schemaID, template);
+        this.parameterNames.put(schemaID, parameterNames);
+        this.parameterValues.put(schemaID, parameterValues);
+        return null;
+    }
+
     // Transform the record from the Solr result set with the specified transformer
     // Add ExtraRecordData and Identifier fields to the record.
 
@@ -85,7 +117,8 @@ public class SolrSRWDatabase extends SRWDatabase {
 
         log.debug("transforming to " + schemaID);
         // They must have specified a transformer
-        Transformer t = (Transformer) transformers.get(schemaID);
+
+        final Transformer t = getTransformer(schemaID);
         if (t == null) {
             log.error("can't transform record in schema " + rec.getRecordSchemaID());
             log.error("record not available in schema " + schemaID);
@@ -96,6 +129,12 @@ public class SolrSRWDatabase extends SRWDatabase {
             }
             throw new SRWDiagnostic(SRWDiagnostic.RecordNotAvailableInThisSchema, schemaID);
         }
+
+        final Vector paramNames = parameterNames.get(schemaID);
+        final Vector paramValues = parameterValues.get(schemaID);
+        if (paramNames != null)
+            for (int i = 0; i < paramNames.size(); i++)
+                t.setParameter((String) paramNames.get(i), paramValues.get(i));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StreamSource fromRec = new StreamSource(new StringReader(recStr));
@@ -129,13 +168,23 @@ public class SolrSRWDatabase extends SRWDatabase {
         return new Record(recordData, schemaID);
     }
 
+    public Transformer getTransformer(String schemaID) {
+        final Templates template = templates.get(schemaID);
+        Transformer transformer = null;
+        try {
+            transformer = template.newTransformer();
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        }
+        return transformer;
+    }
+
     /**
      * A utility method
      *
      * @param document A XML document
      * @param TagName  The Elements to look for in the document
      * @return A string with the XML of the Elementr found
-     * @throws ORG.oclc.os.SRW.SRWDiagnostic
      */
     private String GetNodeValue(org.w3c.dom.Document document, String TagName) {
         NodeList list = document.getElementsByTagName(TagName);
@@ -170,9 +219,8 @@ public class SolrSRWDatabase extends SRWDatabase {
      * For now we use fields as defined in the solrconfig SRW handler to add to the extra response data.
      * The facets first request may take a while, depending on the size of the index. Better to therefore to add these as autowarming parameters in solr.QuerySenderListener
      *
-     * @param result  The resultset for which we have to calculate the facets
-     * @param request
-     * @return
+     * @param result The resultset for which we have to calculate the facets
+     * @return Response data
      */
     @Override
     public String getExtraResponseData(QueryResult result, SearchRetrieveRequestType request) {
@@ -211,9 +259,7 @@ public class SolrSRWDatabase extends SRWDatabase {
 
         try {
             return getFacetData(request, r, facets_result);
-        } catch (XMLStreamException e) {
-            log.warn(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (XMLStreamException | UnsupportedEncodingException e) {
             log.warn(e);
         }
 
@@ -238,9 +284,8 @@ public class SolrSRWDatabase extends SRWDatabase {
      * requestUrl
      * count
      *
-     * @param request       The SRW request that has some parameters we want to use: version and recordSchema. Needed for a follow up query.
-     * @param r             The SolrQueryResult resultset. It has the original query. Needed for a follow up query.
-     * @param facets_result
+     * @param request The SRW request that has some parameters we want to use: version and recordSchema. Needed for a follow up query.
+     * @param r       The SolrQueryResult resultset. It has the original query. Needed for a follow up query.
      * @return The facets
      * @throws javax.xml.stream.XMLStreamException
      * @throws UnsupportedEncodingException
@@ -524,7 +569,7 @@ public class SolrSRWDatabase extends SRWDatabase {
         String sortKeys = request.getSortKeys(); // See if there is a sortkeys argument
         if (sortKeys != null) {
             StringTokenizer st_keys = new StringTokenizer(sortKeys, " "); // Sort fields are separated by a space
-            ArrayList<SortField> list = new ArrayList();
+            ArrayList<SortField> list = new ArrayList<>();
 
             while (st_keys.hasMoreTokens()) {
                 String key = st_keys.nextToken();
@@ -549,10 +594,7 @@ public class SolrSRWDatabase extends SRWDatabase {
                 // Now we have a fieldname an a sort order.
                 // But we still need a map to the actual index
                 ArrayList fields = explainMap.get(IndexOptions.sort + "." + fieldname);
-                if (fields == null) // No such index to sort on...
-                {
-                    // just ignore it... probably we should throw an SRW Exception.
-                } else
+                if (fields != null) // No such index to sort on...
                     for (Object field1 : fields) {
                         SchemaField field = req.getSchema().getField((String) field1);
                         SortField sortField = field.getSortField(top);
@@ -560,7 +602,6 @@ public class SolrSRWDatabase extends SRWDatabase {
                             list.add(sortField);
                     }
             }
-
             if (list.size() != 0) {
                 SortField[] sfields = new SortField[list.size()];
                 sort = new Sort(list.toArray(sfields));
@@ -583,12 +624,10 @@ public class SolrSRWDatabase extends SRWDatabase {
 
     private String makeQuery(CQLNode xQuery) throws TransformerException, IOException {
 
-        final Transformer t = (Transformer) transformers.get("cql-2-lucene");
+        final Transformer t = getTransformer("cql-2-lucene") ;
         final ByteArrayInputStream bais = mergeCQLandIndices(xQuery);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         t.transform(new StreamSource(bais), new StreamResult(baos));
-
         return baos.toString(encoding).replace("\r", "").replace("\n", "");
     }
 
@@ -633,7 +672,7 @@ public class SolrSRWDatabase extends SRWDatabase {
         return true;
     }
 
-    public void setExplainMap(Map explainMap) {
+    public void setExplainMap(Map<String, ArrayList> explainMap) {
         this.explainMap = explainMap;
     }
 
@@ -706,19 +745,6 @@ public class SolrSRWDatabase extends SRWDatabase {
         return msgContext;
     }
 
-    public Transformer getTransformers(String schemaID) {
-        return (Transformer) transformers.get(schemaID);
-    }
-
-
-    public void init(String dbname, String srwHome,
-                     String dbHome, String dbPropertiesFileName,
-                     Properties dbProperties,
-                     HttpServletRequest request) throws Exception {
-        log.info("request=" + request);
-        init(dbname, srwHome, dbHome, dbPropertiesFileName, dbProperties);
-    }
-
     @Override
     public void init(String dbname, String srwHome, String dbHome, String dbPropertiesFileName, Properties dbProperties) throws Exception {
 
@@ -735,7 +761,6 @@ public class SolrSRWDatabase extends SRWDatabase {
 
         // Add custom system transformers:
         // It is kind of a hack to put these along the xmlSchema, but it does no harm.
-        // Still: ToDo: implement a seperate HashTable for system transformers.
         String xmlSchemas = dbProperties.getProperty("xmlSchemas") + " " + dbProperties.getProperty("system.xmlSchemas");
         dbProperties.setProperty("xmlSchemas", xmlSchemas);
 
@@ -746,9 +771,14 @@ public class SolrSRWDatabase extends SRWDatabase {
             temp = dbProperties.getProperty("configInfo.maximumRecords");
         if (temp != null)
             setMaximumRecords(Integer.parseInt(temp));
+
+        // Now get rid of the stored transformers, but make sure we know the default.
+        transformers.clear();
+        final String schemaIdentifier = String.valueOf(schemas.get("default"));
+        templates.put("default", templates.get(schemaIdentifier));
     }
 
-    public enum IndexOptions {
+    public static enum IndexOptions {
         search,
         search_exact,
         search_range,
@@ -757,15 +787,15 @@ public class SolrSRWDatabase extends SRWDatabase {
         sort
     }
 
-    public enum RequestTypes {
+    public static enum RequestTypes {
         explainRequest, scanRequest, searchRetrieveRequest
     }
 
-    public enum Services {
+    public static enum Services {
         SRW, ExplainSOAP
     }
 
-    public enum Transport {
+    public static enum Transport {
         SRU, SRW, JSON
     }  // SRU is a call with the URL. SRW is a SOAP call.
 
@@ -774,5 +804,5 @@ public class SolrSRWDatabase extends SRWDatabase {
     private Map<String, ArrayList> explainMap; // typically our normalized Lucene fields for searching
     private NamedList facets;
 
-    private final Log log = LogFactory.getLog(this.getClass());
+    private final static Log log = LogFactory.getLog("SolrSRWDatabase");
 }

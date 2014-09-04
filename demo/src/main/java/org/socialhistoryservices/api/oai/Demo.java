@@ -2,9 +2,7 @@ package org.socialhistoryservices.api.oai;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.embedded.JettySolrRunner;
-import org.apache.solr.core.CoreContainer;
 
 import java.io.File;
 
@@ -23,16 +21,16 @@ public class Demo {
 
         checkLib(solr_home);
 
-        final CoreContainer coreContainer = new CoreContainer(solr_home, new File(solr_home, "solr.xml"));
-        final EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, CORE);
-
-        server.deleteByQuery("*:*");
-        server.optimize();
-
-        final BatchImport batchImport = new BatchImport(server);
-        batchImport.processFiles(new File(solr_home + "/docs/"));
-        server.commit();
-        server.shutdown();
+//        final CoreContainer coreContainer = new CoreContainer(solr_home, new File(solr_home, "solr.xml"));
+//        final EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, CORE);
+//
+//        server.deleteByQuery("*:*");
+//        server.optimize();
+//
+//        final BatchImport batchImport = new BatchImport(server);
+//        batchImport.processFiles(new File(solr_home + "/docs/"));
+//        server.commit();
+//        server.shutdown();
 
         JettySolrRunner solrRunner = new JettySolrRunner("/solr", 8983);
         String baseUrl = "http://localhost:8983/solr/core0/oai?";
