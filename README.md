@@ -378,7 +378,7 @@ The -Dsolr.solr.home VM property may need to be set manually if the unit tests c
 The end result is a package in ./oai2-plugin/target/oai2-plugin-3.x-1.0.jar ( or your maven local repository if you used 'install').
 
 ##Download
-You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
+You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR-29/artifact
 
 ##Install
 Place oai2-plugin-3.x-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
