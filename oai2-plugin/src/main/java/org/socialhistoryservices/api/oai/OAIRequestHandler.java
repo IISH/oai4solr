@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.SolrResourceLoader;
@@ -63,6 +64,7 @@ import java.util.List;
 public class OAIRequestHandler extends RequestHandlerBase {
 
     private final Log log = LogFactory.getLog(this.getClass());
+    private final static String WT = "oai";  // The request writer
 
 
     @Override
@@ -73,7 +75,12 @@ public class OAIRequestHandler extends RequestHandlerBase {
     public void handleRequestBody(SolrQueryRequest request, SolrQueryResponse response) throws Exception {
 
         final NamedList<Object> list = request.getParams().toNamedList();
-        list.add("wt", Parameters.getParam("wt", "oai")); // The request writer
+        list.add(CommonParams.WT, Parameters.getParam(CommonParams.WT, WT));
+
+        // Add the xslt parameters from solrconfig
+        final NamedList xslt_parameters = (NamedList) Parameters.getParam("xslt_parameters");
+        list.addAll(xslt_parameters);
+
         request.setParams(SolrParams.toSolrParams(list));
 
         OAIPMHtype oai = new OAIPMHtype();
@@ -98,13 +105,21 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
         switch (verb) {
             case IDENTIFY:
-            case LIST_SETS:
             case LIST_METADATA_FORMATS:
                 response.getValues().remove("oai");
                 oai = Parameters.getParam(verb);
                 oai.setRequest(oaiRequest);
                 response.add("oai", oai);
-
+                break;
+            case LIST_SETS:
+                oai = Parameters.getParam(verb);
+                if (oai == null) {
+                    Validation.error(response, OAIPMHerrorcodeType.NO_SET_HIERARCHY);
+                    return;
+                }
+                response.getValues().remove("oai");
+                oai.setRequest(oaiRequest);
+                response.add("oai", oai);
                 break;
             case GET_RECORD:
             case LIST_IDENTIFIERS:
@@ -225,10 +240,21 @@ public class OAIRequestHandler extends RequestHandlerBase {
         q.add(query);
     }
 
+    /**
+     * addSetToQuery
+     *
+     * @param setParam The index or query template string
+     * @param q        The query list
+     */
     private void addSetToQuery(String setParam, List<String> q) {
 
-        if (setParam != null)
-            addToQuery(String.format("%s:\"%s\"", Parameters.getParam("field_index_set"), setParam), q);
+        if (setParam != null) {
+            final String field_index_set = (String) Parameters.getParam("field_index_set");
+            if (field_index_set.contains("%s"))
+                addToQuery(String.format(field_index_set, setParam), q);
+            else
+                addToQuery(String.format("%s:\"%s\"", field_index_set, setParam), q);
+        }
     }
 
     private DocList runQuery(SolrQueryRequest request, List<String> q, int cursor, int len) throws IOException, SyntaxError {
@@ -237,9 +263,19 @@ public class OAIRequestHandler extends RequestHandlerBase {
         final Sort sort = new Sort(sortField);
 
         String[] queryParts = q.toArray(new String[q.size()]);
-        final QParser parser = QParser.getParser(Parsing.join(queryParts, " AND "), QParserPlugin.DEFAULT_QTYPE, request);
+        String join = Parsing.join(queryParts, " AND ");
+        final String static_query = (String) Parameters.getParam("static_query");
+        if (!static_query.isEmpty()) join += " AND (" + static_query + ")";
+        final QParser parser = QParser.getParser(join, QParserPlugin.DEFAULT_QTYPE, request);
 
-        final Query filter = null; // un used
+        Query filter = null;
+        if (true == Parameters.getParam("enable_filter_query")) {
+            final String fq = request.getParams().get("fq");
+            if (fq != null) {
+                filter = QParser.getParser(fq, QParserPlugin.DEFAULT_QTYPE, request).getQuery();
+            }
+        }
+
         return request.getSearcher().getDocList(parser.getQuery(), filter, sort, cursor, len);
     }
 
@@ -276,6 +312,9 @@ public class OAIRequestHandler extends RequestHandlerBase {
         Parameters.setParam(args, "field_index_datestamp", "datestamp");
         Parameters.setParam(args, "field_sort_datestamp", "datestamp");
         Parameters.setParam(args, "field_index_set", "set");
+        Parameters.setParam(args, "static_query", "");
+        Parameters.setParam(args, "enable_filter_query", false);
+        Parameters.setParam(args, "xslt_parameters", new NamedList<List>());
 
         final File file = getOaiHome(args);
         if (!file.exists()) {
@@ -295,7 +334,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
             }
         }
 
-        // Add our marchallers
+        // Add our marshallers
         try {
             final JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class);
             Parameters.setParam("marshaller", jc.createMarshaller());
@@ -313,7 +352,6 @@ public class OAIRequestHandler extends RequestHandlerBase {
         } catch (JAXBException e) {
             log.error(e);
         }
-
 
         addStylesheets(file);
     }
@@ -370,6 +408,6 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
     @Override
     public String getVersion() {
-        return "$3.x-1.0 $";
+        return "$4.x-1.0 $";
     }
 }

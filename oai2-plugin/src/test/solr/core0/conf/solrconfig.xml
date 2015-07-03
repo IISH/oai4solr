@@ -76,6 +76,17 @@
         -->
         <int name="resumptionTokenExpirationInSeconds">86400</int>
         <str name="resumptionTokenSeparator">,</str>
+
+        <str name="static_query"/>
+        <bool name="enable_filter_query">false</bool>
+
+        <!-- The xslt_parameters is a list of key-value pairs that will be passed on to the XSLT.
+      -->
+        <lst name="xslt_parameters">
+            <str name="key1">value1</str>
+            <str name="key2">value2</str>
+        </lst>
+
     </requestHandler>
     <!-- Custom wt that is being used by the OAI handler -->
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
@@ -90,24 +101,24 @@
   <dataDir>${solr.core0.data.dir:}</dataDir>
 
   <!-- To enable dynamic schema REST APIs, use the following for <schemaFactory>:
-  
+
        <schemaFactory class="ManagedIndexSchemaFactory">
          <bool name="mutable">true</bool>
          <str name="managedSchemaResourceName">managed-schema</str>
        </schemaFactory>
-       
+
        When ManagedIndexSchemaFactory is specified, Solr will load the schema from
        he resource named in 'managedSchemaResourceName', rather than from schema.xml.
        Note that the managed schema resource CANNOT be named schema.xml.  If the managed
        schema does not exist, Solr will create it after reading schema.xml, then rename
-       'schema.xml' to 'schema.xml.bak'. 
-       
+       'schema.xml' to 'schema.xml.bak'.
+
        Do NOT hand edit the managed schema - external modifications will be ignored and
        overwritten as a result of schema modification REST API calls.
 
        When ManagedIndexSchemaFactory is specified with mutable = true, schema
        modification REST API calls will be allowed; otherwise, error responses will be
-       sent back for these requests. 
+       sent back for these requests.
   -->
   <schemaFactory class="ClassicIndexSchemaFactory"/>
 
@@ -117,19 +128,19 @@
     </updateLog>
   </updateHandler>
 
-  <!-- realtime get handler, guaranteed to return the latest stored fields 
-    of any document, without the need to commit or open a new searcher. The current 
+  <!-- realtime get handler, guaranteed to return the latest stored fields
+    of any document, without the need to commit or open a new searcher. The current
     implementation relies on the updateLog feature being enabled. -->
   <requestHandler name="/get" class="solr.RealTimeGetHandler">
     <lst name="defaults">
       <str name="omitHeader">true</str>
     </lst>
-  </requestHandler>  
+  </requestHandler>
 
   <requestDispatcher handleSelect="true" >
     <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" formdataUploadLimitInKB="2048" />
   </requestDispatcher>
-  
+
   <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
   <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />
   <requestHandler name="/update" class="solr.UpdateRequestHandler"  />

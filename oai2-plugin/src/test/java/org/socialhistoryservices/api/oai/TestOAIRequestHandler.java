@@ -1,6 +1,7 @@
 package org.socialhistoryservices.api.oai;
 
 import junit.framework.TestCase;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -28,8 +29,7 @@ public class TestOAIRequestHandler extends TestCase {
     private final Log log = LogFactory.getLog(this.getClass());
 
     public static String CORE = "core0";
-
-    private static EmbeddedServer server;
+    private static EmbeddedServer server = null;
 
     private static int testRecordCount = 1000;
     private static String datestamp_from = "1980-01-01T00:00:00Z";
@@ -40,6 +40,7 @@ public class TestOAIRequestHandler extends TestCase {
     private static String marked_setSpec = "setSpec1";
     private static int expectedSetSpec;
 
+
     /**
      * Start the embedded server and add [testRecordCount] Lucene documents.
      * The setSpec will alternative between setSpec1, setSpec2 and setSpec3
@@ -47,20 +48,22 @@ public class TestOAIRequestHandler extends TestCase {
      *
      * @throws Exception
      */
+    @Override
     protected void setUp() throws Exception {
-        if ( server == null ) {
+
+        if (server == null) {
             super.setUp();
             String solr_home = System.getProperty("solr.solr.home");
             if (solr_home == null)
                 solr_home = deriveSolrHome();
 
+            FileUtils.deleteDirectory(new File(solr_home + "/" + CORE + "/data/index/"));
+            FileUtils.deleteDirectory(new File(solr_home + "/" + CORE + "/data/tlog/"));
+
             Parameters.clearParams();
             final CoreContainer coreContainer = new CoreContainer(solr_home);
             coreContainer.load();
             server = new EmbeddedServer(coreContainer, CORE);
-
-            deleteIndex();
-
             marker_from = Parsing.parseDatestamp(datestamp_from).getTime();
             marker_until = Parsing.parseDatestamp(datestamp_until).getTime();
 
@@ -86,6 +89,13 @@ public class TestOAIRequestHandler extends TestCase {
         }
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        Parameters.setParam("enable_filter_query", false);
+        Parameters.setParam("static_query", "");
+    }
+
     private String deriveSolrHome() {
 
         File file = new File(System.getProperty("user.dir"), "/oai2-plugin/src/test/solr");
@@ -99,17 +109,6 @@ public class TestOAIRequestHandler extends TestCase {
 
         System.setProperty("solr.solr.home", file.getAbsolutePath());
         return file.getAbsolutePath();
-    }
-
-    private void deleteIndex() {
-        try {
-            server.deleteByQuery("*:*");
-            server.optimize();
-        } catch (SolrServerException e) {
-            log.error(e);
-        } catch (IOException e) {
-            log.error(e);
-        }
     }
 
     /**
@@ -191,7 +190,7 @@ public class TestOAIRequestHandler extends TestCase {
     }
 
 
-    public void testListSetsNoSetSpec() {
+    public void testListSetsNoSetSpecNoSetHierarchy() throws FileNotFoundException, JAXBException {
         final ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("verb", "ListRecords");
         params.set("metadataPrefix", "oai_dc");
@@ -199,8 +198,9 @@ public class TestOAIRequestHandler extends TestCase {
         OAIPMHtype oai2Document = server.sendRequest(params);
         assertEquals(OAIPMHerrorcodeType.NO_RECORDS_MATCH, oai2Document.getError().get(0).getCode());
 
-        Parameters.setParam("ListSets", null);
+        Parameters.setParam(VerbType.LIST_SETS, null);
         oai2Document = server.sendRequest(params);
+        Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(VerbType.LIST_SETS));
         assertEquals(OAIPMHerrorcodeType.NO_SET_HIERARCHY, oai2Document.getError().get(0).getCode());
     }
 
@@ -341,7 +341,114 @@ public class TestOAIRequestHandler extends TestCase {
             resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
         } while (resumptionToken != null);
 
-        assertEquals( expectedFromUntilRange , count);
+        assertEquals(expectedFromUntilRange, count);
+    }
+
+    public void testFilterQueryOff() {
+        // Start a harvest
+        final ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("verb", "ListIdentifiers");
+        params.set("metadataPrefix", "oai_dc");
+        params.set("fq", "theme:i_do_not_exist");
+
+        int count = 0;
+        ResumptionTokenType resumptionToken = null;
+        do {
+            if (resumptionToken != null)
+                params.set("resumptionToken", resumptionToken.getValue());
+
+            final OAIPMHtype oai2Document = server.sendRequest(params);
+            final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
+            for (HeaderType header : listIdentifiers.getHeader()) {
+                int i = count++;
+                String expected = Parameters.getParam("prefix") + String.valueOf(i);
+                String actual = header.getIdentifier();
+                assertEquals(expected, actual);
+            }
+            resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
+        } while (resumptionToken != null);
+        assertEquals(testRecordCount, count);
+    }
+
+    public void testFilterQueryOn() {
+        // Start a harvest
+        final ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("verb", "ListIdentifiers");
+        params.set("metadataPrefix", "oai_dc");
+        params.set("fq", "theme:setSpec1");
+        Parameters.setParam("enable_filter_query", true);
+
+        int count = 0;
+        ResumptionTokenType resumptionToken = null;
+        do {
+            if (resumptionToken != null)
+                params.set("resumptionToken", resumptionToken.getValue());
+
+            final OAIPMHtype oai2Document = server.sendRequest(params);
+            final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
+            count += listIdentifiers.getHeader().size();
+            resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
+        } while (resumptionToken != null);
+        assertEquals(expectedSetSpec, count);
+    }
+
+    public void testStaticQuery() {
+        // Start a harvest
+        final ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("verb", "ListIdentifiers");
+        params.set("metadataPrefix", "oai_dc");
+        params.set("fq", "theme:i_do_not_exist");
+        Parameters.setParam("static_query", "theme:setSpec1");
+
+        int count = 0;
+        ResumptionTokenType resumptionToken = null;
+        do {
+            if (resumptionToken != null)
+                params.set("resumptionToken", resumptionToken.getValue());
+
+            final OAIPMHtype oai2Document = server.sendRequest(params);
+            final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
+            count += listIdentifiers.getHeader().size();
+            resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
+        } while (resumptionToken != null);
+        assertEquals(expectedSetSpec, count);
+    }
+
+    public void testStaticQueryAndFilteredQuery() {
+        // Start a harvest
+        final ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("verb", "ListIdentifiers");
+        params.set("metadataPrefix", "oai_dc");
+        params.set("fq", "theme:setSpec1");
+        Parameters.setParam("enable_filter_query", true);
+        Parameters.setParam("static_query", "theme:setSpec1");
+
+        int count = 0;
+        ResumptionTokenType resumptionToken = null;
+        do {
+            if (resumptionToken != null)
+                params.set("resumptionToken", resumptionToken.getValue());
+
+            final OAIPMHtype oai2Document = server.sendRequest(params);
+            final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
+            count += listIdentifiers.getHeader().size();
+            resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
+        } while (resumptionToken != null);
+        assertEquals(expectedSetSpec, count);
+    }
+
+    public void testStaticQueryAndFilteredQueryNoResults() {
+        // Start a harvest
+        final ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("verb", "ListIdentifiers");
+        params.set("metadataPrefix", "oai_dc");
+        params.set("fq", "theme:i_do_not_exist");
+        Parameters.setParam("enable_filter_query", true);
+        Parameters.setParam("static_query", "theme:setSpec1");
+
+        final OAIPMHtype oai2Document = server.sendRequest(params);
+        assertEquals(1, oai2Document.getError().size());
+        assertEquals(OAIPMHerrorcodeType.NO_RECORDS_MATCH, oai2Document.getError().get(0).getCode());
     }
 
 }

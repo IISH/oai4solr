@@ -60,7 +60,7 @@
         <str name="field_sort_datestamp">datestamp</str>
 
         <!-- index for the -set value -->
-        <str name="field_index_set">theme</str>
+        <str name="field_index_set">theme:"%s"</str>
 
         <!-- Some documents may be large or small, depending on the schema.
         In that case, we set the step of the paging to a lower count. -->
@@ -75,6 +75,48 @@
         -->
         <int name="resumptionTokenExpirationInSeconds">86400</int>
         <str name="resumptionTokenSeparator">,</str>
+
+        <!--
+        The static_query argument is an optional extra Lucene query and if set, appended as an AND query to the internal
+        OAI2 query string. Use this query when you do not want to expose the entire Solr index, but a specific subset.
+         For example:
+         <str name="static_query">(visible:true AND status:available) OR showall:true</str>
+        will be appended by the OAI2 handler so:
+        [the OAI2 query here] AND ( (visible:true AND status:available) OR showall:true )
+         -->
+        <!--
+            <str name="static_query"/>
+        -->
+
+        <!--
+        The enable_filter_query is set to true or false ( false is the default ).
+
+        Use this when the OAI2 handler is invoked via a parent handler or proxy which attaches extra query conditions dynamically.
+        This can be use full when the client is not allowed to see certain records based on access policies. The latter
+        you can translate into a filter query.
+
+        Filter query arguments must be appended to the oai handler with a -fq key.
+
+        For example, you may have an internal service that captures the client request and the identity of the client.
+        You can then call the service internally like so:
+        String OAI2_ARGUMENTS = capture_oai_arguments(client_request);
+        String QUERY_FILTER_ARGUMENTS = get_query_arguments_from_user_authorities(client_authorities);
+        SolrServer solrServer = new HttpSolrServer("http://localhost/solr/collection1/oai?" + OAI2_ARGUMENTS + "&qf=QUERY_FILTER_ARGUMENTS);
+
+        Note: if you want to use the -fq parameter for this purpose make sure you do not allow the client to inject
+        the -fq parameter. The enable_filter_query value is false when not set.
+        -->
+        <!--
+            <bool name="enable_filter_query">false</bool>
+        -->
+
+        <!-- The xslt_parameters is a list of key-value pairs that will be passed on to the XSLT.
+         For example:
+         -->
+        <lst name="xslt_parameters">
+            <str name="key">33fa17ca-e715-445d-937e-e7140fe549a3</str>
+        </lst>
+
     </requestHandler>
     <!-- Custom wt that is being used by the OAI handler -->
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
@@ -125,13 +167,13 @@
         </lst>
     </requestHandler>
 
-    <requestDispatcher handleSelect="true" >
-        <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" formdataUploadLimitInKB="2048" />
+    <requestDispatcher handleSelect="true">
+        <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" formdataUploadLimitInKB="2048"/>
     </requestDispatcher>
 
-    <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
-    <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />
-    <requestHandler name="/update" class="solr.UpdateRequestHandler"  />
-    <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
+    <requestHandler name="standard" class="solr.StandardRequestHandler" default="true"/>
+    <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler"/>
+    <requestHandler name="/update" class="solr.UpdateRequestHandler"/>
+    <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers"/>
 
 </config>

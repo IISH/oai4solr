@@ -210,6 +210,30 @@ The default is 200 records per response before the resumptionToken kicks in. You
         <!-- EAD documents are large, so we want to page per document -->
         <int name="ead">1</int>
     </lst>
+    
+##Non OAI2 settings
+###static_query
+The static_query argument is an optional extra Lucene query and if set, appended as an AND query to the internal OAI2
+query string. Use a static query when you do not want to expose the entire Solr index, but a specific subset.
+
+    <!-- Example: -->
+    <str name="static_query">visible:true</str>
+
+###enable_filter_query
+Use this when the OAI2 handler is invoked via a parent handler or proxy which attaches extra query conditions
+dynamically. For example when the client is not allowed to see certain records based on access policies.
+Filter query arguments must be appended to the oai handler with a -fq key.
+
+For example, if set:
+
+    <bool name="enable_filter_query">true</bool>
+    
+Clients may then append an -fq parameter to the oai handler's query string. However this setting is intended for server side control,
+where you can call the oai2 service internally like so in this pseude code:
+
+    String OAI2_ARGUMENTS = capture_oai_arguments(client_request);
+    String QUERY_FILTER_ARGUMENTS = get_query_arguments_from_user_authorities(client_id);
+    HttpClient client = new HttpClient("http://localhost/solr/collection1/oai?" + OAI2_ARGUMENTS + "&qf=QUERY_FILTER_ARGUMENTS);
 
 ##Solrconfig.xml configuration in full
 Set the following in the solrconfig.xml document:
@@ -275,6 +299,40 @@ Set the following in the solrconfig.xml document:
         -->
         <int name="resumptionTokenExpirationInSeconds">86400</int>
         <str name="resumptionTokenSeparator">,</str>
+        
+        
+        <!-- The static_query argument is an optional extra Lucene query and if set, appended as an AND query to the internal
+        OAI2 query string. Use this query when you do not want to expose the entire Solr index, but a specific subset.
+        For example:
+            <str name="static_query">(visible:true AND status:available) OR showall:true</str>
+        will be appended by the OAI2 handler so:
+            [the OAI2 query here] AND ( (visible:true AND status:available) OR showall:true )
+        -->
+        <!--
+            <str name="static_query"/>
+        -->
+
+        <!-- The enable_filter_query is set to true or false ( false is the default ).
+
+        Use this when the OAI2 handler is invoked via a parent handler or proxy which attaches extra query conditions dynamically.
+        This can be use full when the client is not allowed to see certain records based on access policies. The latter
+        you can translate into a filter query.
+
+        Filter query arguments must be appended to the oai handler with a -fq key.
+
+        For example, you may have an internal service that captures the client request and the identity of the client.
+        You can then call the service internally like so in this pseude code:
+        String OAI2_ARGUMENTS = capture_oai_arguments(client_request);
+        String QUERY_FILTER_ARGUMENTS = get_query_arguments_from_user_authorities(client_id);
+        SolrServer solrServer = new HttpSolrServer("http://localhost/solr/collection1/oai?" + OAI2_ARGUMENTS + "&qf=QUERY_FILTER_ARGUMENTS);
+
+        Note: if you want to use the -fq parameter for this purpose make sure you do not allow the client to inject
+        the -fq parameter. The enable_filter_query value is false when not set.
+        -->
+        <!--
+            <bool name="enable_filter_query">false</bool>
+        -->
+        
     </requestHandler>
 
     <!-- Custom wt that is being used by the OAI handler -->
@@ -375,19 +433,19 @@ The -Dsolr.solr.home VM property may need to be set manually if the unit tests c
 
     $ mvn -Dsolr.solr.home=[absolute path to oai4solr/solr] clean package
 
-The end result is a package in ./oai2-plugin/target/oai2-plugin-3.x-1.0.jar ( or your maven local repository if you used 'install').
+The end result is a package in ./oai2-plugin/target/oai2-plugin-4.x-1.0.jar ( or your maven local repository if you used 'install').
 
 ##Download
 You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
 
 ##Install
-Place oai2-plugin-3.x-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
+Place oai2-plugin-4.x-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
 that points to the jar.
 
 ##Runable demo
 Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.
 
-Copy the oai2-plugin-3.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
+Copy the oai2-plugin-4.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
 directory structure should look like this:
 
     ----
@@ -402,7 +460,7 @@ directory structure should look like this:
 
 Start the demo with:
 
-    java -jar demo/target/demo-1.0.jar
+    java -jar demo/target/demo-4.1.jar
 
 Then explore the test OAI2 repository with your request to it, e.g.
 
