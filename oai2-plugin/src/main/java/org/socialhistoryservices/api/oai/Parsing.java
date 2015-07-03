@@ -41,7 +41,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Parsing
- *
+ * <p/>
  * Utility class to parse request values to Solr Lucene queries and format dates into the two OAI2 UTCdatetime datestamps.
  */
 public class Parsing {
@@ -69,7 +69,7 @@ public class Parsing {
 
     /**
      * parseDatestamp
-     *
+     * <p/>
      * Parse a UTCdatetime datestamp String into a Date
      *
      * @throws java.text.ParseException
@@ -125,7 +125,6 @@ public class Parsing {
     }
 
 
-
     /**
      * parseRange
      * <p/>
@@ -145,7 +144,6 @@ public class Parsing {
     }
 
 
-
     /**
      * stripOaiPrefix
      * <p/>
@@ -158,11 +156,9 @@ public class Parsing {
     public static String stripOaiPrefix(String identifier) {
 
         final String prefix = (String) Parameters.getParam("prefix");
-        final String id = identifier.substring(prefix.length());
-        System.out.println("Prefix is " + prefix);
-        System.out.println("Identifier is " + identifier);
-        System.out.println("Looking for " + id);
-        return id;
+        final int length_prefix = prefix.length();
+        if (identifier.length() < length_prefix) return "oai:domain:identifier";
+        return identifier.substring(length_prefix);
     }
 
     /**
