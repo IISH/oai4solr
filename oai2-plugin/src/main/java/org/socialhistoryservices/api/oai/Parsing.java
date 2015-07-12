@@ -158,11 +158,9 @@ public class Parsing {
     public static String stripOaiPrefix(String identifier) {
 
         final String prefix = (String) Parameters.getParam("prefix");
-        final String id = identifier.substring(prefix.length());
-        System.out.println("Prefix is " + prefix);
-        System.out.println("Identifier is " + identifier);
-        System.out.println("Looking for " + id);
-        return id;
+        final int length_prefix = prefix.length();
+        if (identifier.length() < length_prefix) return "unparsable";
+        return identifier.substring(length_prefix);
     }
 
     /**

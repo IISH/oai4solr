@@ -345,8 +345,22 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
         try {
             Parameters.setParam(VerbType.IDENTIFY, Parsing.loadStaticVerb(VerbType.IDENTIFY));
-            Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(VerbType.LIST_SETS));
+        } catch (FileNotFoundException e) {
+            log.warn(e);
+        } catch (JAXBException e) {
+            log.error(e);
+        }
+
+        try {
             Parameters.setParam(VerbType.LIST_METADATA_FORMATS, Parsing.loadStaticVerb(VerbType.LIST_METADATA_FORMATS));
+        } catch (FileNotFoundException e) {
+            log.warn(e);
+        } catch (JAXBException e) {
+            log.error(e);
+        }
+
+        try {
+            Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(VerbType.LIST_SETS));
         } catch (FileNotFoundException e) {
             log.warn(e);
         } catch (JAXBException e) {
