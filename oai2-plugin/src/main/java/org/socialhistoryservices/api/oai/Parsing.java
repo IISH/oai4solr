@@ -109,8 +109,8 @@ public class Parsing {
     public static String parseGregorianDate(XMLGregorianCalendar date) {
 
         date.setTimezone(0); // Zulu
-        final OAIPMHtype oaipmHtype = Parameters.getParam(VerbType.IDENTIFY);
-        return date.toString().substring(0, oaipmHtype.getIdentify().getGranularity().value().length() - 1) + "Z";
+        int l = date.toString().length();
+        return (l < 19) ? date.toString() : date.toString().substring(0, 19) + "Z";   // length of YYYY-MM-DDThh:mm:ssZ
     }
 
     public static String join(String[] s, String glue) {
