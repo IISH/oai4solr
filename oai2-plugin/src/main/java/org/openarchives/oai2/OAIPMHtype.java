@@ -20,10 +20,7 @@
 
 package org.openarchives.oai2;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
@@ -73,6 +70,13 @@ import java.util.List;
 })
 public class OAIPMHtype {
 
+    // We hardcode the constant xsi namespace and schemaLocation here.
+    @XmlAttribute(name = "xmlns:xsi", namespace = "")
+    protected String xmlns_xsi = "http://www.w3.org/2001/XMLSchema-instance";
+    @XmlAttribute(name = "xsi:schemaLocation", namespace = "")
+    protected String xsi_schemaLocation = "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
+
+    // Ensure the responseDate value is parsed correctly with a XmlDatestampAdapter
     @XmlElement(namespace = "http://www.openarchives.org/OAI/2.0/", required = true)
     @XmlJavaTypeAdapter(XmlDatestampAdapter.class)
     protected XMLGregorianCalendar responseDate;
