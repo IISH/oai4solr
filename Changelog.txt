@@ -1,4 +1,14 @@
-Version 4.1 + 3.1
+2016-01-30
+ - A Identify, ListSets and ListMetadataFormats response return the xmlns:xsi declaration and schemaLocation.
+ - Merged 4.1 additions into 3.1
+
+2015-06-22, version 4.1
+ - An absent ListSets.xml file will give a noSetHierarchy response.
+ - Added an optional static query 'static_query' in the solrconfig to limit search results to a subsection of indexed documents.
+ - For OAI request that are not served directly but via another server handler: added a 'enable_filter_query' option. When set to true a handler can add a filtered query parameter to the oai handler's query string.
+ - 3.1 does not have these new features.
+
+2014:, version 4.1 + 3.1
  - Created two branches to support both Solr search platforms.
  - Added two more unit test for asserting the correct response of -set, -from and -until requests.
  - Drop the index before the unit tests and demo starts.

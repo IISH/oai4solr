@@ -402,7 +402,7 @@ directory structure should look like this:
 
 Start the demo with:
 
-    java -jar demo/target/demo-1.0.jar
+    java -jar demo/target/demo-3.1.jar
 
 Then explore the test OAI2 repository with your request to it, e.g.
 

@@ -41,7 +41,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Parsing
- * <p/>
+ *
  * Utility class to parse request values to Solr Lucene queries and format dates into the two OAI2 UTCdatetime datestamps.
  */
 public class Parsing {
@@ -69,7 +69,7 @@ public class Parsing {
 
     /**
      * parseDatestamp
-     * <p/>
+     *
      * Parse a UTCdatetime datestamp String into a Date
      *
      * @throws java.text.ParseException
@@ -109,8 +109,8 @@ public class Parsing {
     public static String parseGregorianDate(XMLGregorianCalendar date) {
 
         date.setTimezone(0); // Zulu
-        final OAIPMHtype oaipmHtype = Parameters.getParam(VerbType.IDENTIFY);
-        return date.toString().substring(0, oaipmHtype.getIdentify().getGranularity().value().length() - 1) + "Z";
+        int l = date.toString().length();
+        return (l < 19) ? date.toString() : date.toString().substring(0, 19) + "Z";   // length of YYYY-MM-DDThh:mm:ssZ
     }
 
     public static String join(String[] s, String glue) {
@@ -123,6 +123,7 @@ public class Parsing {
             out.append(glue).append(s[x]);
         return out.toString();
     }
+
 
 
     /**
@@ -144,6 +145,7 @@ public class Parsing {
     }
 
 
+
     /**
      * stripOaiPrefix
      * <p/>
@@ -157,7 +159,7 @@ public class Parsing {
 
         final String prefix = (String) Parameters.getParam("prefix");
         final int length_prefix = prefix.length();
-        if (identifier.length() < length_prefix) return "oai:domain:identifier";
+        if (identifier.length() < length_prefix) return "unparsable";
         return identifier.substring(length_prefix);
     }
 
