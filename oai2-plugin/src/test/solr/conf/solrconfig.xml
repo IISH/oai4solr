@@ -31,7 +31,7 @@
         The default is [solr_home]/oai
         In this folder the xsl stylesheets, ListMetadataPrefix.xml, Identify.xml and ListSets.xsl must be placed.
         -->
-        <str name="oai_home">/core0/oai</str>
+        <str name="oai_home">/conf/oai</str>
 
         <!-- the base url...  -->
         <str name="proxyurl">http://localhost:8983/core0/oai</str>
@@ -92,7 +92,7 @@
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
 
 
-    <luceneMatchVersion>4.7</luceneMatchVersion>
+    <luceneMatchVersion>5.5.4</luceneMatchVersion>
   <!--  The DirectoryFactory to use for indexes.
         solr.StandardDirectoryFactory, the default, is filesystem based.
         solr.RAMDirectoryFactory is memory based, not persistent, and doesn't work with replication. -->
@@ -144,7 +144,6 @@
   <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
   <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />
   <requestHandler name="/update" class="solr.UpdateRequestHandler"  />
-  <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
 
 </config>
 

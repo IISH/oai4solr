@@ -33,24 +33,24 @@ import java.util.Date;
  *
  * author: Lucien van Wouw <lwo@iisg.nl>
  */
-public class ResumptionToken extends RequestType {
+class ResumptionToken extends RequestType {
 
    private boolean good_resumptionToken = true;
     private int cursor = 0;
 
-    public int getCursor() {
+    int getCursor() {
         return cursor;
     }
 
-    public void setCursor(int cursor) {
+    private void setCursor(int cursor) {
         this.cursor = cursor;
     }
 
-    public boolean isGood_resumptionToken() {
+    boolean isGood_resumptionToken() {
         return good_resumptionToken;
     }
 
-    public void setResumptiontokenHealth(boolean good_resumptionToken) {
+    void setResumptiontokenHealth(boolean good_resumptionToken) {
         this.good_resumptionToken = good_resumptionToken;
     }
 
@@ -59,10 +59,8 @@ public class ResumptionToken extends RequestType {
      * <p/>
      * Parses a ResumptionTokenType instance into a base 64 encoded string. This string will serve as the
      * resumption token.
-     *
-     * @throws java.io.UnsupportedEncodingException
      */
-    public static ResumptionTokenType encodeResumptionToken(ResumptionToken oaiResumptionToken, int cursor, int nextCursor, int matches, int resumptionTokenExpirationInSeconds) throws UnsupportedEncodingException {
+    static ResumptionTokenType encodeResumptionToken(ResumptionToken oaiResumptionToken, int cursor, int nextCursor, int matches, int resumptionTokenExpirationInSeconds) throws UnsupportedEncodingException {
 
         final ResumptionTokenType resumptionToken = new ResumptionTokenType();
         resumptionToken.setCursor(BigInteger.valueOf(cursor));
@@ -91,9 +89,8 @@ public class ResumptionToken extends RequestType {
      *
      * @param token The resumption token as base 64 encoded String
      * @return The resumption token instance
-     * @throws Exception
      */
-    public static ResumptionToken decodeResumptionToken(String token) throws Exception {
+    static ResumptionToken decodeResumptionToken(String token) throws Exception {
 
         if (token == null)
             return null;

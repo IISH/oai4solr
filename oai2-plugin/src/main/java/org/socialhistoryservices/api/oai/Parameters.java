@@ -11,33 +11,39 @@ import java.util.HashMap;
  * <p/>
  * Im memory datastore for system parameters.
  */
-public class Parameters {
+class Parameters {
 
-    final private static HashMap<String, Object> store = new HashMap<String, Object>();
+    final private static HashMap<String, Object> store = new HashMap<>();
 
 
-    public static OAIPMHtype getParam(VerbType verb) {
+    static OAIPMHtype getParam(VerbType verb) {
 
         return (OAIPMHtype) store.get(verb.value());
     }
 
-    public static void setParam(VerbType verb, Object def) {
+    static void setParam(VerbType verb, Object def) {
 
         setParam(verb.value(), def);
     }
 
-    public static Object getParam(String key) {
+    static Object getParam(String key) {
 
         return store.get(key);
     }
 
-    public static Object getParam(String key, Object def) {
+    static Object getParam(String key, Object def) {
 
         Object o = store.get(key);
         return (o == null) ? def : o;
     }
 
-    public static void setParam(NamedList args, String key, Object def) {
+    static Boolean getBool(String key, Boolean def) {
+
+        Object o = store.get(key);
+        return (o == null) ? def : (Boolean) o;
+    }
+
+    static void setParam(NamedList args, String key, Object def) {
 
         Object value = args.get(key);
         if (value == null)
@@ -45,7 +51,7 @@ public class Parameters {
         setParam(key, value);
     }
 
-    public static void setParam(String key, Object o) {
+    static void setParam(String key, Object o) {
 
         if (o == null)
             store.remove(key);
@@ -53,7 +59,7 @@ public class Parameters {
             store.put(key, o);
     }
 
-    public static void clearParams() {
+    static void clearParams() {
         store.clear();
     }
 }

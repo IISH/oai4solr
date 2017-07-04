@@ -31,12 +31,12 @@ import java.util.regex.Pattern;
  *
  * Utility class to check the validity of OAI2 requests
  */
-public class Validation {
+class Validation {
 
     final private static Pattern datestampSLong = Pattern.compile("^\\d{4}-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]Z$|^\\d{4}-[0-1][0-9]-[0-3][0-9]$");
     final private static Pattern datestampShort = Pattern.compile("^\\d{4}-[0-1][0-9]-[0-3][0-9]");
 
-    public static boolean error(SolrQueryResponse response, OAIPMHerrorcodeType code) {
+    static boolean error(SolrQueryResponse response, OAIPMHerrorcodeType code) {
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         OAIPMHerrorType error = new OAIPMHerrorType();
@@ -45,7 +45,7 @@ public class Validation {
         return false;
     }
 
-    public static boolean error(SolrQueryResponse response, String value, OAIPMHerrorcodeType code) {
+    static boolean error(SolrQueryResponse response, String value, OAIPMHerrorcodeType code) {
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         OAIPMHerrorType error = new OAIPMHerrorType();
@@ -55,21 +55,12 @@ public class Validation {
         return false;
     }
 
-    public static RecordType error(Exception e) {
-
-        RecordType rt = new RecordType();
-        MetadataType md = new MetadataType();
-        md.setAny(e.getMessage());
-        rt.setMetadata(md);
-        return rt;
-    }
-
     /**
      * isValidIdentifier
      * <p/>
      * See if the identifier exists or is invalid.
      */
-    public static boolean isValidIdentifier(SolrQueryResponse response, RequestType oaiRequest) {
+    static boolean isValidIdentifier(SolrQueryResponse response, RequestType oaiRequest) {
 
         final String identifier = oaiRequest.getIdentifier();
         if (identifier == null)
@@ -87,7 +78,7 @@ public class Validation {
      * @param recordCount Number of records
      * @return true if we have the expected number
      */
-    public static boolean isAvailableIdentifier(SolrQueryResponse response, int recordCount) {
+    static boolean isAvailableIdentifier(SolrQueryResponse response, int recordCount) {
 
         return recordCount == 1 || error(response, OAIPMHerrorcodeType.ID_DOES_NOT_EXIST);
     }
@@ -100,7 +91,7 @@ public class Validation {
      * @param recordCount Number of records
      * @return true if we have more than zero records
      */
-    public static boolean hasMatchingRecords(SolrQueryResponse response, int recordCount) {
+    static boolean hasMatchingRecords(SolrQueryResponse response, int recordCount) {
 
         return recordCount != 0 || error(response, OAIPMHerrorcodeType.NO_RECORDS_MATCH);
     }
@@ -112,7 +103,7 @@ public class Validation {
      *
      * @return True if supported
      */
-    public static boolean isValidMetadataPrefix(SolrQueryResponse response, RequestType oaiRequest) {
+    static boolean isValidMetadataPrefix(SolrQueryResponse response, RequestType oaiRequest) {
 
         final String metadataPrefix = oaiRequest.getMetadataPrefix();
         if (metadataPrefix == null) {
@@ -134,7 +125,7 @@ public class Validation {
      * @param setSpec The requested set
      * @return True if we have a declared setSpec matching the request
      */
-    public static boolean isValidSet(String setSpec, SolrQueryResponse response) {
+    static boolean isValidSet(String setSpec, SolrQueryResponse response) {
 
         if (setSpec == null || setSpec.isEmpty())
             return true;
@@ -150,7 +141,7 @@ public class Validation {
         return error(response, String.format("Set argument doesn't match any sets. The setSpec was '%s'", setSpec), OAIPMHerrorcodeType.NO_RECORDS_MATCH);
     }
 
-    public static boolean isValidDatestamp(String datestamp, String range, SolrQueryResponse response) {
+    static boolean isValidDatestamp(String datestamp, String range, SolrQueryResponse response) {
 
         if (datestamp == null) return true;
 
@@ -177,7 +168,7 @@ public class Validation {
      * @param until The until datestamp
      * @return True if from <= until
      */
-    public static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
+    static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
 
         return (from == null || until == null || Parsing.parseDatestamp(from).getTime() <= Parsing.parseDatestamp(until).getTime()) || error(response, "Bad date values, must have from<=until", OAIPMHerrorcodeType.BAD_ARGUMENT);
     }

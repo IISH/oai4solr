@@ -16,7 +16,7 @@
  limitations under the License.
 -->
 
-<schema name="unittest" version="1.2">
+<schema name="unittest" version="1.6">
 
     <types>
         <fieldtype name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>

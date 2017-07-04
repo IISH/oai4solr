@@ -52,7 +52,7 @@ public class Parsing {
      * <p/>
      * Convert a Java date into a GregorianCalendar date in the Zulu timezone.
      */
-    public static XMLGregorianCalendar getGregorianDate(Date date) {
+    static XMLGregorianCalendar getGregorianDate(Date date) {
 
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);
@@ -71,10 +71,8 @@ public class Parsing {
      * parseDatestamp
      *
      * Parse a UTCdatetime datestamp String into a Date
-     *
-     * @throws java.text.ParseException
      */
-    public static Date parseDatestamp(String datestamp) throws ParseException {
+    static Date parseDatestamp(String datestamp) throws ParseException {
 
         final SimpleDateFormat dateFormat = (datestamp.length() == GranularityType.YYYY_MM_DD_THH_MM_SS_Z.value().length()) ?
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS'Z'") :
@@ -113,7 +111,7 @@ public class Parsing {
         return (l < 19) ? date.toString() : date.toString().substring(0, 19) + "Z";   // length of YYYY-MM-DDThh:mm:ssZ
     }
 
-    public static String join(String[] s, String glue) {
+    static String join(String[] s, String glue) {
 
         int k = s.length;
         if (k == 0) return null;
@@ -136,7 +134,7 @@ public class Parsing {
      *
      * @return An ISO 8601 formatted date or an infinite range Lucene character when the date is null
      */
-    public static String parseRange(String datestamp, String range) {
+    static String parseRange(String datestamp, String range) {
 
         if (datestamp == null) return "*";
 
@@ -155,7 +153,7 @@ public class Parsing {
      * @param identifier the oai identifier
      * @return A local identifier
      */
-    public static String stripOaiPrefix(String identifier) {
+    static String stripOaiPrefix(String identifier) {
 
         final String prefix = (String) Parameters.getParam("prefix");
         final int length_prefix = prefix.length();
@@ -170,11 +168,9 @@ public class Parsing {
      *
      * @param verb The OAI2 verb
      * @return The OAIPMHtype instance
-     * @throws java.io.FileNotFoundException
-     * @throws javax.xml.bind.JAXBException
      */
     @SuppressWarnings("unchecked")
-    public static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
+    static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
 
         final File f = new File(Parameters.getParam("oai_home") + File.separator + verb.value() + ".xml");
         final FileInputStream fis = new FileInputStream(f);

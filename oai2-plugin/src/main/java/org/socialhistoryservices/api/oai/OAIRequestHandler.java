@@ -50,6 +50,8 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -68,10 +70,11 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
 
     @Override
-    /**
+    /*
      * Here we instantiate the oai request and validate the parameters.
      *
      */
+    @SuppressWarnings("unchecked")
     public void handleRequestBody(SolrQueryRequest request, SolrQueryResponse response) throws Exception {
 
         final NamedList<Object> list = request.getParams().toNamedList();
@@ -269,7 +272,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         final QParser parser = QParser.getParser(join, QParserPlugin.DEFAULT_QTYPE, request);
 
         Query filter = null;
-        if (true == Parameters.getParam("enable_filter_query")) {
+        if (Parameters.getBool("enable_filter_query", false)) {
             final String fq = request.getParams().get("fq");
             if (fq != null) {
                 filter = QParser.getParser(fq, QParserPlugin.DEFAULT_QTYPE, request).getQuery();
@@ -371,12 +374,10 @@ public class OAIRequestHandler extends RequestHandlerBase {
     }
 
     private File getOaiHome(NamedList args) {
-        String solr_home = SolrResourceLoader.locateSolrHome();
-        if (solr_home == null)
-            solr_home = System.getProperty("solr.solr.home");
+        Path solr_home = SolrResourceLoader.locateSolrHome();
         String oai_home = (String) args.get("oai_home");
         oai_home = (oai_home == null)
-                ? solr_home + File.separatorChar + "oai"
+                ? solr_home.toString() + File.separatorChar + "oai"
                 : solr_home + oai_home;
         File file = new File(oai_home);
         log.info("oai_home=" + oai_home);
@@ -395,19 +396,17 @@ public class OAIRequestHandler extends RequestHandlerBase {
             }
         })) {
 
-            final TransformerFactory tf = TransformerFactory.newInstance();
-            try {
-                final Source xslSource = new StreamSource(file);
-                xslSource.setSystemId(file.toURI().toURL().toString());
-                final Templates templates = tf.newTemplates(xslSource);
-                String metadataPrefix = FilenameUtils.removeExtension(file.getName());
-                Parameters.setParam(metadataPrefix, templates);
-            } catch (TransformerConfigurationException e) {
-                log.error(e);
-            } catch (MalformedURLException e) {
-                log.error(e);
+                final TransformerFactory tf = TransformerFactory.newInstance();
+                try {
+                    final Source xslSource = new StreamSource(file);
+                    xslSource.setSystemId(file.toURI().toURL().toString());
+                    final Templates templates = tf.newTemplates(xslSource);
+                    String metadataPrefix = FilenameUtils.removeExtension(file.getName());
+                    Parameters.setParam(metadataPrefix, templates);
+                } catch (TransformerConfigurationException | MalformedURLException e) {
+                    log.error(e);
+                }
             }
-        }
     }
 
     @Override

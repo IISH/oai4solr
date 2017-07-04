@@ -15,40 +15,7 @@ public class Demo {
 
     private final static Log log = LogFactory.getLog("Demo");
 
-    public static String CORE = "core0";
-
-    public static void main(String[] args) throws Exception {
-
-        String solr_home = deriveSolrHome();
-
-        checkLib(solr_home);
-
-        final CoreContainer coreContainer = new CoreContainer(solr_home);
-        coreContainer.load();
-        final EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, CORE);
-
-        server.deleteByQuery("*:*");
-        server.optimize();
-
-        final BatchImport batchImport = new BatchImport(server);
-        batchImport.processFiles(new File(solr_home + "/docs/"));
-        server.commit();
-        server.shutdown();
-
-        JettySolrRunner solrRunner = new JettySolrRunner(solr_home, "/solr", 8983);
-        String baseUrl = "http://localhost:8983/solr/core0/oai?";
-        System.out.println("\n\nGo ahead and try out the plugin:\n" +
-                baseUrl + "verb=Identify\n" +
-                baseUrl + "verb=ListSets\n" +
-                baseUrl + "verb=ListMetadataFormats\n" +
-                baseUrl + "verb=ListRecords&metadataPrefix=oai_dc\n" +
-                baseUrl + "verb=ListRecords&metadataPrefix=marcxml\n" +
-                baseUrl + "verb=ListRecords&metadataPrefix=solr\n" +
-                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=oai_dc\n" +
-                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=marcxml\n" +
-                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=solr");
-        solrRunner.start(true);
-    }
+    private static String CORE = "core0";
 
     private static void checkLib(String solr_home) {
         File checkLib = new File(solr_home, "/lib/");
@@ -78,5 +45,38 @@ public class Demo {
         String solr_home = new File(file, solr_relative_home).getAbsolutePath();
         System.setProperty("solr.solr.home", solr_home);
         return solr_home;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        String solr_home = deriveSolrHome();
+
+        checkLib(solr_home);
+
+        final CoreContainer coreContainer = new CoreContainer(solr_home);
+        coreContainer.load();
+        final EmbeddedSolrServer server = new EmbeddedSolrServer(coreContainer, CORE);
+
+        server.deleteByQuery("*:*");
+        server.optimize();
+
+        final BatchImport batchImport = new BatchImport(server);
+        batchImport.processFiles(new File(solr_home + "/docs/"));
+        server.commit();
+        server.close();
+
+        JettySolrRunner jetty = new JettySolrRunner(solr_home, "/solr", 8983);
+        String baseUrl = "http://localhost:8983/solr/core0/oai?";
+        System.out.println("\n\nGo ahead and try out the plugin:\n" +
+                baseUrl + "verb=Identify\n" +
+                baseUrl + "verb=ListSets\n" +
+                baseUrl + "verb=ListMetadataFormats\n" +
+                baseUrl + "verb=ListRecords&metadataPrefix=oai_dc\n" +
+                baseUrl + "verb=ListRecords&metadataPrefix=marcxml\n" +
+                baseUrl + "verb=ListRecords&metadataPrefix=solr\n" +
+                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=oai_dc\n" +
+                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=marcxml\n" +
+                baseUrl + "verb=GetRecord&identifier=oai:localhost:1&metadataPrefix=solr");
+        jetty.start();
     }
 }

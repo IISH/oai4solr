@@ -1,3 +1,6 @@
+2017-07-04, version 5.1
+ - Port from Solr 4 to version 5. No further changes.
+
 2015-06-22, version 4.1
  - An absent ListSets.xml file will give a noSetHierarchy response.
  - Added an optional static query 'static_query' in the solrconfig to limit search results to a subsection of indexed documents.

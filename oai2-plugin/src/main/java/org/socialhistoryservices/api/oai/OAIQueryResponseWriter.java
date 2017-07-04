@@ -55,7 +55,7 @@ import java.util.Date;
  */
 public class OAIQueryResponseWriter implements org.apache.solr.response.QueryResponseWriter {
 
-    final static QName qname = new QName("http://www.openarchives.org/OAI/2.0/", "OAI-PMH");
+    private final static QName qname = new QName("http://www.openarchives.org/OAI/2.0/", "OAI-PMH");
 
     private final Log log = LogFactory.getLog(this.getClass());
 
@@ -152,8 +152,6 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
      * norecords
      * <p/>
      * Marshalls the Identifier, ListSets, ListMetadataFormats and errors.
-     *
-     * @throws IOException
      */
     @SuppressWarnings("unchecked")
     private void norecords(Writer writer, OAIPMHtype oai) throws IOException {
@@ -176,8 +174,6 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     /**
      * Iterate over each individual Solr record and do the transformation and marshalling into an object.
      * We could transform the entire resultset, but this way we may spare some memory.
-     *
-     * @throws IOException
      */
     private void result(Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
 
@@ -195,8 +191,6 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
     /**
      * Get the Lucene document from the index and add it to a temporary response.
-     *
-     * @throws IOException
      */
     private void writeRecord(Writer writer, SolrQueryRequest request, int docId) throws IOException, TransformerException {
 
@@ -219,8 +213,6 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
     /**
      * Transform the Solr document into a schema using the associate transformer.
-     *
-     * @throws TransformerException
      */
     private void transform(Writer writer, ByteArrayOutputStream baos, String metadataPrefix) throws TransformerException {
 

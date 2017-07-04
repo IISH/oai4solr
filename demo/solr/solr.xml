@@ -16,8 +16,6 @@
  limitations under the License.
 -->
 
-<solr persistent="false" sharedLib="lib">
-    <cores adminPath="/admin/multicore">
-        <core name="core0" instanceDir="core0"/>
-    </cores>
+
+<solr>
 </solr>
