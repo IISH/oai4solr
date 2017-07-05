@@ -16,13 +16,13 @@
  */
 package org.socialhistoryservices.api.oai;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
 import com.google.common.base.Strings;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -93,7 +93,7 @@ public class EmbeddedSolrServer2 extends SolrClient {
      * Create an EmbeddedSolrServer wrapping a particular SolrCore
      */
     public EmbeddedSolrServer2(SolrCore core) {
-        this(core.getCoreDescriptor().getCoreContainer(), core.getName());
+        this(core.getCoreContainer(), core.getName());
     }
 
     /**
@@ -176,6 +176,7 @@ public class EmbeddedSolrServer2 extends SolrClient {
 
             req = _parser.buildRequestFrom(core, params, request.getContentStreams());
             req.getContext().put(PATH, path);
+            req.getContext().put("httpMethod", request.getMethod().name());
             SolrQueryResponse rsp = new SolrQueryResponse();
             SolrRequestInfo.setRequestInfo(new SolrRequestInfo(req, rsp));
 
@@ -192,9 +193,9 @@ public class EmbeddedSolrServer2 extends SolrClient {
                                 public void writeResults(ResultContext ctx, JavaBinCodec codec) throws IOException {
                                     // write an empty list...
                                     SolrDocumentList docs = new SolrDocumentList();
-                                    docs.setNumFound(ctx.docs.matches());
-                                    docs.setStart(ctx.docs.offset());
-                                    docs.setMaxScore(ctx.docs.maxScore());
+                                    docs.setNumFound(ctx.getDocList().matches());
+                                    docs.setStart(ctx.getDocList().offset());
+                                    docs.setMaxScore(ctx.getDocList().maxScore());
                                     codec.writeSolrDocumentList(docs);
 
                                     // This will transform
@@ -203,39 +204,21 @@ public class EmbeddedSolrServer2 extends SolrClient {
                             };
 
 
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    new JavaBinCodec(resolver) {
+                    try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                        createJavaBinCodec(callback, resolver).setWritableDocFields(resolver).marshal(rsp.getValues(), out);
 
-                        @Override
-                        public void writeSolrDocument(SolrDocument doc) {
-                            callback.streamSolrDocument(doc);
-                            //super.writeSolrDocument( doc, fields );
+                        try(InputStream in = out.toInputStream()){
+                            return (NamedList<Object>) new JavaBinCodec(resolver).unmarshal(in);
                         }
-
-                        @Override
-                        public void writeSolrDocumentList(SolrDocumentList docs) throws IOException {
-                            if (docs.size() > 0) {
-                                SolrDocumentList tmp = new SolrDocumentList();
-                                tmp.setMaxScore(docs.getMaxScore());
-                                tmp.setNumFound(docs.getNumFound());
-                                tmp.setStart(docs.getStart());
-                                docs = tmp;
-                            }
-                            callback.streamDocListInfo(docs.getNumFound(), docs.getStart(), docs.getMaxScore());
-                            super.writeSolrDocumentList(docs);
-                        }
-
-                    }.setWritableDocFields(resolver). marshal(rsp.getValues(), out);
-
-                    InputStream in = new ByteArrayInputStream(out.toByteArray());
-                    return (NamedList<Object>) new JavaBinCodec(resolver).unmarshal(in);
+                    }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
             }
 
             // Now write it out
-            return getParsedResponse(req, rsp);
+            NamedList<Object> normalized = getParsedResponse(req, rsp);
+            return normalized;
         } catch (IOException | SolrException iox) {
             throw iox;
         } catch (Exception ex) {
@@ -244,6 +227,31 @@ public class EmbeddedSolrServer2 extends SolrClient {
             if (req != null) req.close();
             SolrRequestInfo.clearRequestInfo();
         }
+    }
+
+    private JavaBinCodec createJavaBinCodec(final StreamingResponseCallback callback, final BinaryResponseWriter.Resolver resolver) {
+        return new JavaBinCodec(resolver) {
+
+            @Override
+            public void writeSolrDocument(SolrDocument doc) {
+                callback.streamSolrDocument(doc);
+                //super.writeSolrDocument( doc, fields );
+            }
+
+            @Override
+            public void writeSolrDocumentList(SolrDocumentList docs) throws IOException {
+                if (docs.size() > 0) {
+                    SolrDocumentList tmp = new SolrDocumentList();
+                    tmp.setMaxScore(docs.getMaxScore());
+                    tmp.setNumFound(docs.getNumFound());
+                    tmp.setStart(docs.getStart());
+                    docs = tmp;
+                }
+                callback.streamDocListInfo(docs.getNumFound(), docs.getStart(), docs.getMaxScore());
+                super.writeSolrDocumentList(docs);
+            }
+
+        };
     }
 
     private static void checkForExceptions(SolrQueryResponse rsp) throws Exception {
@@ -260,14 +268,8 @@ public class EmbeddedSolrServer2 extends SolrClient {
      * Shutdown all cores within the EmbeddedSolrServer instance
      */
     @Override
-    @Deprecated
-    public void shutdown() {
-        coreContainer.shutdown();
-    }
-
-    @Override
     public void close() throws IOException {
-        shutdown();
+        coreContainer.shutdown();
     }
 
     /**

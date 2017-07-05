@@ -1,4 +1,7 @@
-2017-07-04, version 5.1
+2017-07-05, version 6.1
+ - Port from Solr 5 to version 6. No further changes.
+
+ 2017-07-04, version 5.1
  - Port from Solr 4 to version 5. No further changes.
 
 2015-06-22, version 4.1
