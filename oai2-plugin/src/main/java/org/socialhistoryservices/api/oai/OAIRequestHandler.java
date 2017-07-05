@@ -268,7 +268,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         final QParser parser = QParser.getParser(join, QParserPlugin.DEFAULT_QTYPE, request);
 
         Query filter = null;
-        if (true == Parameters.getParam("enable_filter_query")) {
+        if (Parameters.getBool("enable_filter_query", false)) {
             final String fq = request.getParams().get("fq");
             if (fq != null) {
                 filter = QParser.getParser(fq, QParserPlugin.DEFAULT_QTYPE, request).getQuery();
