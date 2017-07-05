@@ -37,7 +37,13 @@ public class Parameters {
         return (o == null) ? def : o;
     }
 
-    public static void setParam(NamedList args, String key, Object def) {
+    static Boolean getBool(String key, Boolean def) {
+
+        Object o = store.get(key);
+        return (o == null) ? def : (Boolean) o;
+    }
+
+    static void setParam(NamedList args, String key, Object def) {
 
         Object value = args.get(key);
         if (value == null)
