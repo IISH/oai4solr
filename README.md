@@ -209,7 +209,7 @@ The default is 200 records per response before the resumptionToken kicks in. You
         <int name="ead">1</int>
     </lst>
     
-##N on OAI2 settings
+## OAI2 settings
 ### static_query
 The static_query argument is an optional extra Lucene query and if set, appended as an AND query to the internal OAI2
 query string. Use a static query when you do not want to expose the entire Solr index, but a specific subset.
@@ -240,7 +240,7 @@ Set the following in the solrconfig.xml document:
 
     <!-- configuration -->
 
-    <requestHandler name="/oai" default="false" class="org.socialhistoryservices.solr.oai.OAIRequestHandler">
+    <requestHandler name="/oai" default="false" class="org.socialhistoryservices.api.oai.OAIRequestHandler">
 
         <!-- WT is the key for the queryResponseWriter (see below) -->
         <str name="wt">oai</str>
@@ -334,7 +334,7 @@ Set the following in the solrconfig.xml document:
     </requestHandler>
 
     <!-- Custom wt that is being used by the OAI handler -->
-    <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.solr.oai.OAIQueryResponseWriter"/>
+    <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
 
     </config>
 
