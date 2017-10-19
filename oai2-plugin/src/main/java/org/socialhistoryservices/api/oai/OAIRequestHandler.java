@@ -326,7 +326,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         }
 
         final List maxrecords = args.getAll("maxrecords");
-        if (maxrecords == null)
+        if (maxrecords.size() == 0)
             Parameters.setParam(args, "maxrecords_default", 200);
         else {
             SolrParams p = SolrParams.toSolrParams((NamedList) maxrecords.get(0));
