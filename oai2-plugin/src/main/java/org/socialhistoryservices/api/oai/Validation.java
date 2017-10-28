@@ -1,7 +1,7 @@
 /*
  * OAI4Solr exposes your Solr indexes by adding a OAI2 protocol handler.
  *
- *     Copyright (c) 2011-2014  International Institute of Social History
+ *     Copyright (c) 2011-2017  International Institute of Social History
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ class Validation {
             return error(response, OAIPMHerrorcodeType.NO_METADATA_FORMATS);
         }
 
-        final OAIPMHtype oaipmHtype = Parameters.getParam(VerbType.LIST_METADATA_FORMATS);
+        final OAIPMHtype oaipmHtype = Parameters.getParam(0, VerbType.LIST_METADATA_FORMATS);
         for (MetadataFormatType metadataFormatType : oaipmHtype.getListMetadataFormats().getMetadataFormat()) {
             if (metadataFormatType.getMetadataPrefix().equals(metadataPrefix)) return true;
         }
@@ -129,7 +129,7 @@ class Validation {
 
         if (setSpec == null || setSpec.isEmpty())
             return true;
-        final OAIPMHtype oaipmHtype = Parameters.getParam(VerbType.LIST_SETS);
+        final OAIPMHtype oaipmHtype = Parameters.getParam(0, VerbType.LIST_SETS);
         if (oaipmHtype == null) {
             return error(response, OAIPMHerrorcodeType.NO_SET_HIERARCHY);
         }
@@ -145,7 +145,7 @@ class Validation {
 
         if (datestamp == null) return true;
 
-        final GranularityType granularity = Parameters.getParam(VerbType.IDENTIFY).getIdentify().getGranularity();
+        final GranularityType granularity = Parameters.getParam(0, VerbType.IDENTIFY).getIdentify().getGranularity();
         Pattern pattern = (granularity == GranularityType.YYYY_MM_DD_THH_MM_SS_Z) ? datestampSLong : datestampShort;
 
         if (!pattern.matcher(datestamp).matches()) return error(response,

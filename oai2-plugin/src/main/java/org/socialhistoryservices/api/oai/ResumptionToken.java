@@ -1,7 +1,7 @@
 /*
  * OAI4Solr exposes your Solr indexes by adding a OAI2 protocol handler.
  *
- *     Copyright (c) 2011-2014  International Institute of Social History
+ *     Copyright (c) 2011-2017  International Institute of Social History
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class ResumptionToken extends RequestType {
         resumptionToken.setCompleteListSize(BigInteger.valueOf(matches));
 
         // Parameters are in fixed order: "verb", "from", "until","set","metadataPrefix","cursor"
-        final String s = (String) Parameters.getParam("separator", ",");
+        final String s = (String) Parameters.getParam(0, "separator", ",");
         String token = oaiResumptionToken.getVerb().value() + s + getValue(oaiResumptionToken.getFrom()) + s + getValue(oaiResumptionToken.getUntil()) + s + getValue(oaiResumptionToken.getSet()) + s + getValue(oaiResumptionToken.getMetadataPrefix()) + s + nextCursor;
         final byte[] bytes = token.getBytes("utf-8");
         resumptionToken.setValue(Base64.byteArrayToBase64(bytes, 0, bytes.length));
@@ -96,7 +96,7 @@ class ResumptionToken extends RequestType {
             return null;
         final byte[] bytes = Base64.base64ToByteArray(token);
         String pt = new String(bytes, "utf-8");
-        final String separator = (String) Parameters.getParam("separator", ",");
+        final String separator = (String) Parameters.getParam(0, "separator", ",");
         final String[] split = pt.split(separator, 6);
         ResumptionToken re = new ResumptionToken();
 

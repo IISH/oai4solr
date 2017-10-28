@@ -437,8 +437,10 @@ The end result is a package in ./oai2-plugin/target/oai2-plugin-6.x-1.0.jar ( or
 You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
 
 ## Install
-Place oai2-plugin-6.x-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
-that points to the jar.
+Place oai2-plugin-6.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
+that points to the jar. For example:
+
+    <lib dir="${solr.install.dir:../../../..}/contrib/oai" />
 
 ## Runable demo
 Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.

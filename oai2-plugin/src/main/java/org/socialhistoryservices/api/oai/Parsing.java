@@ -1,7 +1,7 @@
 /*
  * OAI4Solr exposes your Solr indexes by adding a OAI2 protocol handler.
  *
- *     Copyright (c) 2011-2014  International Institute of Social History
+ *     Copyright (c) 2011-2017  International Institute of Social History
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -150,15 +150,20 @@ public class Parsing {
      * Remove the oai prefix and return the identifier.
      * oai:domain:identifier => identifier
      *
+     * @param prefix the id of the caller
      * @param identifier the oai identifier
      * @return A local identifier
      */
-    static String stripOaiPrefix(String identifier) {
+    static String stripOaiPrefix(int prefix, String identifier) {
 
-        final String prefix = (String) Parameters.getParam("prefix");
-        final int length_prefix = prefix.length();
+        final String _prefix = (String) Parameters.getParam(prefix, "prefix");
+        final int length_prefix = _prefix.length();
         if (identifier.length() < length_prefix) return "unparsable";
         return identifier.substring(length_prefix);
+    }
+
+    static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
+        return loadStaticVerb(0, verb);
     }
 
     /**
@@ -166,16 +171,17 @@ public class Parsing {
      * <p/>
      * Loads an Identity.xml, ListSets.xml or ListMetadataPrefix.xml from file and unmarshalls it.
      *
+     * @param prefix the id of the caller
      * @param verb The OAI2 verb
      * @return The OAIPMHtype instance
      */
     @SuppressWarnings("unchecked")
-    static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
+    static OAIPMHtype loadStaticVerb(int prefix, VerbType verb) throws FileNotFoundException, JAXBException {
 
-        final File f = new File(Parameters.getParam("oai_home") + File.separator + verb.value() + ".xml");
+        final File f = new File(Parameters.getParam(prefix,"oai_home") + File.separator + verb.value() + ".xml");
         final FileInputStream fis = new FileInputStream(f);
         final Source source = new StreamSource(fis);
-        final Unmarshaller marshaller = (Unmarshaller) Parameters.getParam("unmarshaller");
+        final Unmarshaller marshaller = (Unmarshaller) Parameters.getParam(0, "unmarshaller");
         return ((JAXBElement<OAIPMHtype>) marshaller.unmarshal(source)).getValue();
     }
 
