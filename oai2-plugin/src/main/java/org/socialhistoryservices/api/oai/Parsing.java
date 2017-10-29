@@ -162,10 +162,6 @@ public class Parsing {
         return identifier.substring(length_prefix);
     }
 
-    static OAIPMHtype loadStaticVerb(VerbType verb) throws FileNotFoundException, JAXBException {
-        return loadStaticVerb(0, verb);
-    }
-
     /**
      * loadStaticVerb
      * <p/>
@@ -181,7 +177,7 @@ public class Parsing {
         final File f = new File(Parameters.getParam(prefix,"oai_home") + File.separator + verb.value() + ".xml");
         final FileInputStream fis = new FileInputStream(f);
         final Source source = new StreamSource(fis);
-        final Unmarshaller marshaller = (Unmarshaller) Parameters.getParam(0, "unmarshaller");
+        final Unmarshaller marshaller = (Unmarshaller) Parameters.getParam("unmarshaller");
         return ((JAXBElement<OAIPMHtype>) marshaller.unmarshal(source)).getValue();
     }
 

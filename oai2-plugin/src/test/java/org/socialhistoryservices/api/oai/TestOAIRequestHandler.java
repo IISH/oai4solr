@@ -120,7 +120,7 @@ public class TestOAIRequestHandler extends TestCase {
         params.set("verb", "Identify");
         OAIPMHtype oai2Document = server.sendRequest(params);
 
-        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.IDENTIFY);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(0, VerbType.IDENTIFY);
         IdentifyType identify = oai2Document.getIdentify();
         assertNotNull(identify);
 
@@ -142,7 +142,7 @@ public class TestOAIRequestHandler extends TestCase {
         OAIPMHtype oai2Document = server.sendRequest(params);
         ListSetsType listSets = oai2Document.getListSets();
 
-        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.LIST_SETS);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(0, VerbType.LIST_SETS);
 
         for (SetType setTypeFromRequest : listSets.getSet()) {
             boolean match = false;
@@ -192,7 +192,7 @@ public class TestOAIRequestHandler extends TestCase {
 
         Parameters.setParam(VerbType.LIST_SETS, null);
         oai2Document = server.sendRequest(params);
-        Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(VerbType.LIST_SETS));
+        Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(0, VerbType.LIST_SETS));
         assertEquals(OAIPMHerrorcodeType.NO_SET_HIERARCHY, oai2Document.getError().get(0).getCode());
     }
 
@@ -208,7 +208,7 @@ public class TestOAIRequestHandler extends TestCase {
         ListMetadataFormatsType listMetadataFormats = oai2Document.getListMetadataFormats();
         assertNotNull(listMetadataFormats);
 
-        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.LIST_METADATA_FORMATS);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(0, VerbType.LIST_METADATA_FORMATS);
 
         for (MetadataFormatType metadataFormatTypeFromRequest : listMetadataFormats.getMetadataFormat()) {
             boolean match = false;
@@ -238,7 +238,7 @@ public class TestOAIRequestHandler extends TestCase {
         token.setVerb(VerbType.LIST_IDENTIFIERS);
         token.setMetadataPrefix("oai_dc");
         token.setFrom("2001-01-01T00:00:00Z");
-        ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(token, 0, 200, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds"));
+        ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(0, token, 0, 200, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds"));
 
         String bad_token = resumptionTokenType.getValue().concat("12345");
         final ModifiableSolrParams params = new ModifiableSolrParams();

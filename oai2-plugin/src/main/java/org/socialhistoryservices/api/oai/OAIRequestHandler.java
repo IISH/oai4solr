@@ -139,7 +139,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
         boolean token_good = true;
         ResumptionToken oaiRequest = null;
         try {
-            oaiRequest = ResumptionToken.decodeResumptionToken(params.get("resumptionToken"));
+            oaiRequest = ResumptionToken.decodeResumptionToken(getId(), params.get("resumptionToken"));
         } catch (Exception e) {
             token_good = false;
         }
@@ -181,14 +181,14 @@ public class OAIRequestHandler extends RequestHandlerBase {
         switch (verb) {
             case LIST_IDENTIFIERS:
             case LIST_RECORDS:
-                if (!Validation.isValidMetadataPrefix(response, oaiRequest)) {
+                if (!Validation.isValidMetadataPrefix(getId(), response, oaiRequest)) {
                     return;
                 }
 
-                if (!Validation.isValidDatestamp(oaiRequest.getFrom(), "from", response))
+                if (!Validation.isValidDatestamp(getId(), oaiRequest.getFrom(), "from", response))
                     return;
 
-                if (!Validation.isValidDatestamp(oaiRequest.getUntil(), "until", response)) {
+                if (!Validation.isValidDatestamp(getId(), oaiRequest.getUntil(), "until", response)) {
                     return;
                 }
 
@@ -201,7 +201,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
                 q.add(String.format("%s:[%s TO %s]", Parameters.getParam(getId(), "field_index_datestamp"), from, until));
 
-                if (Validation.isValidSet(oaiRequest.getSet(), response))
+                if (Validation.isValidSet(getId(), oaiRequest.getSet(), response))
                     addSetToQuery(oaiRequest.getSet(), q);
                 else
                     return;
@@ -214,7 +214,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
                     return;
 
                 final ResumptionTokenType rt = (docList.matches() > nextCursor)
-                        ? ResumptionToken.encodeResumptionToken(oaiRequest, cursor, nextCursor, docList.matches(), (Integer) Parameters.getParam(getId(), "resumptionTokenExpirationInSeconds"))
+                        ? ResumptionToken.encodeResumptionToken(getId(), oaiRequest, cursor, nextCursor, docList.matches(), (Integer) Parameters.getParam(getId(), "resumptionTokenExpirationInSeconds"))
                         : null;
 
                 if (verb == VerbType.LIST_RECORDS)
@@ -227,7 +227,7 @@ public class OAIRequestHandler extends RequestHandlerBase {
                 if (!Validation.isValidIdentifier(response, oaiRequest)) {
                     return;
                 }
-                if (!Validation.isValidMetadataPrefix(response, oaiRequest)) {
+                if (!Validation.isValidMetadataPrefix(getId(), response, oaiRequest)) {
                     return;
                 }
                 addToQuery(String.format("%s:\"%s\"", Parameters.getParam(getId(), "field_index_identifier"), Parsing.stripOaiPrefix(getId(), oaiRequest.getIdentifier())), q);
