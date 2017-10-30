@@ -1,7 +1,7 @@
 # This is a OAI2 library plugin for Solr
 
 ## What is it ?
-A plugin that exposes your Solr 6.x indexes with the OAI2 protocol.
+A plugin that exposes your Solr 5.x indexes with the OAI2 protocol.
 
 ## How it works
 You can use simple xslt documents to map the raw Solr XML response into the oai_dc metadata format; and any other
@@ -431,13 +431,13 @@ The -Dsolr.solr.home VM property may need to be set manually if the unit tests c
 
     $ mvn -Dsolr.solr.home=[absolute path to oai4solr/solr] clean package
 
-The end result is a package in ./oai2-plugin/target/oai2-plugin-6.x-1.0.jar ( or your maven local repository if you used 'install').
+The end result is a package in ./oai2-plugin/target/oai2-plugin-5.x-1.0.jar ( or your maven local repository if you used 'install').
 
 ## Download
 You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
 
 ## Install
-Place oai2-plugin-6.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
+Place oai2-plugin-5.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
 that points to the jar. For example:
 
     <lib dir="${solr.install.dir:../../../..}/contrib/oai" />
@@ -445,7 +445,7 @@ that points to the jar. For example:
 ## Runable demo
 Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.
 
-Copy the oai2-plugin-6.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
+Copy the oai2-plugin-5.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
 directory structure should look like this:
 
     ----
