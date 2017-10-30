@@ -1,7 +1,7 @@
 /*
  * OAI4Solr exposes your Solr indexes by adding a OAI2 protocol handler.
  *
- *     Copyright (c) 2011-2014  International Institute of Social History
+ *     Copyright (c) 2011-2017  International Institute of Social History
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ class ResumptionToken extends RequestType {
      * Parses a ResumptionTokenType instance into a base 64 encoded string. This string will serve as the
      * resumption token.
      */
-    static ResumptionTokenType encodeResumptionToken(ResumptionToken oaiResumptionToken, int cursor, int nextCursor, int matches, int resumptionTokenExpirationInSeconds) throws UnsupportedEncodingException {
+    static ResumptionTokenType encodeResumptionToken(int prefix, ResumptionToken oaiResumptionToken, int cursor, int nextCursor, int matches, int resumptionTokenExpirationInSeconds) throws UnsupportedEncodingException {
 
         final ResumptionTokenType resumptionToken = new ResumptionTokenType();
         resumptionToken.setCursor(BigInteger.valueOf(cursor));
@@ -69,7 +69,7 @@ class ResumptionToken extends RequestType {
         resumptionToken.setCompleteListSize(BigInteger.valueOf(matches));
 
         // Parameters are in fixed order: "verb", "from", "until","set","metadataPrefix","cursor"
-        final String s = (String) Parameters.getParam("separator", ",");
+        final String s = (String) Parameters.getParam(prefix, "separator", ",");
         String token = oaiResumptionToken.getVerb().value() + s + getValue(oaiResumptionToken.getFrom()) + s + getValue(oaiResumptionToken.getUntil()) + s + getValue(oaiResumptionToken.getSet()) + s + getValue(oaiResumptionToken.getMetadataPrefix()) + s + nextCursor;
         final byte[] bytes = token.getBytes("utf-8");
         resumptionToken.setValue(Base64.byteArrayToBase64(bytes, 0, bytes.length));
@@ -87,16 +87,17 @@ class ResumptionToken extends RequestType {
      * The string is separated by values. Turned into an array by the separator, the
      * OAI2 parameters are in fixed order: "from", "until","set","metadataPrefix","cursor"
      *
+     * @param prefix the id of the caller
      * @param token The resumption token as base 64 encoded String
      * @return The resumption token instance
      */
-    static ResumptionToken decodeResumptionToken(String token) throws Exception {
+    static ResumptionToken decodeResumptionToken(int prefix, String token) throws Exception {
 
         if (token == null)
             return null;
         final byte[] bytes = Base64.base64ToByteArray(token);
         String pt = new String(bytes, "utf-8");
-        final String separator = (String) Parameters.getParam("separator", ",");
+        final String separator = (String) Parameters.getParam(prefix, "separator", ",");
         final String[] split = pt.split(separator, 6);
         ResumptionToken re = new ResumptionToken();
 

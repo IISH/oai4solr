@@ -99,7 +99,7 @@ public class TestValidation extends TestCase {
         final RequestType oaiRequest = new RequestType();
 
         oaiRequest.setMetadataPrefix(null);
-        assertFalse(Validation.isValidMetadataPrefix(response, oaiRequest));
+        assertFalse(Validation.isValidMetadataPrefix(0, response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.NO_METADATA_FORMATS, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -113,10 +113,10 @@ public class TestValidation extends TestCase {
         Parameters.setParam(VerbType.LIST_METADATA_FORMATS, forListlistMetadataFormats);
 
         oaiRequest.setMetadataPrefix("some_schema");
-        assertTrue(Validation.isValidMetadataPrefix(response, oaiRequest));
+        assertTrue(Validation.isValidMetadataPrefix(0, response, oaiRequest));
 
         oaiRequest.setMetadataPrefix("some_other_schema");
-        assertFalse(Validation.isValidMetadataPrefix(response, oaiRequest));
+        assertFalse(Validation.isValidMetadataPrefix(0, response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.CANNOT_DISSEMINATE_FORMAT, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -127,7 +127,7 @@ public class TestValidation extends TestCase {
 
         final SolrQueryResponse response = getResponse();
 
-        OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
+        OAIPMHtype oai;// = (OAIPMHtype) response.getValues().get("oai");
         //assertEquals(OAIPMHerrorcodeType.NO_SET_HIERARCHY, oai.getError().get(0).getCode());
 
         OAIPMHtype oai_with_set = new OAIPMHtype();
@@ -138,13 +138,13 @@ public class TestValidation extends TestCase {
         oai_with_set.setListSets(value);
         Parameters.setParam("ListSets", oai_with_set);
 
-        assertFalse(Validation.isValidSet("some_set", response));
+        assertFalse(Validation.isValidSet(0, "some_set", response));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.NO_RECORDS_MATCH, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         setType.setSetSpec("some_set");
-        assertTrue(Validation.isValidSet("some_set", response));
+        assertTrue(Validation.isValidSet(0, "some_set", response));
     }
 
     public void testFormatDate() {
@@ -175,29 +175,29 @@ public class TestValidation extends TestCase {
         Parameters.setParam(VerbType.IDENTIFY, oaiForIdentify);
 
         identify.setGranularity(GranularityType.YYYY_MM_DD);
-        assertFalse(Validation.isValidDatestamp("2012", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-01", "a range", response));
-        assertTrue(Validation.isValidDatestamp("2012-02-03", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-01", "a range", response));
+        assertTrue(Validation.isValidDatestamp(0, "2012-02-03", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04:05", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04:05:06", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04:05:06Z", "a range", response));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
-        assertFalse(Validation.isValidDatestamp("2012", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-01", "a range", response));
-        assertTrue(Validation.isValidDatestamp("2012-02-03", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05", "a range", response));
-        assertFalse(Validation.isValidDatestamp("2012-02-03T04:05:06", "a range", response));
-        assertTrue(Validation.isValidDatestamp("2012-02-03T04:05:06Z", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-01", "a range", response));
+        assertTrue(Validation.isValidDatestamp(0, "2012-02-03", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04:05", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-03T04:05:06", "a range", response));
+        assertTrue(Validation.isValidDatestamp(0, "2012-02-03T04:05:06Z", "a range", response));
 
-        assertFalse(Validation.isValidDatestamp("nonsense", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "nonsense", "a range", response));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
-        assertFalse(Validation.isValidDatestamp("2012-02-a", "a range", response));
+        assertFalse(Validation.isValidDatestamp(0, "2012-02-a", "a range", response));
         oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
@@ -238,9 +238,9 @@ public class TestValidation extends TestCase {
         oaiResumptionToken.setMetadataPrefix("prefix");
 
         int nextCursor = 200;
-        final ResumptionTokenType resumptionTokenEncoded = ResumptionToken.encodeResumptionToken(oaiResumptionToken, 0, nextCursor, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds", 86400));
+        final ResumptionTokenType resumptionTokenEncoded = ResumptionToken.encodeResumptionToken(0, oaiResumptionToken, 0, nextCursor, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds", 86400));
 
-        final ResumptionToken resumptionTokenDecoded = ResumptionToken.decodeResumptionToken(resumptionTokenEncoded.getValue());
+        final ResumptionToken resumptionTokenDecoded = ResumptionToken.decodeResumptionToken(0, resumptionTokenEncoded.getValue());
 
         BigInteger add = resumptionTokenEncoded.getCursor().add(BigInteger.valueOf(nextCursor));
         BigInteger cursor = BigInteger.valueOf(resumptionTokenDecoded.getCursor());

@@ -1,6 +1,8 @@
 # Solr material
-data
-index
+data/
+index/
+core0/
+lib/
 
 # Compiled source #
 ###################
