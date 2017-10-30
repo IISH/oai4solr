@@ -1,14 +1,14 @@
-#This is a OAI2 library plugin for Solr
+# This is a OAI2 library plugin for Solr
 
-##What is it ?
+## What is it ?
 A plugin that exposes your Solr 4.x indexes with the OAI2 protocol.
 
-##How it works
+## How it works
 You can use simple xslt documents to map the raw Solr XML response into the oai_dc metadata format; and any other
-metadata schema you may which to offer to your harvesting public. This way you can expose your index, regardless of your
+metadata schema you want to offer your harvesting public. This way you can expose your index, regardless of your
 solr schema. It can be used for single and multicore instances.
 
-##Declare the request and response handlers
+## Declare the request and response handlers
 In the solrconfig.xml add a requestHandler and response writer:
 
     <requestHandler name="/oai" default="false" class="org.socialhistoryservices.solr.oai.OAIRequestHandler">
@@ -20,7 +20,7 @@ In the solrconfig.xml add a requestHandler and response writer:
 
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.solr.oai.OAIQueryResponseWriter"/>
 
-##The oai folder
+## The oai folder
 For each metadata schema you want to support, add an associated xslt document to the "oai" folder. There are sample xslt
 documents already in the folder of this distribution.
 
@@ -62,11 +62,11 @@ Alternatively, you can place a oai folder in each core as well. For example:
                 solrconfig.xml
             +oai
 
-###Non dynamic documents
+### Non dynamic documents
 The Identify, ListSets and ListMetadataPrefix verbs are
- xml documents you need to set manually in the oai folder:
+ xml documents you need to place manually in the oai folder.
 
-###The Identify verb
+#### The Identify verb
 Place a suitable Identify.xml document in the -oai folder. For example:
 
     <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
@@ -100,7 +100,7 @@ Place a suitable Identify.xml document in the -oai folder. For example:
     </OAI-PMH>
 
 
-###The ListMetadataFormats verb
+#### The ListMetadataFormats verb
 The ListMetadataPrefix.xml document contains your metadata schema definitions. At startup the oai4Solr plugin will look
 for a 'ListMetadataPrefix.xml' document in the oai folder and use for the ListMetadataFormats response.
 
@@ -139,7 +139,7 @@ oai_dc.xsl, marcxml.xsl and solr.xsl
 Valid OAI2 metadataPrefix parameter values will then be oai_dc, marcxml and solr. The OAI2 response will be manufactured by
 applying the corresponding (cached) xslt template.
 
-###The ListSets verb
+#### The ListSets verb
 ListSets are not constructed dynamically from facets. Rather, like 'ListMetadataFormats' and 'Identify' they are
 declared in the file ListSets.xml. For example like:
 
@@ -173,7 +173,7 @@ Then indicate the value in your solrconfig.xml document so:
 
     <str name="field_index_set">catalog_source</str>
 
-##OAI Identifier
+## OAI Identifier
 An OAI identifier has the format 'oai:[domain]:[identifier]'. When this value is passed on with the GetRecord verb using the -identifier parameter,
 the 'oai:[domain]:' bit is stripped of and the remaining (low local) identifier is used for the Lucene query.
 
@@ -188,7 +188,7 @@ And the local identifier with the 'identifier' parameter. For example:
 So in this example an oai identifier like 'oai:localhost:12345' would translate in a Lucene query 'my-unique-record-identifier:12345'
 
 
-##Datestamps
+## Datestamps
 The -from and -until OAI2 parameters need to be mapped also in the solrconfig.xml document. Make sure the solr fields
 that contain the indexed datestamps are of type 'date' to allow for sorting. For example:
 
@@ -200,7 +200,7 @@ The plugin will need to know which index fields can be used for querying and sor
         <str name="field_sort_datestamp">my_datestamp</str>
         <str name="field_index_datestamp">my_datestamp</str>
 
-##Resultset length
+## Resultset length
 The default is 200 records per response before the resumptionToken kicks in. You can set a maximum record length per
  schema with the maxrecords parameter:
 
@@ -219,24 +219,24 @@ query string. Use a static query when you do not want to expose the entire Solr 
     <!-- Example: -->
     <str name="static_query">visible:true</str>
 
-###enable_filter_query
+### enable_filter_query
 Use this when the OAI2 handler is invoked via a parent handler or proxy which attaches extra query conditions
 dynamically. For example when the client is not allowed to see certain records based on access policies.
 Filter query arguments must be appended to the oai handler with a -fq key.
 
-For example, if set:
+For example, if set to `true`:
 
     <bool name="enable_filter_query">true</bool>
     
-Clients may then append an -fq parameter to the oai handler's query string. However this setting is intended for server side control,
-where you can call the oai2 service internally like so in this pseude code:
+then backend clients can append a -fq parameter to the oai handler's query string. This setting is intended for server side control,
+so you can call the oai2 service internally. For example like this with pseude code:
 
     String OAI2_ARGUMENTS = capture_oai_arguments(client_request);
     String QUERY_FILTER_ARGUMENTS = get_query_arguments_from_user_authorities(client_id);
     HttpClient client = new HttpClient("http://localhost/solr/collection1/oai?" + OAI2_ARGUMENTS + "&qf=QUERY_FILTER_ARGUMENTS);
 
-##Solrconfig.xml configuration in full
-Set the following in the solrconfig.xml document:
+## Solrconfig.xml configuration in full
+If needed, set the following in the solrconfig.xml document:
 
     <config>
 
@@ -253,7 +253,7 @@ Set the following in the solrconfig.xml document:
         -->
         <str name="oai_home">/oai</str>
 
-        <!-- the base url...  -->
+        <!-- the base url. If you are begin a proxy, use the proxy domain.-->
         <str name="proxyurl">http://localhost:8080/oai</str>
 
         <!-- index name of the oai identifier used for the -identifier parameter
@@ -340,11 +340,11 @@ Set the following in the solrconfig.xml document:
 
     </config>
 
-##Mapping tips
+## Mapping tips
 To map your Solr documents onto a metadata schema like OAI_DC, Marc, EAD, Mets, MODS, etc., make a corresponding XSLT
  document for each.
 
-###1. From stored Solr index fields
+### 1. From stored Solr index fields
 Map stored Solr index fields from your schema.xml. Typically, those fields will show up in a /select XML Solr result set.
 
 For example, if you want to create an oai_dc metadata response with a dc:title and the suitable Solr index field
@@ -360,7 +360,7 @@ then map it to a dc:title in the oai_dc.xsl document so:
 
 See the oai_dc.xsl example in the demo/solr/oai folder of this project for a working example.
 
-###2. Map a single stored XML document
+### 2. Map a single stored XML document
 In some cases, you may find it more convenient to - apart from the indexed fields - add the complete document of a
 particular metadata schema as an unindexed and compressed resource field and just data dump it.
 
@@ -424,7 +424,7 @@ or /tomcat6/lib
 
 or the web-container-classpath-of-your-choice equivalent.
 
-##To build from source
+## To build from source
 Clone from the git repository and use one the two maven commands:
 
     $ mvn clean package
@@ -435,14 +435,16 @@ The -Dsolr.solr.home VM property may need to be set manually if the unit tests c
 
 The end result is a package in ./oai2-plugin/target/oai2-plugin-4.x-1.0.jar ( or your maven local repository if you used 'install').
 
-##Download
+## Download
 You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
 
-##Install
-Place oai2-plugin-4.x-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
-that points to the jar.
+## Install
+Place oai2-plugin-4.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
+that points to the jar. For example:
 
-##Runable demo
+    <lib dir="${solr.install.dir:../../../..}/contrib/oai" />
+
+## Runable demo
 Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.
 
 Copy the oai2-plugin-4.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
@@ -465,3 +467,7 @@ Start the demo with:
 Then explore the test OAI2 repository with your request to it, e.g.
 
     http://localhost:8983/solr/core0/oai?verb=Identify
+    
+## Feature requests and contributions
+If you want a particular feature, make a feature request by opening up an issue. If on top of that you
+want to contribute, then please feel free to fork this project; branch off; implement the function with tests and make a pull request.
