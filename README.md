@@ -5,7 +5,7 @@ A plugin that exposes your Solr 6.x indexes with the OAI2 protocol.
 
 ## How it works
 You can use simple xslt documents to map the raw Solr XML response into the oai_dc metadata format; and any other
-metadata schema you may which to offer to your harvesting public. This way you can expose your index, regardless of your
+metadata schema you want to offer your harvesting public. This way you can expose your index, regardless of your
 solr schema. It can be used for single and multicore instances.
 
 ## Declare the request and response handlers
@@ -48,7 +48,7 @@ then the setting ought to be
 
     <str name="oai_home">/oai</str>
 
-Alternatively, you can place a oai folder in each core as well. For example:
+Alternatively, you can place an oai folder in each core as well. For example:
 
     <str name="oai_home">/core0/oai</str>
 
@@ -62,9 +62,9 @@ Alternatively, you can place a oai folder in each core as well. For example:
 
 ### Non dynamic documents
 The Identify, ListSets and ListMetadataPrefix verbs are
- xml documents you need to set manually in the oai folder:
+ xml documents you need to place manually in the oai folder.
 
-### The Identify verb
+#### The Identify verb
 Place a suitable Identify.xml document in the -oai folder. For example:
 
     <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
@@ -98,7 +98,7 @@ Place a suitable Identify.xml document in the -oai folder. For example:
     </OAI-PMH>
 
 
-### The ListMetadataFormats verb
+#### The ListMetadataFormats verb
 The ListMetadataPrefix.xml document contains your metadata schema definitions. At startup the oai4Solr plugin will look
 for a 'ListMetadataPrefix.xml' document in the oai folder and use for the ListMetadataFormats response.
 
@@ -137,7 +137,7 @@ oai_dc.xsl, marcxml.xsl and solr.xsl
 Valid OAI2 metadataPrefix parameter values will then be oai_dc, marcxml and solr. The OAI2 response will be manufactured by
 applying the corresponding (cached) xslt template.
 
-###The ListSets verb
+#### The ListSets verb
 ListSets are not constructed dynamically from facets. Rather, like 'ListMetadataFormats' and 'Identify' they are
 declared in the file ListSets.xml. For example like:
 
@@ -222,19 +222,19 @@ Use this when the OAI2 handler is invoked via a parent handler or proxy which at
 dynamically. For example when the client is not allowed to see certain records based on access policies.
 Filter query arguments must be appended to the oai handler with a -fq key.
 
-For example, if set:
+For example, if set to `true`:
 
     <bool name="enable_filter_query">true</bool>
     
-Clients may then append an -fq parameter to the oai handler's query string. However this setting is intended for server side control,
-where you can call the oai2 service internally like so in this pseude code:
+then backend clients can append a -fq parameter to the oai handler's query string. This setting is intended for server side control,
+so you can call the oai2 service internally. For example like this with pseude code:
 
     String OAI2_ARGUMENTS = capture_oai_arguments(client_request);
     String QUERY_FILTER_ARGUMENTS = get_query_arguments_from_user_authorities(client_id);
     HttpClient client = new HttpClient("http://localhost/solr/collection1/oai?" + OAI2_ARGUMENTS + "&qf=QUERY_FILTER_ARGUMENTS);
 
 ## Solrconfig.xml configuration in full
-Set the following in the solrconfig.xml document:
+If needed, set the following in the solrconfig.xml document:
 
     <config>
 
@@ -251,7 +251,7 @@ Set the following in the solrconfig.xml document:
         -->
         <str name="oai_home">/oai</str>
 
-        <!-- the base url...  -->
+        <!-- the base url. If you are begin a proxy, use the proxy domain.-->
         <str name="proxyurl">http://localhost:8080/oai</str>
 
         <!-- index name of the oai identifier used for the -identifier parameter
@@ -437,8 +437,10 @@ The end result is a package in ./oai2-plugin/target/oai2-plugin-6.x-1.0.jar ( or
 You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
 
 ## Install
-Place oai2-plugin-6.x-1.0.jar in the designated "lib" folder of your Solr application. Or add a symbolic link in the "lib"
-that points to the jar.
+Place oai2-plugin-6.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
+that points to the jar. For example:
+
+    <lib dir="${solr.install.dir:../../../..}/contrib/oai" />
 
 ## Runable demo
 Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.
@@ -463,3 +465,7 @@ Start the demo with:
 Then explore the test OAI2 repository with your request to it, e.g.
 
     http://localhost:8983/solr/core0/oai?verb=Identify
+    
+## Feature requests and contributions
+If you want a particular feature, make a feature request by opening up an issue. If on top of that you
+want to contribute, then please feel free to fork this project; branch off; implement the function with tests and make a pull request.

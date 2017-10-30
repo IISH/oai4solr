@@ -1,7 +1,7 @@
 /*
  * OAI4Solr exposes your Solr indexes by adding a OAI2 protocol handler.
  *
- *     Copyright (c) 2011-2014  International Institute of Social History
+ *     Copyright (c) 2011-2017  International Institute of Social History
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -101,16 +101,17 @@ class Validation {
      * <p/>
      * See if the requested metadataPrefix is supported.
      *
+     * @param prefix the id of the caller
      * @return True if supported
      */
-    static boolean isValidMetadataPrefix(SolrQueryResponse response, RequestType oaiRequest) {
+    static boolean isValidMetadataPrefix(int prefix, SolrQueryResponse response, RequestType oaiRequest) {
 
         final String metadataPrefix = oaiRequest.getMetadataPrefix();
         if (metadataPrefix == null) {
             return error(response, OAIPMHerrorcodeType.NO_METADATA_FORMATS);
         }
 
-        final OAIPMHtype oaipmHtype = Parameters.getParam(VerbType.LIST_METADATA_FORMATS);
+        final OAIPMHtype oaipmHtype = Parameters.getParam(prefix, VerbType.LIST_METADATA_FORMATS);
         for (MetadataFormatType metadataFormatType : oaipmHtype.getListMetadataFormats().getMetadataFormat()) {
             if (metadataFormatType.getMetadataPrefix().equals(metadataPrefix)) return true;
         }
@@ -122,14 +123,15 @@ class Validation {
      * <p/>
      * See if we support ListSets. If so, check if the setSpec exists.
      *
+     * @param prefix the id of the caller
      * @param setSpec The requested set
      * @return True if we have a declared setSpec matching the request
      */
-    static boolean isValidSet(String setSpec, SolrQueryResponse response) {
+    static boolean isValidSet(int prefix, String setSpec, SolrQueryResponse response) {
 
         if (setSpec == null || setSpec.isEmpty())
             return true;
-        final OAIPMHtype oaipmHtype = Parameters.getParam(VerbType.LIST_SETS);
+        final OAIPMHtype oaipmHtype = Parameters.getParam(prefix, VerbType.LIST_SETS);
         if (oaipmHtype == null) {
             return error(response, OAIPMHerrorcodeType.NO_SET_HIERARCHY);
         }
@@ -141,11 +143,11 @@ class Validation {
         return error(response, String.format("Set argument doesn't match any sets. The setSpec was '%s'", setSpec), OAIPMHerrorcodeType.NO_RECORDS_MATCH);
     }
 
-    static boolean isValidDatestamp(String datestamp, String range, SolrQueryResponse response) {
+    static boolean isValidDatestamp(int prefix, String datestamp, String range, SolrQueryResponse response) {
 
         if (datestamp == null) return true;
 
-        final GranularityType granularity = Parameters.getParam(VerbType.IDENTIFY).getIdentify().getGranularity();
+        final GranularityType granularity = Parameters.getParam(prefix, VerbType.IDENTIFY).getIdentify().getGranularity();
         Pattern pattern = (granularity == GranularityType.YYYY_MM_DD_THH_MM_SS_Z) ? datestampSLong : datestampShort;
 
         if (!pattern.matcher(datestamp).matches()) return error(response,

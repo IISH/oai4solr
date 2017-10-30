@@ -1,7 +1,7 @@
 /*
  * OAI4Solr exposes your Solr indexes by adding a OAI2 protocol handler.
  *
- *     Copyright (c) 2011-2014  International Institute of Social History
+ *     Copyright (c) 2011-2017  International Institute of Social History
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,8 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
 
     public void write(Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
 
-        OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
+        final int caller_id = (int) response.getValues().get("id");
+        final OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         oai.setResponseDate(Parsing.getGregorianDate(new Date()));
 
         Object tmp = response.getValues().get("docList");
@@ -78,14 +79,14 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
             ResumptionTokenType resumptionToken = null;
             switch (oai.getRequest().getVerb()) {
                 case GET_RECORD:
-                    result(writer, request, response);
+                    result(caller_id, writer, request, response);
                     break;
                 case LIST_RECORDS:
-                    result(writer, request, response);
+                    result(caller_id, writer, request, response);
                     resumptionToken = oai.getListRecords().getResumptionToken();
                     break;
                 case LIST_IDENTIFIERS:
-                    result(writer, request, response);
+                    result(caller_id, writer, request, response);
                     resumptionToken = oai.getListIdentifiers().getResumptionToken();
                     break;
             }
@@ -95,7 +96,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
             closeXmlElement(writer, oai.getRequest().getVerb().value());
             writer.write("</OAI-PMH>");
         } else {
-            norecords(writer, oai);
+            norecords(caller_id, writer, oai);
         }
     }
 
@@ -154,7 +155,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
      * Marshalls the Identifier, ListSets, ListMetadataFormats and errors.
      */
     @SuppressWarnings("unchecked")
-    private void norecords(Writer writer, OAIPMHtype oai) throws IOException {
+    private void norecords(int caller_id, Writer writer, OAIPMHtype oai) throws IOException {
 
         final Marshaller marshaller = (Marshaller) Parameters.getParam("marshaller");
         final JAXBElement element = new JAXBElement(qname, OAIPMHtype.class, oai);
@@ -175,14 +176,14 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
      * Iterate over each individual Solr record and do the transformation and marshalling into an object.
      * We could transform the entire resultset, but this way we may spare some memory.
      */
-    private void result(Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
+    private void result(int caller_id, Writer writer, SolrQueryRequest request, SolrQueryResponse response) throws IOException {
 
         DocList docList = (DocList) response.getValues().get("docList");
         final DocIterator iterator = docList.iterator();
         while (iterator.hasNext()) {
             int docId = iterator.next();
             try {
-                writeRecord(writer, request, docId);
+                writeRecord(caller_id, writer, request, docId);
             } catch (TransformerException e) {
                 error(writer, e.getMessage());
             }
@@ -192,7 +193,7 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     /**
      * Get the Lucene document from the index and add it to a temporary response.
      */
-    private void writeRecord(Writer writer, SolrQueryRequest request, int docId) throws IOException, TransformerException {
+    private void writeRecord(int caller_id, Writer writer, SolrQueryRequest request, int docId) throws IOException, TransformerException {
 
         SolrParams params = request.getParams();
         final SolrQueryResponse dummy = new SolrQueryResponse();
@@ -208,19 +209,19 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
             error(writer, e.getMessage());
         }
 
-        transform(writer, baos, params.get("metadataPrefix"));
+        transform(caller_id, writer, baos, params.get("metadataPrefix"));
     }
 
     /**
      * Transform the Solr document into a schema using the associate transformer.
      */
-    private void transform(Writer writer, ByteArrayOutputStream baos, String metadataPrefix) throws TransformerException {
+    private void transform(int caller_id, Writer writer, ByteArrayOutputStream baos, String metadataPrefix) throws TransformerException {
 
         StreamSource source = new StreamSource(new ByteArrayInputStream(baos.toByteArray()));
         Result result = new StreamResult(writer);
-        Templates t = (Templates) Parameters.getParam(metadataPrefix);
+        Templates t = (Templates) Parameters.getParam(caller_id, metadataPrefix);
         Transformer transformer = t.newTransformer();
-        transformer.setParameter("prefix", Parameters.getParam("prefix"));
+        transformer.setParameter("prefix", Parameters.getParam(caller_id, "prefix"));
         transformer.transform(source, result);
     }
 
@@ -229,5 +230,6 @@ public class OAIQueryResponseWriter implements org.apache.solr.response.QueryRes
     }
 
     public void init(NamedList namedList) {
+        // Not implemented.
     }
 }

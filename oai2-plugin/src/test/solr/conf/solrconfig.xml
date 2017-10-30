@@ -24,6 +24,8 @@
 
     <requestHandler name="/oai" default="false" class="org.socialhistoryservices.api.oai.OAIRequestHandler">
 
+        <int name="id">0</int>
+
         <!-- WT is the key for the queryResponseWriter (see below) -->
         <str name="wt">oai</str>
 
@@ -92,7 +94,7 @@
     <queryResponseWriter name="oai" default="false" class="org.socialhistoryservices.api.oai.OAIQueryResponseWriter"/>
 
 
-    <luceneMatchVersion>5.5.4</luceneMatchVersion>
+    <luceneMatchVersion>6.6.0</luceneMatchVersion>
   <!--  The DirectoryFactory to use for indexes.
         solr.StandardDirectoryFactory, the default, is filesystem based.
         solr.RAMDirectoryFactory is memory based, not persistent, and doesn't work with replication. -->
