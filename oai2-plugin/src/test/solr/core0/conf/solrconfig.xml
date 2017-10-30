@@ -24,6 +24,8 @@
 
     <requestHandler name="/oai" default="false" class="org.socialhistoryservices.api.oai.OAIRequestHandler">
 
+        <int name="id">0</int>
+
         <!-- WT is the key for the queryResponseWriter (see below) -->
         <str name="wt">oai</str>
 

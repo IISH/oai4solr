@@ -28,7 +28,7 @@ public class TestOAIRequestHandler extends TestCase {
 
     private final Log log = LogFactory.getLog(this.getClass());
 
-    public static String CORE = "core0";
+    static String CORE = "core0";
     private static EmbeddedServer server = null;
 
     private static int testRecordCount = 1000;
@@ -45,8 +45,6 @@ public class TestOAIRequestHandler extends TestCase {
      * Start the embedded server and add [testRecordCount] Lucene documents.
      * The setSpec will alternative between setSpec1, setSpec2 and setSpec3
      * And the datestamp will be between day 1 (1970 ) and the next 1000 months or so.
-     *
-     * @throws Exception
      */
     @Override
     protected void setUp() throws Exception {
@@ -115,9 +113,6 @@ public class TestOAIRequestHandler extends TestCase {
      * testVerbIdentify
      * <p/>
      * See if we receive an Identify response and if it holds against the Identify.xml document.
-     *
-     * @throws SolrServerException
-     * @throws IOException
      */
     public void testVerbIdentify() throws SolrServerException, IOException, XPathExpressionException, JAXBException {
 
@@ -125,7 +120,7 @@ public class TestOAIRequestHandler extends TestCase {
         params.set("verb", "Identify");
         OAIPMHtype oai2Document = server.sendRequest(params);
 
-        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.IDENTIFY);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(0, VerbType.IDENTIFY);
         IdentifyType identify = oai2Document.getIdentify();
         assertNotNull(identify);
 
@@ -139,9 +134,6 @@ public class TestOAIRequestHandler extends TestCase {
      * testListSets
      * <p/>
      * See if we receive a ListSet response.
-     *
-     * @throws SolrServerException
-     * @throws IOException
      */
     public void testListSets() throws SolrServerException, IOException, JAXBException {
 
@@ -150,7 +142,7 @@ public class TestOAIRequestHandler extends TestCase {
         OAIPMHtype oai2Document = server.sendRequest(params);
         ListSetsType listSets = oai2Document.getListSets();
 
-        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.LIST_SETS);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(0, VerbType.LIST_SETS);
 
         for (SetType setTypeFromRequest : listSets.getSet()) {
             boolean match = false;
@@ -200,7 +192,7 @@ public class TestOAIRequestHandler extends TestCase {
 
         Parameters.setParam(VerbType.LIST_SETS, null);
         oai2Document = server.sendRequest(params);
-        Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(VerbType.LIST_SETS));
+        Parameters.setParam(VerbType.LIST_SETS, Parsing.loadStaticVerb(0, VerbType.LIST_SETS));
         assertEquals(OAIPMHerrorcodeType.NO_SET_HIERARCHY, oai2Document.getError().get(0).getCode());
     }
 
@@ -216,7 +208,7 @@ public class TestOAIRequestHandler extends TestCase {
         ListMetadataFormatsType listMetadataFormats = oai2Document.getListMetadataFormats();
         assertNotNull(listMetadataFormats);
 
-        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(VerbType.LIST_METADATA_FORMATS);
+        OAIPMHtype oaipmHtype = Parsing.loadStaticVerb(0, VerbType.LIST_METADATA_FORMATS);
 
         for (MetadataFormatType metadataFormatTypeFromRequest : listMetadataFormats.getMetadataFormat()) {
             boolean match = false;
@@ -246,7 +238,7 @@ public class TestOAIRequestHandler extends TestCase {
         token.setVerb(VerbType.LIST_IDENTIFIERS);
         token.setMetadataPrefix("oai_dc");
         token.setFrom("2001-01-01T00:00:00Z");
-        ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(token, 0, 200, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds"));
+        ResumptionTokenType resumptionTokenType = ResumptionToken.encodeResumptionToken(0, token, 0, 200, 1000, (Integer) Parameters.getParam("resumptionTokenExpirationInSeconds"));
 
         String bad_token = resumptionTokenType.getValue().concat("12345");
         final ModifiableSolrParams params = new ModifiableSolrParams();
@@ -378,17 +370,7 @@ public class TestOAIRequestHandler extends TestCase {
         params.set("fq", "theme:setSpec1");
         Parameters.setParam("enable_filter_query", true);
 
-        int count = 0;
-        ResumptionTokenType resumptionToken = null;
-        do {
-            if (resumptionToken != null)
-                params.set("resumptionToken", resumptionToken.getValue());
-
-            final OAIPMHtype oai2Document = server.sendRequest(params);
-            final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
-            count += listIdentifiers.getHeader().size();
-            resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
-        } while (resumptionToken != null);
+        int count = getCount(params);
         assertEquals(expectedSetSpec, count);
     }
 
@@ -400,6 +382,11 @@ public class TestOAIRequestHandler extends TestCase {
         params.set("fq", "theme:i_do_not_exist");
         Parameters.setParam("static_query", "theme:setSpec1");
 
+        int count = getCount(params);
+        assertEquals(expectedSetSpec, count);
+    }
+
+    private int getCount(ModifiableSolrParams params) {
         int count = 0;
         ResumptionTokenType resumptionToken = null;
         do {
@@ -411,7 +398,7 @@ public class TestOAIRequestHandler extends TestCase {
             count += listIdentifiers.getHeader().size();
             resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
         } while (resumptionToken != null);
-        assertEquals(expectedSetSpec, count);
+        return count;
     }
 
     public void testStaticQueryAndFilteredQuery() {
@@ -423,17 +410,7 @@ public class TestOAIRequestHandler extends TestCase {
         Parameters.setParam("enable_filter_query", true);
         Parameters.setParam("static_query", "theme:setSpec1");
 
-        int count = 0;
-        ResumptionTokenType resumptionToken = null;
-        do {
-            if (resumptionToken != null)
-                params.set("resumptionToken", resumptionToken.getValue());
-
-            final OAIPMHtype oai2Document = server.sendRequest(params);
-            final ListIdentifiersType listIdentifiers = oai2Document.getListIdentifiers();
-            count += listIdentifiers.getHeader().size();
-            resumptionToken = oai2Document.getListIdentifiers().getResumptionToken();
-        } while (resumptionToken != null);
+        int count = getCount(params);
         assertEquals(expectedSetSpec, count);
     }
 
