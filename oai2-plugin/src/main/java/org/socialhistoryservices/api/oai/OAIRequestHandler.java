@@ -428,6 +428,6 @@ public class OAIRequestHandler extends RequestHandlerBase {
     }
 
     public String getVersion() {
-        return "$7.x-1.0 $";
+        return "$8.x-1.0 $";
     }
 }
