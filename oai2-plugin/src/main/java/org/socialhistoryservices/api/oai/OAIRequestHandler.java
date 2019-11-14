@@ -423,13 +423,11 @@ public class OAIRequestHandler extends RequestHandlerBase {
         return "An OAI2 request handler";
     }
 
-    @Override
     public String getSource() {
         return "$URL: https://github.com/IISH/oai4solr $";
     }
 
-    @Override
     public String getVersion() {
-        return "$6.x-1.0 $";
+        return "$7.x-1.0 $";
     }
 }
