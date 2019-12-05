@@ -60,7 +60,7 @@ class ResumptionToken extends RequestType {
      * Parses a ResumptionTokenType instance into a base 64 encoded string. This string will serve as the
      * resumption token.
      */
-    static ResumptionTokenType encodeResumptionToken(int prefix, ResumptionToken oaiResumptionToken, int cursor, int nextCursor, int matches, int resumptionTokenExpirationInSeconds) throws UnsupportedEncodingException {
+    static ResumptionTokenType encodeResumptionToken(int prefix, ResumptionToken oaiResumptionToken, int cursor, int nextCursor, long matches, int resumptionTokenExpirationInSeconds) throws UnsupportedEncodingException {
 
         final ResumptionTokenType resumptionToken = new ResumptionTokenType();
         resumptionToken.setCursor(BigInteger.valueOf(cursor));
