@@ -74,7 +74,7 @@ limitations under the License.
     </developers>
 
     <properties>
-        <solr.version>8.0.0</solr.version>
+        <solr.version>8.3.0</solr.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
