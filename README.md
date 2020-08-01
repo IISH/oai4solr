@@ -1,7 +1,7 @@
 # This is a OAI2 library plugin for Solr
 
 ## What is it ?
-A plugin that exposes your Solr 6.x indexes with the OAI2 protocol.
+A plugin that exposes your Solr 8.x indexes with the OAI2 protocol.
 
 ## How it works
 You can use simple xslt documents to map the raw Solr XML response into the oai_dc metadata format; and any other
@@ -42,7 +42,7 @@ The oai folder can be placed in each core; or higher up in de solr_home director
         oai_dc.xsl
         solr.xsl
     -lib
-        oai2-plugin-6.1.jar
+        oai2-plugin-8.1.jar
 
 then the setting ought to be
 
@@ -418,7 +418,7 @@ Place the libraries in the class path, i.e.
 
 ../webapps/solr/WEB-INF/lib
 
-or /tomcat6/lib
+or /tomcat8/lib
 
 or the web-container-classpath-of-your-choice equivalent.
 
@@ -431,13 +431,13 @@ The -Dsolr.solr.home VM property may need to be set manually if the unit tests c
 
     $ mvn -Dsolr.solr.home=[absolute path to oai4solr/solr] clean package
 
-The end result is a package in ./oai2-plugin/target/oai2-plugin-6.x-1.0.jar ( or your maven local repository if you used 'install').
+The end result is a package in ./oai2-plugin/target/oai2-plugin-8.x-1.0.jar ( or your maven local repository if you used 'install').
 
 ## Download
 You can also download the latest build from https://bamboo.socialhistoryservices.org/browse/OAI4SOLR-OAI4SOLR/latest from the artifacts tab.
 
 ## Install
-Place oai2-plugin-6.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
+Place oai2-plugin-8.x-1.0.jar in the designated "lib", "contrib" folder of your Solr application. Or add a symbolic link in the "lib"
 that points to the jar. For example:
 
     <lib dir="${solr.install.dir:../../../..}/contrib/oai" />
@@ -445,7 +445,7 @@ that points to the jar. For example:
 ## Runable demo
 Once the project is build, a demo is available. It contains an embedded Solr Jetty server. If you start it, it will load MarcXML test records.
 
-Copy the oai2-plugin-6.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
+Copy the oai2-plugin-8.x-1.0.jar into the demo/solr/lib folder. Or place a symbolic link to it. The
 directory structure should look like this:
 
     ----
@@ -456,11 +456,11 @@ directory structure should look like this:
                 +oai
             +docs
             -lib
-                oai2-plugin-6.1.jar
+                oai2-plugin-8.1.jar
 
 Start the demo with:
 
-    java -jar demo/target/demo-6.1.jar
+    java -jar demo/target/demo-8.1.jar
 
 Then explore the test OAI2 repository with your request to it, e.g.
 

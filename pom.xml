@@ -63,7 +63,7 @@ limitations under the License.
 
     <organization>
         <name>International Institute of Social History</name>
-        <url>www.socialhistory.org</url>
+        <url>iisg.amsterdam</url>
     </organization>
 
     <developers>
@@ -74,7 +74,7 @@ limitations under the License.
     </developers>
 
     <properties>
-        <solr.version>8.0.0</solr.version>
+        <solr.version>8.4.1</solr.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

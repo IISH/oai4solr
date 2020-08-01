@@ -40,9 +40,9 @@ import java.util.Map;
  * <p/>
  * Therefore we override that normalization step here and chain the two class instances.
  *
- * Furthermore we add some helper methods for unmarchall and lookup actions.
+ * Furthermore we add some helper methods for unmarshall and lookup actions.
  */
-public class EmbeddedServer extends EmbeddedSolrServer2 {
+final public class EmbeddedServer extends EmbeddedSolrServer2 {
 
     private final Log log = LogFactory.getLog(this.getClass());
 

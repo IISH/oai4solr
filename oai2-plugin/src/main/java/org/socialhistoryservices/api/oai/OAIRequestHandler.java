@@ -46,7 +46,6 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -389,12 +388,9 @@ public class OAIRequestHandler extends RequestHandlerBase {
 
     private void addStylesheets(File oai_home) {
 
-        for (File file : oai_home.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                String name = file.getName().toLowerCase();
-                return !name.equals("oai.xsl") && (name.endsWith(".xsl") || name.endsWith(".xslt"));
-            }
+        for (File file : oai_home.listFiles(file -> {
+            final String name = file.getName().toLowerCase();
+            return !name.equals("oai.xsl") && (name.endsWith(".xsl") || name.endsWith(".xslt"));
         })) {
 
                 final TransformerFactory tf = TransformerFactory.newInstance();
