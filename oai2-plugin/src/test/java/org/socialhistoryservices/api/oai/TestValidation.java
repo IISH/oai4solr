@@ -28,31 +28,31 @@ public class TestValidation extends TestCase {
         oaiRequest.setIdentifier(null);
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla:");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla:valid");

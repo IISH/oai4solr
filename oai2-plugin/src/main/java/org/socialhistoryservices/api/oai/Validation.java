@@ -64,10 +64,12 @@ class Validation {
 
         final String identifier = oaiRequest.getIdentifier();
         if (identifier == null)
-            return error(response, OAIPMHerrorcodeType.ID_DOES_NOT_EXIST);
+            return error(response, "Missing identifier!", OAIPMHerrorcodeType.BAD_ARGUMENT);
 
         String[] split = identifier.split(":", 3);
-        return (split.length == 3 && split[0].equals("oai") && split[2].length() != 0) || error(response, OAIPMHerrorcodeType.ID_DOES_NOT_EXIST);
+        boolean isValid = split.length == 3 && split[0].equals("oai") && split[2].length() != 0;
+
+        return isValid || error(response, "Invalid identifier format!", OAIPMHerrorcodeType.BAD_ARGUMENT);
     }
 
     /**
