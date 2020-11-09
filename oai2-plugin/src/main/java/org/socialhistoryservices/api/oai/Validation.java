@@ -110,7 +110,7 @@ class Validation {
 
         final String metadataPrefix = oaiRequest.getMetadataPrefix();
         if (metadataPrefix == null) {
-            return error(response, OAIPMHerrorcodeType.NO_METADATA_FORMATS);
+            return error(response, "Missing metadata prefix!", OAIPMHerrorcodeType.BAD_ARGUMENT);
         }
 
         final OAIPMHtype oaipmHtype = Parameters.getParam(prefix, VerbType.LIST_METADATA_FORMATS);

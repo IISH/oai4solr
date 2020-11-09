@@ -101,7 +101,7 @@ public class TestValidation extends TestCase {
         oaiRequest.setMetadataPrefix(null);
         assertFalse(Validation.isValidMetadataPrefix(0, response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.NO_METADATA_FORMATS, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         ListMetadataFormatsType listMetadataFormatsType = new ListMetadataFormatsType();
