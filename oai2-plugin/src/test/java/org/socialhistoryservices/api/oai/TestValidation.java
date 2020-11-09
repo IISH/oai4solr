@@ -212,8 +212,8 @@ public class TestValidation extends TestCase {
         IdentifyType identify = new IdentifyType();
         oaiForIdentify.setIdentify(identify);
         Parameters.setParam(VerbType.IDENTIFY, oaiForIdentify);
-        identify.setGranularity(GranularityType.YYYY_MM_DD);
 
+        identify.setGranularity(GranularityType.YYYY_MM_DD);
         assertTrue(Validation.isValidFromUntilCombination(null, null, response));
         assertTrue(Validation.isValidFromUntilCombination("some from date", null, response));
         assertTrue(Validation.isValidFromUntilCombination(null, "some until date", response));
@@ -223,6 +223,8 @@ public class TestValidation extends TestCase {
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
         assertTrue(Validation.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:06Z", response));
         assertFalse(Validation.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:05Z", response));
+
+        assertFalse(Validation.isValidFromUntilCombination("2012-02-03", "2012-02-03T04:05:05Z", response));
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());

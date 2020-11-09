@@ -167,14 +167,25 @@ class Validation {
      * isValidFromUntilCombination
      * <p/>
      * Check if the from parameter is not behind the until.
+     * Also check parameters granularity.
      *
      * @param from  The from datestamp
      * @param until The until datestamp
-     * @return True if from <= until
+     * @return True if the datetime granularity is the same and if from <= until
      */
     static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
+        boolean allParamsExist = from != null && until != null;
+        if (!allParamsExist) return true;  // one parameter may be missing, but it's ok
 
-        return (from == null || until == null || Parsing.parseDatestamp(from).getTime() <= Parsing.parseDatestamp(until).getTime()) || error(response, "Bad date values, must have from<=until", OAIPMHerrorcodeType.BAD_ARGUMENT);
+        boolean sameGranularity = from.length() == until.length();
+        if (!sameGranularity)
+            return error(response, "Date values must have the same granularity!", OAIPMHerrorcodeType.BAD_ARGUMENT);
+
+        boolean untilAhead = Parsing.parseDatestamp(from).getTime() <= Parsing.parseDatestamp(until).getTime();
+        if (!untilAhead)
+            return error(response, "Bad date values, must have from<=until", OAIPMHerrorcodeType.BAD_ARGUMENT);
+
+        return true;
     }
 
 }
