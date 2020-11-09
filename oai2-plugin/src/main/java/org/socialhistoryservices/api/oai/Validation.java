@@ -95,7 +95,7 @@ class Validation {
      */
     static boolean hasMatchingRecords(SolrQueryResponse response, int recordCount) {
 
-        return recordCount != 0 || error(response, OAIPMHerrorcodeType.NO_RECORDS_MATCH);
+        return recordCount != 0 || error(response, "No records for given combination of parameters!", OAIPMHerrorcodeType.NO_RECORDS_MATCH);
     }
 
     /**
@@ -174,6 +174,7 @@ class Validation {
      * @return True if the datetime granularity is the same and if from <= until
      */
     static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
+
         boolean allParamsExist = from != null && until != null;
         if (!allParamsExist) return true;  // one parameter may be missing, but it's ok
 
