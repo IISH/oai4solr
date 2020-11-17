@@ -64,10 +64,12 @@ class Validation {
 
         final String identifier = oaiRequest.getIdentifier();
         if (identifier == null)
-            return error(response, OAIPMHerrorcodeType.ID_DOES_NOT_EXIST);
+            return error(response, "Missing identifier!", OAIPMHerrorcodeType.BAD_ARGUMENT);
 
         String[] split = identifier.split(":", 3);
-        return (split.length == 3 && split[0].equals("oai") && split[2].length() != 0) || error(response, OAIPMHerrorcodeType.ID_DOES_NOT_EXIST);
+        boolean isValid = split.length == 3 && split[0].equals("oai") && split[2].length() != 0;
+
+        return isValid || error(response, "Invalid identifier format!", OAIPMHerrorcodeType.BAD_ARGUMENT);
     }
 
     /**
@@ -93,7 +95,7 @@ class Validation {
      */
     static boolean hasMatchingRecords(SolrQueryResponse response, int recordCount) {
 
-        return recordCount != 0 || error(response, OAIPMHerrorcodeType.NO_RECORDS_MATCH);
+        return recordCount != 0 || error(response, "No records for given combination of parameters!", OAIPMHerrorcodeType.NO_RECORDS_MATCH);
     }
 
     /**
@@ -108,7 +110,7 @@ class Validation {
 
         final String metadataPrefix = oaiRequest.getMetadataPrefix();
         if (metadataPrefix == null) {
-            return error(response, OAIPMHerrorcodeType.NO_METADATA_FORMATS);
+            return error(response, "Missing metadata prefix!", OAIPMHerrorcodeType.BAD_ARGUMENT);
         }
 
         final OAIPMHtype oaipmHtype = Parameters.getParam(prefix, VerbType.LIST_METADATA_FORMATS);
@@ -165,14 +167,26 @@ class Validation {
      * isValidFromUntilCombination
      * <p/>
      * Check if the from parameter is not behind the until.
+     * Also check parameters granularity.
      *
      * @param from  The from datestamp
      * @param until The until datestamp
-     * @return True if from <= until
+     * @return True if the datetime granularity is the same and if from <= until
      */
     static boolean isValidFromUntilCombination(String from, String until, SolrQueryResponse response) throws ParseException {
 
-        return (from == null || until == null || Parsing.parseDatestamp(from).getTime() <= Parsing.parseDatestamp(until).getTime()) || error(response, "Bad date values, must have from<=until", OAIPMHerrorcodeType.BAD_ARGUMENT);
+        boolean allParamsExist = from != null && until != null;
+        if (!allParamsExist) return true;  // one parameter may be missing, but it's ok
+
+        boolean sameGranularity = from.length() == until.length();
+        if (!sameGranularity)
+            return error(response, "Date values must have the same granularity!", OAIPMHerrorcodeType.BAD_ARGUMENT);
+
+        boolean untilAhead = Parsing.parseDatestamp(from).getTime() <= Parsing.parseDatestamp(until).getTime();
+        if (!untilAhead)
+            return error(response, "Bad date values, must have from<=until", OAIPMHerrorcodeType.BAD_ARGUMENT);
+
+        return true;
     }
 
 }

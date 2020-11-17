@@ -28,31 +28,31 @@ public class TestValidation extends TestCase {
         oaiRequest.setIdentifier(null);
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla:");
         assertFalse(Validation.isValidIdentifier(response, oaiRequest));
         oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.ID_DOES_NOT_EXIST, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         oaiRequest.setIdentifier("oai:bla:valid");
@@ -101,7 +101,7 @@ public class TestValidation extends TestCase {
         oaiRequest.setMetadataPrefix(null);
         assertFalse(Validation.isValidMetadataPrefix(0, response, oaiRequest));
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
-        assertEquals(OAIPMHerrorcodeType.NO_METADATA_FORMATS, oai.getError().get(0).getCode());
+        assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
         oai.getError().clear();
 
         ListMetadataFormatsType listMetadataFormatsType = new ListMetadataFormatsType();
@@ -212,8 +212,8 @@ public class TestValidation extends TestCase {
         IdentifyType identify = new IdentifyType();
         oaiForIdentify.setIdentify(identify);
         Parameters.setParam(VerbType.IDENTIFY, oaiForIdentify);
-        identify.setGranularity(GranularityType.YYYY_MM_DD);
 
+        identify.setGranularity(GranularityType.YYYY_MM_DD);
         assertTrue(Validation.isValidFromUntilCombination(null, null, response));
         assertTrue(Validation.isValidFromUntilCombination("some from date", null, response));
         assertTrue(Validation.isValidFromUntilCombination(null, "some until date", response));
@@ -223,6 +223,8 @@ public class TestValidation extends TestCase {
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
         assertTrue(Validation.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:06Z", response));
         assertFalse(Validation.isValidFromUntilCombination("2012-02-03T04:05:06Z", "2012-02-03T04:05:05Z", response));
+
+        assertFalse(Validation.isValidFromUntilCombination("2012-02-03", "2012-02-03T04:05:05Z", response));
 
         OAIPMHtype oai = (OAIPMHtype) response.getValues().get("oai");
         assertEquals(OAIPMHerrorcodeType.BAD_ARGUMENT, oai.getError().get(0).getCode());
