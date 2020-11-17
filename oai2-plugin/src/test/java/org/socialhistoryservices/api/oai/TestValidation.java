@@ -157,12 +157,12 @@ public class TestValidation extends TestCase {
         assertEquals("*", Parsing.parseRange(null, "from"));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD);
-        assertEquals("2012-02-03T00:00:00Z", Parsing.parseRange("2012-02-03", "from"));
-        assertEquals("2012-02-03T23:59:59Z", Parsing.parseRange("2012-02-03", "until"));
+        assertEquals("2012-02-03T00:00:00.000Z", Parsing.parseRange("2012-02-03", "from"));
+        assertEquals("2012-02-03T23:59:59.999Z", Parsing.parseRange("2012-02-03", "until"));
 
         identify.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
-        assertEquals("2012-02-03T04:05:06Z", Parsing.parseRange("2012-02-03T04:05:06Z", "from"));
-        assertEquals("2012-02-03T04:05:06Z", Parsing.parseRange("2012-02-03T04:05:06Z", "until"));
+        assertEquals("2012-02-03T04:05:06.000Z", Parsing.parseRange("2012-02-03T04:05:06Z", "from"));
+        assertEquals("2012-02-03T04:05:06.999Z", Parsing.parseRange("2012-02-03T04:05:06Z", "until"));
     }
 
     public void testIsValidDatestampRange() {
